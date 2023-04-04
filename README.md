@@ -2,7 +2,8 @@
 A YouTube Downloader using PySide6 and yt-dlp
 
 ## GUI
-[![Startpage](https://raw.githubusercontent.com/JJSS-Johannes/YT-Downloader/main/.github/Download.png)](#readme)
+[![Startpage](https://raw.githubusercontent.com/JJSS-Johannes/YT-Downloader/main/.github/Startpage.png)](#readme)
+[![Download-Tab](https://raw.githubusercontent.com/JJSS-Johannes/YT-Downloader/main/.github/Download.png)](#readme)
 
 ## FFmpeg is required for full funcionality:
 - If FFmpeg is under this path "C:/FFmpeg/bin" everything is ok
