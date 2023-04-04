@@ -15,3 +15,6 @@ A YouTube Downloader using PySide6 and yt-dlp
 - Select the Format (Supported: MP3, MP4)
 - If you selected mp4 and the url is a video not a playlist you can select the resolution of the video
 - If you have selected your download location (Default: Downloads) you can click on "Download"
+
+## Credits:
+- Some of the icons used in this project are from [Freepik](https://www.freepik.com/)
