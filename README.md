@@ -1,7 +1,7 @@
 # YT-Downloader
 A YouTube Downloader using PySide6 and yt-dlp
 
-## GUI
+## GUI:
 [![Startpage](https://raw.githubusercontent.com/JJSS-Johannes/YT-Downloader/main/.github/Startpage.png)](#readme)
 [![Download-Tab](https://raw.githubusercontent.com/JJSS-Johannes/YT-Downloader/main/.github/Download.png)](#readme)
 
@@ -10,7 +10,7 @@ A YouTube Downloader using PySide6 and yt-dlp
 - Otherwise Replace the ffmpeg_path argument in the config.ini with your path to ffmpeg/bin
 - Use "/" not "\"
 
-## How to use:
+## Usage/How to use:
 - Download the latest release
 - Unzip it
 - Execute the .exe file
