@@ -1,0 +1,176 @@
+* {
+	font-family: Calibri;
+	color: white;
+	font-size: 25px;
+	outline: none;
+	background-color:  #323C5A;
+}
+
+QFrame#sidebar, QFrame#topbar, QFrame#topframe, QFrame#frame_2, QFrame#sb_top_frame {
+	background-color: #2A2D43;
+}
+
+QWidget#page_1, QWidget#page_2, QWidget#page_3 {
+	background-color: #323C5A;
+	text-align: center;
+}
+
+QPushButton {
+	background-color: #2A2D43;
+	border: 0;
+	text-align: left;
+	padding-left: 20;
+}
+
+QPushButton:hover, QPushButton:checked {
+	background-color: #414361;
+}
+
+QPushButton:checked {
+	border-right: 3px solid white;
+}
+
+QLineEdit#url_entry, QLabel#image_label, QLabel#top_label {
+	background-color: #2A2D43;
+	border: 3px solid white;
+	border-radius: 5px;
+}
+
+QPushButton#side_btn_out {
+	text-align: left;
+}
+
+QComboBox {
+	border: 1px solid white;
+	border-radius: 5px;
+	padding-left: 10px;
+	background-color: #2A2D43;
+}
+
+QComboBox:hover{
+	background-color: #414361;
+}
+
+QComboBox:disabled {
+	color: #414361;
+	border: 1px solid #414361;
+}
+
+QComboBox::down-arrow:disabled {
+	image: none;
+}
+
+QListView {
+	background-color: #323C5A;
+	padding: 5px;
+	
+}
+
+QComboBox:drop-down {
+	border: 0px;
+}
+
+QComboBox:down-arrow {
+	image: url(appdata/images/dropdownarrow.png);
+	width: 12px;
+	height: 12px;
+	margin-right: 10px;
+}
+
+QListView:item {
+	border-radius: 6px;
+}
+
+QListView::item:hover, QListView::item:selected {
+	background-color: #2A2D43;
+	border: 2px solid #414361;
+}
+
+QProgressBar#progressbar{
+    border: 2px solid white;
+    text-align: center;
+	background-color: #323C5A;
+}
+
+QProgressBar::chunk#progressbar {
+    background-color: #2A2D43;
+    width: 10px;
+}
+
+QPushButton#change_location_btn,
+QPushButton#show_folder_btn,
+QPushButton#url_search_btn,
+QPushButton#change_ffmpeg_path_btn,
+QPushButton#download_ffmpeg_btn,
+QPushButton#next_page_btn,
+QPushButton#last_page_btn,
+QPushButton#download_button {
+	padding-right: 20px;
+	border: 2px solid white;
+	border-radius: 5px;
+	text-align: center;
+}
+
+QPushButton:pressed#change_location_btn,
+QPushButton:pressed#show_folder_btn,
+QPushButton:pressed#url_search_btn,
+QPushButton:pressed#change_ffmpeg_path_btn,
+QPushButton:pressed#download_ffmpeg_btn,
+QPushButton:pressed#next_page_btn,
+QPushButton:pressed#last_page_btn,
+QPushButton:pressed#download_button {
+	background-color: #515670;
+}
+
+QPushButton:hover:!pressed#change_location_btn,
+QPushButton:hover:!pressed#show_folder_btn,
+QPushButton:hover:!pressed#url_search_btn,
+QPushButton:hover:!pressed#change_ffmpeg_path_btn,
+QPushButton:hover:!pressed#download_ffmpeg_btn,
+QPushButton:hover:!pressed#next_page_btn,
+QPushButton:hover:!pressed#last_page_btn,
+QPushButton:hover:!pressed#download_button {
+	background-color: #3f435a;
+}
+
+QMessageBox, QProgressDialog {
+	background-color: #323C5A;
+}
+
+QMessageBox QPushButton, QProgressDialog QPushButton{
+	padding-right: 20px;
+	border: 2px solid white;
+	border-radius: 5px;
+}
+
+QLabel {
+	qproperty-alignment: AlignCenter;
+}
+
+QSlider {
+	background-color: none;
+	min-height: 20px;
+}
+
+QSlider::handle {
+	background: white;
+	height: 20px;
+	width: 20px;
+	border-radius: 10px;
+}
+
+QSlider::groove:horizontal {
+	background: #414361;
+	height: 20px;
+	border-radius: 10px;
+}
+
+SliderLabel {
+	margin-bottom: 3px;
+	min-width: 30px;
+	min-height: 20px;
+}
+
+QRangeSlider {
+    qproperty-barColor: #2A2D43;
+}
