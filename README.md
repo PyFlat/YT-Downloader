@@ -14,6 +14,21 @@ YOUTUBE DOWNLOADER
 
 # Usage:
 - Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
+- Paste a video or playlist url into the entry
+- Wait until the downloader has loaded the information
+- Video:
+  - Select the output format (mp3, mp4)
+  - Choose the resolution if you want to download mp4
+  - Select the output folder, this is by default the /Download folder
+  - Press Download and wait until you see the button again, then you can download more videos or another format
+- Playlist:
+  - Choose which range of the playlist should be downloaded
+  - Click on next
+  - Select the output format (mp3, mp4)
+  - Select the output folder, this is by default the /Download folder
+  - Press Download and wait until you see the button again, then you can download more videos or another format
+
+- The download speed depends on the internet connection and the length and quality of the video!
 
 # Showcase:
 ## Start
