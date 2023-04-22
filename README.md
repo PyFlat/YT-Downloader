@@ -1,4 +1,3 @@
-
 * [INSTALLATION](#installation)
 * [USAGE](#usage)
 * [SHOWCASE](#showcase)
