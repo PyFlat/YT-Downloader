@@ -1,3 +1,7 @@
+<div align="center">
+YOUTUBE DOWNLOADER
+</div>
+
 * [INSTALLATION](#installation)
 * [USAGE](#usage)
 * [SHOWCASE](#showcase)
@@ -9,7 +13,7 @@
 - Execute the .exe file
 
 # Usage:
-- 
+- Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
 
 # Showcase:
 ## Start
