@@ -917,11 +917,14 @@ class Downloader():
             self.win.search_labels[i].setPixmap(pixmap)
             self.win.search_labels[i].mousePressEvent = lambda ev, x=entrie["url"],y =entrie["channel"],z=entrie["title"]: self.custom_event(ev,x,y,z)
 
-    def custom_event(self, event, idx, channel, title):
+    def custom_event(self, event, url, channel, title):
         if event.button() == Qt.LeftButton:
-            self.load_video(idx)
+            self.load_video(url)
         elif event.button() == Qt.RightButton:
-            self.yes_no_messagebox(f"Uploader: {channel}\nTitle: {title}", QMessageBox.Information, "Video", QMessageBox.Ok)
+            self.yes_no_messagebox(f"""<p style="font-weight: bold;">Uploader:</p> {channel}
+                                    <p style="font-weight: bold;">Title:</p> {title}
+                                    <p style="font-weight: bold;">URL:</p> 
+                                    <a style="color: white; font-weight: bold;" href='{url}'>{url}</a>""", QMessageBox.Information, "Video", QMessageBox.Ok)
 
     def fill_new_widgs(self):
         if self.win.ui.scrollArea.verticalScrollBar().value() == self.win.ui.scrollArea.verticalScrollBar().maximum():
@@ -1143,7 +1146,8 @@ class Downloader():
             self.yes_no_messagebox(f"""Current version: {VERSION} <br> 
                                         New version: {tag} <br> 
                                         Download the latest version here: <br>
-                                        <a href='https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest'>PyFlat Youtube Downloader</a>""", 
+                                        <a style="color: white; font-weight: bold;" 
+                                        href='https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest'>PyFlat Youtube Downloader</a>""", 
                                         QMessageBox.Information, "Update found", QMessageBox.Ok)
         elif not update_available and tag == "no_connection":
             self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
