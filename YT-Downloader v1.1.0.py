@@ -1,23 +1,39 @@
-import threading, datetime, re, os, configparser,sys,subprocess, requests, shutil, wget
+import threading, datetime, re, os, configparser, sys, shutil, wget
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
-from superqt import QLabeledRangeSlider #https://pyapp-kit.github.io/superqt/widgets/qlabeledrangeslider/
+from superqt import QLabeledRangeSlider
 from urllib.request import urlopen
+from urllib.error import URLError
 from zipfile import ZipFile
 
 #MainWindow.setStyleSheet(open(get_abs_path("appdata/style.qss"), "r").read())
 #self.playlist_range_slider.setOrientation(Qt.Orientation.Horizontal)
 #https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
+
+VERSION = "1.1.0"
+
 class loggerout:
     def error(msg):
-        print(msg)
+        pass
     def warning(msg):
-        print(msg)
+        pass
     def debug(msg):
         pass
+
+class SLabel(QLabel):
+    def __init__(self, *args, **kwargs):
+        QLabel.__init__(self, *args, **kwargs)
+    def enterEvent(self, event):
+        self.geo = self.geometry()
+        self.geo2 = self.geo.adjusted(-10,-10,10,10)
+        self.raise_()
+        self.setGeometry(self.geo2)
+    def leaveEvent(self, event):
+        if self.geometry() == self.geo2:
+            self.setGeometry(self.geo)
 
 def get_abs_path(relative_path):
     base_path = getattr(sys,'_MEIPASS',os.path.dirname(os.path.abspath(__file__)))
@@ -32,11 +48,10 @@ class MainWindow(QMainWindow):
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.top_label.hide()
         self.ui.download_btn.setEnabled(False)
-        self.ui.url_search_btn.setVisible(False)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
-        self.timer.setInterval(300)
+        self.timer.setInterval(750)
 
         self.timer2 = QTimer()
         self.timer2.setSingleShot(True)
@@ -46,6 +61,9 @@ class MainWindow(QMainWindow):
         self.threadpool = QThreadPool()
 
         self.ui.search_btn.setChecked(True)
+
+        self.search_page()
+
         self.show()
 
     def bind_keys(self):
@@ -76,17 +94,7 @@ class MainWindow(QMainWindow):
     def setWidg2Value(self, max: int, min:int):
         self.ui.playlist_range_slider.setValue((max, min))
 
-    @Slot(bool)
-    def import_yt_dlp(self, t):
-        global YoutubeDL, DownloadError
-        try:
-            from appdata.yt_dlp import YoutubeDL
-            from appdata.yt_dlp.utils import DownloadError
-        except ImportError:
-            sys.path.insert(0, get_abs_path("appdata/"))
-            from yt_dlp import YoutubeDL
-            from yt_dlp.utils import DownloadError
-            
+
     def invokeFunc(self, widget, func, connection, arg):
         QMetaObject.invokeMethod(widget, func, connection, arg)
 
@@ -96,15 +104,64 @@ class MainWindow(QMainWindow):
     def connect_wid(self, widget ,func):
         widget.connect(lambda: func())
 
+    def search_page(self):
+        self.search_labels = []
+        self.column = 0
+        for j in range(0,10):
+            for i in range(0,3):
+                label = SLabel(self.ui.scrollAreaWidgetContents)
+                label.setMinimumSize(QSize(300, 169))
+                label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                label.setWindowFlags(label.windowFlags() | Qt.WindowStaysOnTopHint) 
+                label.setObjectName("search_labels")
+                label.setScaledContents(True)
+                t = QSizePolicy()
+                t.setRetainSizeWhenHidden(True)
+                label.setSizePolicy(t)
+                self.search_labels.append(label)
+                self.ui.gridLayout_2.addWidget(label, j, i)
+            self.column += 1
+    
+    def create_more_widg(self):
+        if self.ui.scrollArea.verticalScrollBar().value() == self.ui.scrollArea.verticalScrollBar().maximum():
+            for j in range(0,10):
+                for i in range(0,3):
+                    label = SLabel(self.ui.scrollAreaWidgetContents)
+                    label.setMinimumSize(QSize(300, 169))
+                    label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    label.setWindowFlags(label.windowFlags() | Qt.WindowStaysOnTopHint) 
+                    label.setObjectName("search_labels")
+                    label.setScaledContents(True)
+                    t = QSizePolicy()
+                    t.setRetainSizeWhenHidden(True)
+                    label.setSizePolicy(t)
+                    label.adjustSize()
+                    self.search_labels.append(label)
+                    self.ui.gridLayout_2.addWidget(label, j+self.column, i)
+                self.column += 1
+    def paintEvent(self, event: QPaintEvent):
+        self.ui.scrollArea.setMinimumHeight(self.geometry().height()-175)
+        return super().paintEvent(event)
+
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1100, 550)
-        MainWindow.setMinimumSize(QSize(1100, 550))
+        MainWindow.resize(1150, 550)
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        MainWindow.setMinimumSize(QSize(1150, 550))
+        MainWindow.setMaximumSize(QSize(16777215, 16777215))
         MainWindow.setStyleSheet(open(get_abs_path("appdata/style.qss"), "r").read())
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.centralwidget.setSizePolicy(sizePolicy)
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setContentsMargins(10, 10, 10, 10)
@@ -153,6 +210,8 @@ class Ui_MainWindow(object):
 
         self.main_frame = QFrame(self.centralwidget)
         self.main_frame.setObjectName(u"main_frame")
+        sizePolicy.setHeightForWidth(self.main_frame.sizePolicy().hasHeightForWidth())
+        self.main_frame.setSizePolicy(sizePolicy)
         self.main_frame.setFrameShape(QFrame.NoFrame)
         self.main_frame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.main_frame)
@@ -246,6 +305,8 @@ class Ui_MainWindow(object):
 
         self.frame_5 = QFrame(self.main_frame)
         self.frame_5.setObjectName(u"frame_5")
+        sizePolicy.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
+        self.frame_5.setSizePolicy(sizePolicy)
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_3 = QHBoxLayout(self.frame_5)
@@ -255,8 +316,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.mainpages = QStackedWidget(self.frame_5)
         self.mainpages.setObjectName(u"mainpages")
+        sizePolicy.setHeightForWidth(self.mainpages.sizePolicy().hasHeightForWidth())
+        self.mainpages.setSizePolicy(sizePolicy)
         self.mpage1 = QWidget()
         self.mpage1.setObjectName(u"mpage1")
+        sizePolicy.setHeightForWidth(self.mpage1.sizePolicy().hasHeightForWidth())
+        self.mpage1.setSizePolicy(sizePolicy)
         self.verticalLayout_9 = QVBoxLayout(self.mpage1)
         self.verticalLayout_9.setSpacing(0)
         self.verticalLayout_9.setContentsMargins(10, 10, 10, 10)
@@ -264,28 +329,28 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.frame = QFrame(self.mpage1)
         self.frame.setObjectName(u"frame")
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame)
         self.gridLayout.setSpacing(10)
         self.gridLayout.setContentsMargins(10, 10, 10, 10)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setSizeConstraint(QLayout.SetNoConstraint)
         self.gridLayout.setHorizontalSpacing(15)
         self.gridLayout.setVerticalSpacing(25)
-        self.gridLayout.setContentsMargins(25, 25, 25, 0)
+        self.gridLayout.setContentsMargins(25, 25, 25, 25)
         self.url_entry = QLineEdit(self.frame)
         self.url_entry.setObjectName(u"url_entry")
         self.url_entry.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.url_entry, 0, 0, 1, 1)
 
-        self.url_search_btn = QPushButton(self.frame)
-        self.url_search_btn.setObjectName(u"url_search_btn")
-
-        self.gridLayout.addWidget(self.url_search_btn, 0, 1, 1, 1)
-
         self.search_stack_widg = QStackedWidget(self.frame)
         self.search_stack_widg.setObjectName(u"search_stack_widg")
+        sizePolicy.setHeightForWidth(self.search_stack_widg.sizePolicy().hasHeightForWidth())
+        self.search_stack_widg.setSizePolicy(sizePolicy)
         self.page = QWidget()
         self.page.setObjectName(u"page")
         self.verticalLayout_10 = QVBoxLayout(self.page)
@@ -295,42 +360,47 @@ class Ui_MainWindow(object):
         self.info_start_label = QLabel(self.page)
         self.info_start_label.setObjectName(u"info_start_label")
         self.info_start_label.setAlignment(Qt.AlignCenter)
+        self.info_start_label.setWordWrap(False)
 
         self.verticalLayout_10.addWidget(self.info_start_label, 0, Qt.AlignHCenter|Qt.AlignTop)
 
         self.search_stack_widg.addWidget(self.page)
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
+        sizePolicy.setHeightForWidth(self.page_2.sizePolicy().hasHeightForWidth())
+        self.page_2.setSizePolicy(sizePolicy)
+        self.page_2.setMinimumSize(QSize(0, 0))
         self.verticalLayout_12 = QVBoxLayout(self.page_2)
-        self.verticalLayout_12.setSpacing(10)
+        self.verticalLayout_12.setSpacing(0)
         self.verticalLayout_12.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
         self.scrollArea = QScrollArea(self.page_2)
         self.scrollArea.setObjectName(u"scrollArea")
+        sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
+        self.scrollArea.setSizePolicy(sizePolicy)
+        self.scrollArea.setMinimumSize(QSize(0, 375))
+        self.scrollArea.setMaximumSize(QSize(16777215, 16777215))
         self.scrollArea.setFrameShape(QFrame.NoFrame)
-        self.scrollArea.setFrameShadow(QFrame.Plain)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 814, 1500))
-        self.verticalLayout_13 = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_13.setSpacing(0)
-        self.verticalLayout_13.setContentsMargins(10, 10, 10, 10)
-        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
-        self.verticalLayout_13.setContentsMargins(0, 0, 0, 0)
-        self.widget = QWidget(self.scrollAreaWidgetContents)
-        self.widget.setObjectName(u"widget")
-        self.widget.setMinimumSize(QSize(0, 1500))
-        self.gridLayout_2 = QGridLayout(self.widget)
-        self.gridLayout_2.setSpacing(10)
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1026, 375))
+        sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents.sizePolicy().hasHeightForWidth())
+        self.scrollAreaWidgetContents.setSizePolicy(sizePolicy)
+        self.scrollAreaWidgetContents.setMinimumSize(QSize(0, 0))
+        self.gridLayout_2 = QGridLayout(self.scrollAreaWidgetContents)
+        self.gridLayout_2.setSpacing(5)
         self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-
-        self.verticalLayout_13.addWidget(self.widget)
-
+        self.gridLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
+        self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
-        self.verticalLayout_12.addWidget(self.scrollArea)
+        self.verticalLayout_12.addWidget(self.scrollArea, 0, Qt.AlignTop)
 
         self.search_stack_widg.addWidget(self.page_2)
 
@@ -368,11 +438,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.setContentsMargins(0, 10, 0, 0)
         self.image_label = QLabel(self.image_frame)
         self.image_label.setObjectName(u"image_label")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.image_label.sizePolicy().hasHeightForWidth())
-        self.image_label.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.image_label.sizePolicy().hasHeightForWidth())
+        self.image_label.setSizePolicy(sizePolicy1)
         self.image_label.setMinimumSize(QSize(480, 270))
         self.image_label.setMaximumSize(QSize(480, 270))
         self.image_label.setAlignment(Qt.AlignCenter)
@@ -501,8 +571,8 @@ class Ui_MainWindow(object):
 
         self.progressbar = QProgressBar(self.progress_frame)
         self.progressbar.setObjectName(u"progressbar")
-        sizePolicy.setHeightForWidth(self.progressbar.sizePolicy().hasHeightForWidth())
-        self.progressbar.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.progressbar.sizePolicy().hasHeightForWidth())
+        self.progressbar.setSizePolicy(sizePolicy1)
         self.progressbar.setMinimumSize(QSize(250, 0))
         self.progressbar.setValue(0)
         self.progressbar.setTextVisible(True)
@@ -530,11 +600,8 @@ class Ui_MainWindow(object):
         self.playlist_range_slider = QLabeledRangeSlider(self.download_bar_page3)
         self.playlist_range_slider.setObjectName(u"playlist_range_slider")
         self.playlist_range_slider.setOrientation(Qt.Orientation.Horizontal)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.playlist_range_slider.sizePolicy().hasHeightForWidth())
-        self.playlist_range_slider.setSizePolicy(sizePolicy1)
+        sizePolicy.setHeightForWidth(self.playlist_range_slider.sizePolicy().hasHeightForWidth())
+        self.playlist_range_slider.setSizePolicy(sizePolicy)
         self.playlist_range_slider.setMinimumSize(QSize(0, 81))
 
         self.verticalLayout_14.addWidget(self.playlist_range_slider)
@@ -552,37 +619,49 @@ class Ui_MainWindow(object):
         self.mpage3 = QWidget()
         self.mpage3.setObjectName(u"mpage3")
         self.verticalLayout_11 = QVBoxLayout(self.mpage3)
-        self.verticalLayout_11.setSpacing(10)
+        self.verticalLayout_11.setSpacing(0)
         self.verticalLayout_11.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
         self.selection_frame_2 = QFrame(self.mpage3)
         self.selection_frame_2.setObjectName(u"selection_frame_2")
         self.selection_frame_2.setFrameShape(QFrame.StyledPanel)
         self.selection_frame_2.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_11 = QHBoxLayout(self.selection_frame_2)
-        self.horizontalLayout_11.setSpacing(15)
-        self.horizontalLayout_11.setContentsMargins(10, 10, 10, 10)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3 = QGridLayout(self.selection_frame_2)
+        self.gridLayout_3.setSpacing(10)
+        self.gridLayout_3.setContentsMargins(10, 10, 10, 10)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_3.setHorizontalSpacing(10)
+        self.gridLayout_3.setVerticalSpacing(25)
+        self.gridLayout_3.setContentsMargins(10, 10, 10, 10)
+        self.update_yt_dlp_btn = QPushButton(self.selection_frame_2)
+        self.update_yt_dlp_btn.setObjectName(u"update_yt_dlp_btn")
+
+        self.gridLayout_3.addWidget(self.update_yt_dlp_btn, 0, 2, 1, 1)
+
+        self.search_for_update_btn = QPushButton(self.selection_frame_2)
+        self.search_for_update_btn.setObjectName(u"search_for_update_btn")
+
+        self.gridLayout_3.addWidget(self.search_for_update_btn, 0, 3, 1, 1)
+
         self.change_ffmpeg_path_btn = QPushButton(self.selection_frame_2)
         self.change_ffmpeg_path_btn.setObjectName(u"change_ffmpeg_path_btn")
 
-        self.horizontalLayout_11.addWidget(self.change_ffmpeg_path_btn)
+        self.gridLayout_3.addWidget(self.change_ffmpeg_path_btn, 0, 0, 1, 1)
 
         self.download_ffmpeg_btn = QPushButton(self.selection_frame_2)
         self.download_ffmpeg_btn.setObjectName(u"download_ffmpeg_btn")
 
-        self.horizontalLayout_11.addWidget(self.download_ffmpeg_btn)
+        self.gridLayout_3.addWidget(self.download_ffmpeg_btn, 0, 1, 1, 1)
+
+        self.update_check_box = QCheckBox(self.selection_frame_2)
+        self.update_check_box.setObjectName(u"update_check_box")
+        self.update_check_box.setTristate(False)
+
+        self.gridLayout_3.addWidget(self.update_check_box, 1, 0, 1, 1)
 
 
-        self.verticalLayout_11.addWidget(self.selection_frame_2, 0, Qt.AlignLeft|Qt.AlignTop)
-
-        self.frame_3 = QFrame(self.mpage3)
-        self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setFrameShape(QFrame.StyledPanel)
-        self.frame_3.setFrameShadow(QFrame.Raised)
-
-        self.verticalLayout_11.addWidget(self.frame_3)
+        self.verticalLayout_11.addWidget(self.selection_frame_2, 0, Qt.AlignTop)
 
         self.mainpages.addWidget(self.mpage3)
 
@@ -595,6 +674,22 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.main_frame)
 
         MainWindow.setCentralWidget(self.centralwidget)
+        QWidget.setTabOrder(self.search_btn, self.url_entry)
+        QWidget.setTabOrder(self.url_entry, self.download_btn)
+        QWidget.setTabOrder(self.download_btn, self.settings_btn)
+        QWidget.setTabOrder(self.settings_btn, self.toggle_sidebar_btn)
+        QWidget.setTabOrder(self.toggle_sidebar_btn, self.exit_btn)
+        QWidget.setTabOrder(self.exit_btn, self.resolution_selection)
+        QWidget.setTabOrder(self.resolution_selection, self.change_location_btn)
+        QWidget.setTabOrder(self.change_location_btn, self.show_folder_btn)
+        QWidget.setTabOrder(self.show_folder_btn, self.last_page_btn)
+        QWidget.setTabOrder(self.last_page_btn, self.download_button)
+        QWidget.setTabOrder(self.download_button, self.next_page_btn)
+        QWidget.setTabOrder(self.next_page_btn, self.change_ffmpeg_path_btn)
+        QWidget.setTabOrder(self.change_ffmpeg_path_btn, self.download_ffmpeg_btn)
+        QWidget.setTabOrder(self.download_ffmpeg_btn, self.update_yt_dlp_btn)
+        QWidget.setTabOrder(self.update_yt_dlp_btn, self.format_selection)
+        QWidget.setTabOrder(self.format_selection, self.scrollArea)
 
         self.retranslateUi(MainWindow)
 
@@ -607,7 +702,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.0.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.1.0", None))
         self.toggle_sidebar_btn.setText("")
         self.top_label.setText("")
         self.search_btn.setText(QCoreApplication.translate("MainWindow", u"   Search", None))
@@ -616,7 +711,6 @@ class Ui_MainWindow(object):
         self.exit_btn.setText(QCoreApplication.translate("MainWindow", u"   Exit", None))
         self.url_entry.setText("")
         self.url_entry.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Insert Video or Playlist URL", None))
-        self.url_search_btn.setText(QCoreApplication.translate("MainWindow", u"Search", None))
         self.info_start_label.setText("")
         self.image_label.setText(QCoreApplication.translate("MainWindow", u"Thumbnail", None))
         self.name_label.setText("")
@@ -629,14 +723,18 @@ class Ui_MainWindow(object):
         self.progress_eta_label.setText("")
         self.info_range_slider_label.setText("")
         self.next_page_btn.setText(QCoreApplication.translate("MainWindow", u"Next", None))
+        self.update_yt_dlp_btn.setText(QCoreApplication.translate("MainWindow", u"Update yt-dlp", None))
+        self.search_for_update_btn.setText(QCoreApplication.translate("MainWindow", u"Search For Updates", None))
         self.change_ffmpeg_path_btn.setText(QCoreApplication.translate("MainWindow", u"Change FFmpeg Path", None))
         self.download_ffmpeg_btn.setText(QCoreApplication.translate("MainWindow", u"Download FFmpeg", None))
-    # retranslateUi
+        self.update_check_box.setText(QCoreApplication.translate("MainWindow", u"Check For Updates", None))
+
+
+
 
 class Downloader():
-    def __init__(self, window, app):
+    def __init__(self, window):
         self.win = window
-        self.app = app
         self.win.connect_wid(self.win.timer.timeout, self.start_load_video)
         self.win.connect_wid(self.win.ui.url_entry.textChanged, self.win.timer.start)
         self.win.connect_wid(self.win.ui.format_selection.currentIndexChanged, self.update_file_box)
@@ -647,13 +745,30 @@ class Downloader():
         self.win.connect_wid(self.win.ui.change_ffmpeg_path_btn.clicked, self.change_ffmpeg_location)
         self.win.connect_wid(self.win.ui.next_page_btn.clicked, lambda: self.win.ui.download_2.setCurrentIndex(0))
         self.win.connect_wid(self.win.ui.last_page_btn.clicked, lambda: self.win.ui.download_2.setCurrentIndex(2))
+        self.win.connect_wid(self.win.ui.update_yt_dlp_btn.clicked, self.download_yt_dlp)
+        self.win.connect_wid(self.win.ui.scrollArea.verticalScrollBar().valueChanged, lambda: [self.win.create_more_widg(), self.fill_new_widgs()])
+        self.win.connect_wid(self.win.ui.update_check_box.clicked, self.toggle_check_update)
+        self.win.connect_wid(self.win.ui.search_for_update_btn.clicked, lambda: self.search_for_updates(False))
         self.file_formats = ["Mp4", "Mp3"]
         if not os.path.isfile(get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
             y.join()
         self.load_config()
-        self.win.invokeFunc(self.win, "import_yt_dlp", Qt.QueuedConnection, Q_ARG(bool, True))
+        if __file__[-4:] == ".exe" and self.update_check:
+            self.search_for_updates()
+        self.import_thread = threading.Thread(target=lambda:self.import_yt_dlp())
+        self.import_thread.start()
+
+    def toggle_check_update(self):
+        self.update_config("DEFAULT", "check-for-updates", str(self.win.ui.update_check_box.isChecked()))
+        self.update_check = self.win.ui.update_check_box.isChecked()
+
+    def import_yt_dlp(self):
+        global YoutubeDL, DownloadError
+        sys.path.insert(0, get_abs_path("appdata/yt_dlp"))
+        from yt_dlp import YoutubeDL
+        from yt_dlp.utils import DownloadError
 
     def update_file_box(self):
         if self.win.ui.format_selection.currentText() == "Mp4":
@@ -663,6 +778,7 @@ class Downloader():
             self.win.ui.resolution_selection.setCurrentIndex(0)
 
     def start_load_video(self):
+        self.win.invokeFunc(self.win.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
         self.win.invokeFunc(self.win.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
         threading.Thread(target=self.load_video).start()
 
@@ -671,7 +787,8 @@ class Downloader():
         config["DEFAULT"] = {"download_path": "~/Downloads/",
                              "ffmpeg_path": "None",
                              "yt-dlp-installed": "False",
-                             "yt-dlp-date": "False",}
+                             "yt-dlp-date": "False",
+                             "check-for-updates": "True"}
         with open(get_abs_path("appdata/config.ini"), "w+") as file:
             config.write(file)
 
@@ -681,6 +798,13 @@ class Downloader():
         self.ffmpeg = config["DEFAULT"]["ffmpeg_path"]
         self.file = config["DEFAULT"]["download_path"]
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
+        if config.has_option("DEFAULT", "check-for-updates"):
+            self.update_check = config["DEFAULT"]["check-for-updates"]
+            self.update_check = True if self.update_check.lower() == "true" else False
+        else:
+            self.update_config("DEFAULT", "check-for-updates", "True")
+            self.update_check = True
+        self.win.invokeFunc(self.win.ui.update_check_box, "setChecked", Qt.QueuedConnection, Q_ARG(bool, self.update_check))
         if self.yt_dlp_installed == "False":
             self.install_yt_dlp()
         if self.ffmpeg == "None":
@@ -701,15 +825,34 @@ class Downloader():
         self.image_byt = urlopen(self.url).read()
         self.update_main_frame()
 
-    def load_video(self):
-        cur_link = self.win.ui.url_entry.text()
+    def yt_search(self, text, pl_items, req):
+        opts = {"extract_flat": True,
+                "quiet": True,
+                "noprogress": True,
+                "playlist_items": pl_items,
+                "logger": loggerout}
+        try:
+            ydl = YoutubeDL(opts)
+            vid = ydl.extract_info(f"ytsearch{req}:{text}", download=False)["entries"]
+            self.yt_search_result = vid
+        except DownloadError as e:
+            if "urlopen error" in e.msg:
+                self.yt_search_result = None
+        
+
+    def load_video(self, cur_link = None):
+        self.import_thread.join()
+        if cur_link == None:
+            cur_link = self.win.ui.url_entry.text()   
         if cur_link == "":
             self.win.invokeFunc(self.win.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
             return
+        self.search_thread = threading.Thread(target=lambda: self.yt_search(cur_link,"0:30", 30))
+        self.search_thread.start()
         if "&list=" in cur_link and "?v=" in cur_link:
             cur_link = cur_link.split("&list=")[0]
         info = self.get_video_information(cur_link)
-        if info != None and info["webpage_url_domain"] != None and info["webpage_url_domain"] == "youtube.com":
+        if info != None and info["webpage_url_domain"] != None and info["webpage_url_domain"] == "youtube.com" and info["channel"] != None and info != False:
             self.cur_link = cur_link
             if "?list=" in cur_link and ("&list=" not in cur_link and "?v=" not in cur_link):
                 self.playlist = True
@@ -726,18 +869,88 @@ class Downloader():
             self.url = self.get_thumbnail_url(info)
             self.image_byt = urlopen(self.url).read()
             self.update_main_frame()
-            
         else:
             if len(cur_link) >= 20:
                 cur_link = f"{cur_link[0:13]}..."
-                #\n(If you want to search for '{cur_link}' press Search.) <- Not possible yet! (implement later)
             if info == None or info["webpage_url_domain"] == None:
                 text = f"No video found!"
+                self.search_thread.join()
+                self.search = 30
+                while len(self.win.search_labels) > 30:
+                    self.win.search_labels[len(self.win.search_labels)-1].deleteLater()
+                    self.win.search_labels.pop()
+                self.win.invokeFunc(self.win.ui.scrollArea.verticalScrollBar(), "setValue", Qt.QueuedConnection, Q_ARG(int, 0))
+                self.search_for_vid()
+                if self.yt_search_result == []:
+                    pass
+                elif self.yt_search_result == None:
+                    text = "ERROR: No internet connection"
+                    self.win.invokeFunc(self.win.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
+                else:
+                    self.win.invokeFunc(self.win.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
+
             else:
-                text = f"No valid video url!"
+                text = f"No valid video or playlist url!"
             self.win.invokeFunc(self.win.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, text))
             self.win.invokeFunc(self.win.ui.download_btn, "setEnabled", Qt.QueuedConnection, Q_ARG(bool, False))
 
+    def search_for_vid(self):
+        if self.yt_search_result == None:
+            return
+        for i in self.win.search_labels:
+            i.setVisible(True)
+        search_len = len(self.yt_search_result)
+        for i in self.win.search_labels[search_len:]:
+            i.hide()
+        for i, entrie in enumerate(self.yt_search_result):
+            height = entrie["thumbnails"][0]["height"]
+            width  = entrie["thumbnails"][0]["width"]
+            url = entrie["thumbnails"][0]["url"]
+            if height >= width:
+                height, width = 169, 95
+            else:
+                height, width = 169, 300
+            image_byt = urlopen(url).read()
+            img = QImage()
+            img.loadFromData(image_byt)
+            pixmap = QPixmap.fromImage(img.scaled(width, height))
+            self.win.search_labels[i].setPixmap(pixmap)
+            self.win.search_labels[i].mousePressEvent = lambda ev, x=entrie["url"],y =entrie["channel"],z=entrie["title"]: self.custom_event(ev,x,y,z)
+
+    def custom_event(self, event, idx, channel, title):
+        if event.button() == Qt.LeftButton:
+            self.load_video(idx)
+        elif event.button() == Qt.RightButton:
+            self.yes_no_messagebox(f"Uploader: {channel}\nTitle: {title}", QMessageBox.Information, "Video", QMessageBox.Ok)
+
+    def fill_new_widgs(self):
+        if self.win.ui.scrollArea.verticalScrollBar().value() == self.win.ui.scrollArea.verticalScrollBar().maximum():
+            cur_link = self.win.ui.url_entry.text()
+            x = threading.Thread(target= lambda: self.yt_search(cur_link, f"{self.search+1}:{self.search+30}", self.search + 30))
+            x.start()
+            x.join()
+            if self.yt_search_result == None:
+                while len(self.win.search_labels) > self.search:
+                    self.win.search_labels[len(self.win.search_labels)-1].deleteLater()
+                    self.win.search_labels.pop()
+                self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+                return
+            for i, entrie in enumerate(self.yt_search_result):
+                height = entrie["thumbnails"][0]["height"]
+                width  = entrie["thumbnails"][0]["width"]
+                url = entrie["thumbnails"][0]["url"]
+                if height >= width:
+                    height, width = 169, 95
+                else:
+                    height, width = 169, 300
+                image_byt = urlopen(url).read()
+                img = QImage()
+                img.loadFromData(image_byt)
+                pixmap = QPixmap.fromImage(img.scaled(width, height))
+                self.win.search_labels[i+self.search].setPixmap(pixmap)
+                self.win.search_labels[i+self.search].mousePressEvent = lambda ev, x = entrie["url"]: self.load_video(x)
+            self.search += 30
+            
     def get_thumbnail_url(self, info):
         x = []
         for thumbnail in info["thumbnails"]:
@@ -757,7 +970,9 @@ class Downloader():
         try:
             inf = ydl.extract_info(url, False)
             info = ydl.sanitize_info(inf)
-        except DownloadError:
+        except DownloadError as e:
+            if "urlopen error" in e.msg:
+                info = False
             info = None
         return info
 
@@ -783,6 +998,8 @@ class Downloader():
         self.win.ui.name_label.setText(f"Title: {self.title}")
         self.win.ui.artist_label.setText(f"Uploader: {self.author}")
         self.win.invokeFunc(self.win.ui.format_selection, "setVisible", Qt.QueuedConnection, Q_ARG(bool, True))
+        self.win.ui.format_selection.clear()
+        self.win.ui.resolution_selection.clear()
         self.win.ui.format_selection.addItems(self.file_formats)
         if not self.playlist:
             self.win.ui.date_label.setText(f"Upload Date: {self.upload_date}")
@@ -808,16 +1025,19 @@ class Downloader():
         new_dir = QFileDialog.getExistingDirectory(None, "Select the '/bin' Folder of your FFmpeg installation", os.path.expanduser(self.ffmpeg))
         if new_dir == "":
             return
+        if not os.path.isfile(f"{new_dir}/ffmpeg.exe"):
+            self.yes_no_messagebox("This is not a valid path", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            self.change_ffmpeg_location()
+            return
         self.ffmpeg = f"{new_dir}/"
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
 
     def show_in_explorer(self):
         f = os.path.expanduser(self.file).replace('/', '\\')
         command = f"explorer.exe {f}"
-        subprocess.Popen(command)
+        os.system(command)
 
     def update_to(self, d):
-        #print(d["status"])
         if d["status"] == "started":
             self.win.invokeFunc(self.win.ui.progressbar, "setVisible", Qt.QueuedConnection, Q_ARG(bool, False))
             if self.playlist:
@@ -859,7 +1079,8 @@ class Downloader():
             return False
 
     def user_info_no_ffmpeg(self):
-        self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+        self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation in the settings.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+        self.win.invokeFunc(self.win.ui.mainpages, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 2))
         self.win.ui.settings_btn.click()
 
     def start_playlist_download(self):
@@ -917,34 +1138,51 @@ class Downloader():
             self.win.close()
             sys.exit()
 
-    def download_from_github(self, url, filename, progress):
+    def handle_update_available(self, update_available, tag, auto):
+        if update_available:
+            self.yes_no_messagebox(f"""Current version: {VERSION} <br> 
+                                        New version: {tag} <br> 
+                                        Download the latest version here: <br>
+                                        <a href='https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest'>PyFlat Youtube Downloader</a>""", 
+                                        QMessageBox.Information, "Update found", QMessageBox.Ok)
+        elif not update_available and tag == "no_connection":
+            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+        elif not update_available and not auto:
+            self.yes_no_messagebox("No update available.", QMessageBox.Information, "No update found", QMessageBox.Ok)
+            
+    def search_for_updates(self, auto = True):
+        self.update_thread = UpdateThread(auto)
+        self.update_thread.update_available.connect(self.handle_update_available)
+        self.update_thread.start()
+
+
+    def download_from_github(self,url, filename, progress):
         def bar_progress(current, total, width=80):
             progress_message = int(round(current / total * 100, ndigits=0))
             if progress.value() != progress_message:
                 progress.setValue(progress_message)
-        wget.download(url, out=filename, bar=bar_progress)
-
+        try:
+            wget.filename_fix_existing = lambda x: x
+            wget.download(url, out=filename, bar=bar_progress)
+            if os.path.isdir("appdata/yt_dlp"):
+                shutil.rmtree("appdata/yt_dlp")
+        except URLError:
+            progress.close()
+            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            return False
     def download_yt_dlp(self):
-        if os.path.isdir("appdata/yt_dlp"):
-            shutil.rmtree("appdata/yt_dlp")
         progress = QProgressDialog('Downloading yt-dlp', '', 0, 100, self.win)
         progress.setFixedWidth(250)
         progress.setWindowTitle("Download Window")
         progress.setModal(True)
         progress.setCancelButton(None)
         progress.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint)
-        self.download_from_github("https://github.com/yt-dlp/yt-dlp/archive/refs/heads/master.zip", "appdata/yt-dlp.zip", progress)
-        zp = ZipFile("appdata/yt-dlp.zip")
-        names_foo = [i for i in zp.namelist() if i.startswith("yt-dlp-master/yt_dlp/")]
-        for file in names_foo:
-            zp.extract(file)
-        zp.close()
-        shutil.move("yt-dlp-master/yt_dlp", "appdata/yt_dlp")
-        shutil.rmtree("yt-dlp-master")
-        os.remove("appdata/yt-dlp.zip")
+        x = self.download_from_github("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", "appdata/yt_dlp", progress)
+        if x == False:
+            return
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
-        self.yes_no_messagebox("Download Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
 
     def download_ffmpeg(self):
         if os.path.isdir("appdata/FFmpeg"):
@@ -955,7 +1193,9 @@ class Downloader():
         progress.setModal(True)
         progress.setCancelButton(None)
         progress.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint)
-        self.download_from_github("https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress)
+        x = self.download_from_github("https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress)
+        if x == False:
+            return
         zp = ZipFile("appdata/ffmpeg.zip")
         names_foo = [i for i in zp.namelist() if i.startswith("ffmpeg-master-latest-win64-gpl/")]
         for file in names_foo:
@@ -963,7 +1203,7 @@ class Downloader():
         zp.close()
         os.rename("ffmpeg-master-latest-win64-gpl", "appdata/FFmpeg")
         os.remove("appdata/ffmpeg.zip")
-        self.yes_no_messagebox("Download Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
         self.ffmpeg = get_abs_path("appdata/FFmpeg/bin")
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
 
@@ -1007,11 +1247,39 @@ class Downloader():
                 "overwrites": True,
                 "postprocessor_hooks": [self.update_to],
                 }
-        YoutubeDL(ydl_opts).download(self.cur_link)
+        try:
+            YoutubeDL(ydl_opts).download(self.cur_link)
+        except DownloadError as e:
+            if "urlopen error" in e.msg:
+                self.win.invokeFunc(self.win.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "ERROR: No internet connection"))
+                self.win.ui.search_btn.click()
+                self.win.ui.download_btn.setEnabled(False)
+            else:
+                print(e)
+            
+
+
+class UpdateThread(QThread):
+    update_available = Signal(bool, str, bool)
+    def __init__(self, auto):
+        super().__init__()
+        self.auto = auto
+    def run(self):
+        try:
+            f = urlopen("https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest").url
+        except URLError:
+            self.update_available.emit(None, "no_connection", None)
+            return
+        tag = f.split("/")[-1]
+        if VERSION < tag[1:]:
+            self.update_available.emit(True, tag[1:], self.auto)
+        else:
+            self.update_available.emit(False, "", self.auto)
+
 
 #https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 if __name__ == "__main__":
     app = QApplication([])
-    Downloader(MainWindow(), app)
+    Downloader(MainWindow())
     sys.exit(app.exec())
