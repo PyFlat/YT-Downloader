@@ -9,8 +9,13 @@ YOUTUBE DOWNLOADER
 
 # Installation:
 - Download the [latest release](https://github.com/JJSS-Johannes/YT-Downloader/releases/latest)
-- Unzip the .zip folder
-- Execute the .exe file
+- Zip:
+  - Unzip the .zip folder
+  - Execute the .exe file
+- Installer:
+  - Execute the .exe installer
+  - Follow the installation steps
+  - Start the downloader
 
 # Usage:
 - Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
