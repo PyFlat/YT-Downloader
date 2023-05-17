@@ -11,6 +11,7 @@ YOUTUBE DOWNLOADER
 - Download the [latest release](https://github.com/JJSS-Johannes/YT-Downloader/releases/latest)
 - Unzip the .zip folder
 - Execute the .exe file
+- [VirusTotal check](https://www.virustotal.com/gui/file/c2c90c1c3b3e0afeb204b3e4166cdb855237942ecb40ee70001f45cb531a010e?nocache=1)
 
 # Usage:
 - Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
@@ -27,7 +28,18 @@ YOUTUBE DOWNLOADER
   - Select the output format (mp3, mp4)
   - Select the output folder, this is by default the /Download folder
   - Press Download and wait until you see the button again, then you can download more videos or another format
-
+- Searching:
+  - Enter the search term you want to search for
+  - Wait until the results are displayed
+  - With left click you can open a video in the download page
+  - With right click you can see the uploader and title of the video
+- Settings:
+  - **Change FFmpeg Path:** Set the path to your local ffmpeg location
+  - **Download FFmpeg:** Automatically downloads and installs the latest FFmpeg version (**Warning:** Overwrites FFmpeg location)
+  - **Update yt-dlp:** Automatically downloads and installs the latest yt-dlp version
+  - **Search For Updates:** Searches for a new version of *PyFlat Youtube Downloader* and shows a link if a new version is available
+  - **Check for Updates:** If this is checked the downloader automatically searches for updates
+  
 - The download speed depends on the internet connection and the length and quality of the video!
 
 # Showcase:

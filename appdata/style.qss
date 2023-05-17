@@ -26,6 +26,12 @@ QPushButton:hover, QPushButton:checked {
 	background-color: #414361;
 }
 
+QLabel#search_labels{
+	background: black;
+	border: 2px solid white;
+	border-radius: 5px;
+}
+
 QPushButton:checked {
 	border-right: 3px solid white;
 }
@@ -104,7 +110,9 @@ QPushButton#change_ffmpeg_path_btn,
 QPushButton#download_ffmpeg_btn,
 QPushButton#next_page_btn,
 QPushButton#last_page_btn,
-QPushButton#download_button {
+QPushButton#download_button,
+QPushButton#update_yt_dlp_btn,
+QPushButton#search_for_update_btn {
 	padding-right: 20px;
 	border: 2px solid white;
 	border-radius: 5px;
@@ -118,7 +126,9 @@ QPushButton:pressed#change_ffmpeg_path_btn,
 QPushButton:pressed#download_ffmpeg_btn,
 QPushButton:pressed#next_page_btn,
 QPushButton:pressed#last_page_btn,
-QPushButton:pressed#download_button {
+QPushButton:pressed#download_button,
+QPushButton:pressed#update_yt_dlp_btn,
+QPushButton:pressed#search_for_update_btn {
 	background-color: #515670;
 }
 
@@ -129,12 +139,19 @@ QPushButton:hover:!pressed#change_ffmpeg_path_btn,
 QPushButton:hover:!pressed#download_ffmpeg_btn,
 QPushButton:hover:!pressed#next_page_btn,
 QPushButton:hover:!pressed#last_page_btn,
-QPushButton:hover:!pressed#download_button {
+QPushButton:hover:!pressed#download_button,
+QPushButton:hover:!pressed#update_yt_dlp_btn,
+QPushButton:hover:!pressed#search_for_update_btn {
 	background-color: #3f435a;
 }
 
 QMessageBox, QProgressDialog {
 	background-color: #323C5A;
+}
+
+QMessageBox QLabel:a{
+	color: red;
+	text-decoration: none;
 }
 
 QMessageBox QPushButton, QProgressDialog QPushButton{
@@ -173,4 +190,13 @@ SliderLabel {
 
 QRangeSlider {
     qproperty-barColor: #2A2D43;
+}
+
+
+QCheckBox::indicator:unchecked {
+    image:url("appdata/images/unchecked.png");
+}
+
+QCheckBox::indicator:checked {
+	image:url("appdata/images/checked.png");
 }
