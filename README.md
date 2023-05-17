@@ -9,7 +9,7 @@ YOUTUBE DOWNLOADER
 
 # Installation:
 - Download the [latest release](https://github.com/JJSS-Johannes/YT-Downloader/releases/latest)
-- Zip:
+- Zip Package:
   - Unzip the .zip folder
   - Execute the .exe file
 - Installer:
