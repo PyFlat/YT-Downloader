@@ -32,7 +32,7 @@ YOUTUBE DOWNLOADER
   - Select the output format (mp3, mp4)
   - Select the output folder, this is by default the /Download folder
   - Press Download and wait until you see the button again, then you can download more videos or another format
-- [Search](#search):
+- ### Search:
   - Enter the search term you want to search for
   - Wait until the results are displayed
   - With left click you can open a video in the download page
