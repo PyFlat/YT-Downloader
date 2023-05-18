@@ -21,12 +21,12 @@ YOUTUBE DOWNLOADER
 - Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
 - Paste a video or playlist url into the entry
 - Wait until the downloader has loaded the information
-- Video:
+- ### Video:
   - Select the output format (mp3, mp4)
   - Choose the resolution if you want to download mp4
   - Select the output folder, this is by default the /Download folder
   - Press Download and wait until you see the button again, then you can download more videos or another format
-- Playlist:
+- ### Playlist:
   - Choose which range of the playlist should be downloaded
   - Click on next
   - Select the output format (mp3, mp4)
@@ -37,7 +37,7 @@ YOUTUBE DOWNLOADER
   - Wait until the results are displayed
   - With left click you can open a video in the download page
   - With right click you can see the uploader and title of the video
-- Settings:
+- ### Settings:
   - **Change FFmpeg Path:** Set the path to your local ffmpeg location
   - **Download FFmpeg:** Automatically downloads and installs the latest FFmpeg version (**Warning:** Overwrites FFmpeg location)
   - **Update yt-dlp:** Automatically downloads and installs the latest yt-dlp version
@@ -49,22 +49,22 @@ YOUTUBE DOWNLOADER
 # Showcase:
 ## Start
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#readme)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#usage)
 ## Search
 
 [![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#search)
 ## Download-Page for videos
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Video.png)](#readme)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Video.png)](#video)
 ## Range-Selection-Page for playlists
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Select_Playlist_Range.png)](#readme)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Select_Playlist_Range.png)](#playlist)
 ## Download-Page for playlist
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Playlist.png)](#readme)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Playlist.png)](#playlist)
 ## Settings
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Settings.png)](#readme)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Settings.png)](#settings)
 
 # Credits:
 - <a href="https://www.flaticon.com/free-icons/open-menu" title="open menu icons">Open menu icons created by Pixel perfect - Flaticon</a>
