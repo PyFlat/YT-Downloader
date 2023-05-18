@@ -32,7 +32,7 @@ YOUTUBE DOWNLOADER
   - Select the output format (mp3, mp4)
   - Select the output folder, this is by default the /Download folder
   - Press Download and wait until you see the button again, then you can download more videos or another format
-- [Search]:
+- [Search](#search):
   - Enter the search term you want to search for
   - Wait until the results are displayed
   - With left click you can open a video in the download page
@@ -52,7 +52,7 @@ YOUTUBE DOWNLOADER
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#readme)
 ## Search
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#searching)
+[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#search)
 ## Download-Page for videos
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Video.png)](#readme)
