@@ -52,7 +52,7 @@ YOUTUBE DOWNLOADER
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#readme)
 ## Search
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#readme)
+[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#searching)
 ## Download-Page for videos
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Video.png)](#readme)
