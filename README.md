@@ -44,7 +44,7 @@ YOUTUBE DOWNLOADER
   - **Search For Updates:** Searches for a new version of *PyFlat Youtube Downloader* and shows a link if a new version is available
   - **Check for Updates:** If this is checked the downloader automatically searches for updates
 
-- The download speed depends on the internet connection and the length and quality of the video!
+- The download speed depends on the internet connection and the length and resolution of the video!
 
 # Showcase:
 ## Start
