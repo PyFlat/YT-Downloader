@@ -840,7 +840,6 @@ class LoadPlaylistURLS(QThread):
         super().__init__()
         self.url = url
     def run(self):
-        from main import dl
         result = dl.get_video_information(self.url, True)
         if result != None:
             self.finished.emit(result)
