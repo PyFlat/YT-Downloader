@@ -19,7 +19,7 @@ YOUTUBE DOWNLOADER
 
 # Usage:
 - Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
-- Paste a video or playlist url into the entry
+- Add a video or playlist URL or a search term to the entry
 - Wait until the downloader has loaded the information
 - ### Video:
   - Select the output format (mp3, mp4)
@@ -33,8 +33,7 @@ YOUTUBE DOWNLOADER
   - Select the output folder, this is by default the /Download folder
   - Press Download and wait until you see the button again, then you can download more videos or another format
 - ### Search:
-  - Enter the search term you want to search for
-  - Wait until the results are displayed
+  - Wait until the results are displayed (Can take a bit with slow Wifi)
   - With left click you can open a video in the download page
   - With right click you can see the uploader and title of the video
 - ### Settings:
@@ -43,6 +42,8 @@ YOUTUBE DOWNLOADER
   - **Update yt-dlp:** Automatically downloads and installs the latest yt-dlp version
   - **Search For Updates:** Searches for a new version of *PyFlat Youtube Downloader* and shows a link if a new version is available
   - **Check for Updates:** If this is checked the downloader automatically searches for updates
+  - **Set Maximum Threads:** Set the maximum number of videos that can be downloaded at the same time (If you add more videos they will be added to the queue)
+  - **Show Thumbnails:** If set to false no thumbnails will be loaded -> *faster*
 
 - The download speed depends on the internet connection and the length and resolution of the video!
 
