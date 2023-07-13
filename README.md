@@ -72,8 +72,6 @@ All images were created with the *Show Thumbnails* setting: Off
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Settings.png)](#settings)
 
 # Credits:
-- <a href="https://www.flaticon.com/free-icons/open-menu" title="open menu icons">Open menu icons created by Pixel perfect - Flaticon</a>
-- <a href="https://www.flaticon.com/free-icons/search" title="search icons">Search icons created by Smashicons - Flaticon</a>
-- <a href="https://www.flaticon.com/free-icons/download" title="download icons">Download icons created by Creatype - Flaticon</a>
-- <a href="https://www.flaticon.com/free-icons/settings" title="settings icons">Settings icons created by Freepik - Flaticon</a>
-- <a href="https://www.flaticon.com/free-icons/logout" title="logout icons">Logout icons created by Freepik - Flaticon</a>
+- <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Settings, Exit, Dropdown Arrow - Icons</a>
+- <a href="https://github.com/twbs/icons">Checkbox Icon</a>
+
