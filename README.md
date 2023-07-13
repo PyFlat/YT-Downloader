@@ -48,6 +48,7 @@ YOUTUBE DOWNLOADER
 - The download speed depends on the internet connection and the length and resolution of the video!
 
 # Showcase:
+All images were created with the *Show Thumbnails* setting: Off
 ## Start
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#usage)
@@ -63,6 +64,9 @@ YOUTUBE DOWNLOADER
 ## Download-Page for playlist
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Playlist.png)](#playlist)
+## Download control window
+
+[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Download_Overview.png)](#usage)
 ## Settings
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Settings.png)](#settings)
