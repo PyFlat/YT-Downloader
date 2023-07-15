@@ -153,8 +153,6 @@ class Downloader():
         self.downloads = []
         self.cur_process = []
         self.loading = False
-        self.stream_thumbnails = False
-        #
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
@@ -162,14 +160,7 @@ class Downloader():
         self.load_config()
         if __file__[-4:] == ".exe" and self.update_check:
             self.search_for_updates()
-        self.import_thread = threading.Thread(target=lambda:self.import_yt_dlp())
-        self.import_thread.start()
 
-    def import_yt_dlp(self):
-        global YoutubeDL, DownloadError
-        sys.path.insert(0, Utils.get_abs_path("appdata/yt_dlp"))
-        from yt_dlp import YoutubeDL
-        from yt_dlp.utils import DownloadError
 
     def update_file_box(self):
         if mw.ui.format_selection.currentText() == "Mp4":
@@ -197,12 +188,27 @@ class Downloader():
         self.file = config["DEFAULT"]["download_path"]
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
         self.update_config_version(config)
-        if self.yt_dlp_installed == "False": self.install_yt_dlp()
-        if self.ffmpeg == "None": self.user_info_no_ffmpeg()
-            
+        if self.yt_dlp_installed == "False": 
+            if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
+                self.download_yt_dlp()
+                self.yt_dlp_download_thread.finished.connect(lambda: [self.import_yt_dl()])
+            else:
+                mw.close()
+                sys.exit()
+        else:
+            self.import_yt_dl()
+            if self.ffmpeg == "None":
+                self.user_info_no_ffmpeg()
+
+    
+    def import_yt_dl(self):
+        self.import_yt_dl_thread = ImportYTDLP()
+        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.url_entry.setEnabled(True)])
+        self.import_yt_dl_thread.start()
+        
     def update_config_version(self, config):
         self.update_check = config["DEFAULT"].getboolean("check-for-updates", fallback=True)
-        mw.ui.update_check_box.setCheckable(self.update_check)
+        mw.ui.update_check_box.setChecked(self.update_check)
         self.update_config("DEFAULT", "check-for-updates", str(self.update_check))
 
         max_download_threads = int(config["DEFAULT"].get("max-download-threads", fallback=1))
@@ -221,10 +227,7 @@ class Downloader():
         with open(Utils.get_abs_path("appdata/config.ini"), "w") as file:
             config.write(file)
 
-    def disable_search_widg(self):
-        for i, widget in enumerate(mw.search_labels):
-            widget.setEnabled(False)
-            print(widget.isEnabled())
+
         
     def yt_search(self, text, pl_items, req):
         opts = {"quiet": True,
@@ -266,7 +269,6 @@ class Downloader():
         if cur_link:
             if mw.timer.isActive():
                 return
-
         if not cur_link: 
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
         mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
@@ -274,7 +276,6 @@ class Downloader():
         if cur_link == "":
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
             return
-        self.import_thread.join()
         
         self.search_thread = YoutubeSearch(cur_link,"0:30", 30, self)
         self.search_thread.result.connect(self.store_result)
@@ -410,13 +411,6 @@ class Downloader():
         mw.invokeFunc(mw.ui.mainpages, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 3))
         mw.ui.settings_btn.click()
 
-    def install_yt_dlp(self):
-        if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
-            self.download_yt_dlp()
-        else:
-            mw.close()
-            sys.exit()
-
     def handle_update_available(self, update_available, tag, auto):
         if update_available:
             self.yes_no_messagebox(f"""Current version: {VERSION} <br> 
@@ -460,6 +454,8 @@ class Downloader():
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        if self.ffmpeg == "None": self.user_info_no_ffmpeg()
+
     
     def download_ffmpeg(self):
         if os.path.isdir("appdata/FFmpeg"):
@@ -536,8 +532,7 @@ class DataHandler():
         self.info = info
         self.file_name_threads = []
         if skip:
-            char_remov = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|"]
-            for char in char_remov: self.windows_file_title = self.windows_file_title.replace(char, "#")
+            self.windows_file_title = re.sub(r'[\\/:"*?<>|]+', '#', self.windows_file_title)
             return
         if dl.stream_thumbnails:
             self.thumbnail_url = self.get_thumbnail_url()
@@ -555,8 +550,7 @@ class DataHandler():
             hours, minutes = divmod(minutes, 60)
             self.duration = f"{hours:02}:{minutes:02}:{seconds:02}"
             self.resolutions = self.get_available_resolutions()
-            char_remov = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|"]
-            for char in char_remov: self.windows_file_title = self.windows_file_title.replace(char, "#")
+            self.windows_file_title = re.sub(r'[\\/:"*?<>|]+', '#', self.windows_file_title)
 
     def store_playlist_urls(self, data):
         self.playlist_data_await = True
@@ -619,7 +613,8 @@ class DataHandler():
         if row != None:
             self.download(row)
             return
-        file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext)
+        
+        file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext, dl.file)
         file_name_thread.ret_filename.connect(self.check_if_exists)
         file_name_thread.start()
         self.file_name_threads.append(file_name_thread)
@@ -658,7 +653,7 @@ class DataHandler():
             mw.ui.tableWidget.setItem(row, 4, item)
             row_count = row
 
-        dl_thread = VideoDownloadThread(self.url, self.download_format, self.vid_ext, dl.ffmpeg, self.outtmpl, row_count)
+        dl_thread = VideoDownloadThread(self.url, self.download_format, self.vid_ext, dl.ffmpeg, self.filename, row_count)
         dl_thread.finished.connect(self.handle_download_finished)
         dl_thread.progress.connect(self.update_progress)
         thread_worker = ThreadWorker(dl_thread)
@@ -700,9 +695,10 @@ class DataHandler():
         
 class FileNameThread(QThread):
     ret_filename = Signal(str)
-    def __init__(self, template, download_format, url, ext):
+    def __init__(self, template, download_format, url, ext, file):
         super().__init__()
         self.template = template
+        self.file = file.replace("/", "\\")
         self.download_format = download_format
         self.url = url
         self.ext = ext
@@ -710,16 +706,17 @@ class FileNameThread(QThread):
         ydl_opts = {
             'quiet': True,
             'simulate': True,
-            'forcefilename': True,
             'outtmpl': self.template,
             'format': self.download_format,
-            'merge_output_format': self.ext
+            'merge_output_format': self.ext,
         }
         with YoutubeDL(ydl_opts) as ydl:
             try:
                 info = ydl.extract_info(self.url, download=False)
-                filename = ydl.prepare_filename(info)
-                self.ret_filename.emit(filename)
+                filename = ydl.prepare_filename(info, warn = True)
+                filename = filename.split(self.file)[1]
+                compat_filename = re.sub(r'[\\/:"*?<>|]+', '#', filename)
+                self.ret_filename.emit(self.file + compat_filename)
             except DownloadError as e: 
                 if "urlopen error" in e.msg:
                     self.ret_filename.emit("Connection Error")
@@ -927,6 +924,7 @@ class VideoDownloadThread(QThread):
                 "socket_timeout": 7.5,
                 }
         try:
+
             YoutubeDL(ydl_opts).download(self.url)
         except DownloadError as e:
             if "urlopen error" in e.msg or "The read operation timed out" in e.msg:
@@ -970,6 +968,16 @@ class YoutubeSearch(QThread):
     def run(self):
         result = self.dl.yt_search(self.url,self.range, self.amount)
         self.result.emit(result)
+        
+class ImportYTDLP(QThread):
+    def __init__(self):
+        super().__init__()
+    def run(self):
+        global YoutubeDL, DownloadError
+        sys.path.insert(0, Utils.get_abs_path("appdata/yt_dlp"))
+        from yt_dlp import YoutubeDL
+        from yt_dlp.utils import DownloadError
+        
 
 if __name__ == "__main__":
     app = QApplication([])
