@@ -186,6 +186,9 @@ class Downloader():
         config.read(Utils.get_abs_path("appdata/config.ini"))
         self.ffmpeg = config["DEFAULT"]["ffmpeg_path"]
         self.file = config["DEFAULT"]["download_path"]
+        expanded_path = os.path.expanduser(self.file)
+        self.file = os.path.join(os.path.normpath(expanded_path), '').replace("\\", "/")
+        self.update_config("DEFAULT", "download_path", self.file)
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
         self.update_config_version(config)
         if self.yt_dlp_installed == "False": 
