@@ -529,17 +529,15 @@ class DataHandler():
     def __init__(self, url, info, playlist = False, skip=False):
         self.playlist = playlist
         self.url = url
-        self.title = self.windows_file_title = str(info["title"])
+        self.title = str(info["title"])
         self.uploader = info["channel"]
         self.author = info["channel"]
         self.info = info
         self.file_name_threads = []
-        if skip:
-            self.windows_file_title = re.sub(r'[\\/:"*?<>|]+', '#', self.windows_file_title)
-            return
+        if skip:return
         if dl.stream_thumbnails:
             self.thumbnail_url = self.get_thumbnail_url()
-            self.image_byt = urlopen(self.thumbnail_url,timeout=5).read()
+            self.image_byt = urlopen(self.thumbnail_url,timeout=15).read()
         if self.playlist:
             self.playlist_count = info["playlist_count"]
             mw.ui.download_button.setDisabled(True)
@@ -553,7 +551,6 @@ class DataHandler():
             hours, minutes = divmod(minutes, 60)
             self.duration = f"{hours:02}:{minutes:02}:{seconds:02}"
             self.resolutions = self.get_available_resolutions()
-            self.windows_file_title = re.sub(r'[\\/:"*?<>|]+', '#', self.windows_file_title)
 
     def store_playlist_urls(self, data):
         self.playlist_data_await = True
@@ -623,6 +620,7 @@ class DataHandler():
         self.file_name_threads.append(file_name_thread)
 
     def check_if_exists(self, filename):
+        print(filename)
         if filename == "Connection Error":
             dl.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
             dl.cur_process.remove(self.process)
@@ -693,6 +691,7 @@ class DataHandler():
         if os.path.isfile(self.filename):
             os.remove(self.filename)
     def play(self):
+        print(f"\"{self.filename}\"")
         mw.set_enabled(False, False, False)
         os.system(f"\"{self.filename}\"")
         
@@ -709,6 +708,7 @@ class FileNameThread(QThread):
         ydl_opts = {
             'quiet': True,
             'simulate': True,
+            "forcefilename": True,
             'outtmpl': self.template,
             'format': self.download_format,
             'merge_output_format': self.ext,
@@ -718,7 +718,7 @@ class FileNameThread(QThread):
                 info = ydl.extract_info(self.url, download=False)
                 filename = ydl.prepare_filename(info, warn = True)
                 filename = filename.split(self.file)[1]
-                compat_filename = re.sub(r'[\\/:"*?<>|]+', '#', filename)
+                compat_filename = re.sub(r'[\\/:"*?<>|&]+', '#', filename)
                 self.ret_filename.emit(self.file + compat_filename)
             except DownloadError as e: 
                 if "urlopen error" in e.msg:
@@ -781,7 +781,7 @@ class FillWidgetThread(QThread):
                 if entry["thumbnails"][0]["height"] >= entry["thumbnails"][0]["width"]:
                     thumbnail_url = f"{thumbnail_url.replace('vi_webp', 'vi').rsplit('/',1)[0]}/mqdefault.jpg"
                 try:
-                    image_byt = urlopen(thumbnail_url, timeout=5).read()
+                    image_byt = urlopen(thumbnail_url, timeout=15).read()
                 except Exception:
                     mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
                     mw.ui.info_start_label.setText("No Internet Connection")
@@ -817,7 +817,7 @@ class GithubDownloader(QThread):
 
     def run(self):
         try:
-            response = requests.get(self.url, stream=True, timeout=7.5)
+            response = requests.get(self.url, stream=True, timeout=15)
             total_size = int(response.headers.get('content-length', 0))
             downloaded_size = 0
 
@@ -904,13 +904,13 @@ class VideoDownloadThread(QThread):
                     'preferredcodec': 'mp3',
                     'preferredquality': '192'
                 }],
-                "outtmpl": self.file_template,
+                "outtmpl": self.file_template[:-4],
                 "quiet": True,
                 "noprogress": True,
                 'progress_hooks': [self._hook],
                 "overwrites": True,
                 "postprocessor_hooks": [self._hook_postprocess],
-                "socket_timeout": 7.5,
+                "socket_timeout": 15,
                 }
         else:
             ydl_opts = {
@@ -924,7 +924,7 @@ class VideoDownloadThread(QThread):
                 "concurrent_fragments": 2,
                 "overwrites": True,
                 "postprocessor_hooks": [self._hook_postprocess],
-                "socket_timeout": 7.5,
+                "socket_timeout": 15,
                 }
         try:
 
