@@ -11,7 +11,7 @@ from src.CustomWidgets.SLabel import SLabel
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.2.0"
+VERSION = "1.0.0"
 
 class Logger:
     def error(msg):
@@ -90,6 +90,7 @@ class MainWindow(QMainWindow):
         widthExtended = maxExtend if width == standard else standard
         self.animation = QPropertyAnimation(self.ui.sidebar, b"minimumWidth")
         self.animation.setDuration(200)
+        self.animation.setEasingCurve(QEasingCurve.InOutQuart)
         self.animation.setStartValue(width)
         self.animation.setEndValue(widthExtended)
         self.animation.start()
@@ -118,7 +119,7 @@ class MainWindow(QMainWindow):
             if not self.ui.scrollArea.verticalScrollBar().value() == self.ui.scrollArea.verticalScrollBar().maximum(): return
         for _ in range(0,10):
             for i in range(0,3):
-                label = SLabel(self.ui.scrollAreaWidgetContents)
+                label = SLabel(self.ui.url_entry, self.ui.scrollAreaWidgetContents)
                 self.search_labels.append(label)
                 self.ui.gridLayout_2.addWidget(label, self.column, i)
                 self.ui.gridLayout_2.setAlignment(label, Qt.AlignTop | Qt.AlignLeft)
@@ -272,6 +273,7 @@ class Downloader():
         if cur_link:
             if mw.timer.isActive():
                 return
+        
         if not cur_link: 
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
         mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
@@ -620,7 +622,6 @@ class DataHandler():
         self.file_name_threads.append(file_name_thread)
 
     def check_if_exists(self, filename):
-        print(filename)
         if filename == "Connection Error":
             dl.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
             dl.cur_process.remove(self.process)
@@ -774,8 +775,9 @@ class FillWidgetThread(QThread):
             else:
                 for _ in range(remaining_labels):
                     mw.search_labels.pop().deleteLater()
-        
+
         for i, entry in enumerate(self.data, dl.search if new_widgs else 0):
+            mw.search_labels[i].mousePressEvent = lambda ev, x=entry["url"], y=entry["channel"], z=entry["title"]: dl.custom_event(ev, x, y, z)
             if dl.stream_thumbnails:
                 thumbnail_url = entry['thumbnails'][0]['url']
                 if entry["thumbnails"][0]["height"] >= entry["thumbnails"][0]["width"]:
@@ -790,7 +792,6 @@ class FillWidgetThread(QThread):
                     
                 img = QImage.fromData(image_byt)
                 pixmap = QPixmap.fromImage(img.scaled(325, 183))
-
                 mw.search_labels[i].setPixmap(pixmap)
             else:
                 if len(entry["title"])>15:
@@ -798,13 +799,11 @@ class FillWidgetThread(QThread):
                 else:
                     mw.search_labels[i].setText(entry["title"])
 
-            mw.search_labels[i].mousePressEvent = lambda ev, x=entry["url"], y=entry["channel"], z=entry["title"]: dl.custom_event(ev, x, y, z)
-            
-
         if new_widgs:
             dl.search += search_len
             dl.new_widget_thread_running = False
         self.finished.emit(True)
+
 
 class GithubDownloader(QThread):
     progress = Signal(float)
