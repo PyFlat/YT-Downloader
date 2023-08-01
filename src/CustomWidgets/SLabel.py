@@ -3,19 +3,22 @@ from PySide6.QtGui import Qt
 from PySide6.QtCore import QSize
 
 class SLabel(QLabel):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, entry, *args, **kwargs):
         QLabel.__init__(self, *args, **kwargs)
+        self.url_entry = entry
         self.setText("Loading...")
         self.setMinimumSize(QSize(325, 183))
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint) 
         self.setObjectName("search_labels")
         self.setScaledContents(True)
-
+        self.setMouseTracking(True)
     def enterEvent(self, event):
         self.geo = self.geometry()
         self.geo2 = self.geo.adjusted(-10,-10,10,10)
         self.raise_()
+        if not self.url_entry.isEnabled():
+            return
         self.setGeometry(self.geo2)
     def leaveEvent(self, event):
         if self.geometry() == self.geo2:
