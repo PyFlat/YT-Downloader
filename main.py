@@ -459,6 +459,7 @@ class Downloader():
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.import_yt_dl()
         if self.ffmpeg == "None": self.user_info_no_ffmpeg()
 
     
