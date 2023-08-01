@@ -51,25 +51,25 @@ YOUTUBE DOWNLOADER
 All images were created with the *Show Thumbnails* setting: Off
 ## Start
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Startpage.png)](#usage)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Startpage.png)](#usage)
 ## Search
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Search.png)](#search)
+[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/v1.2.0/.github/Search.png)](#search)
 ## Download-Page for videos
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Video.png)](#video)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Download_Video.png)](#video)
 ## Range-Selection-Page for playlists
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Select_Playlist_Range.png)](#playlist)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Select_Playlist_Range.png)](#playlist)
 ## Download-Page for playlist
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Download_Playlist.png)](#playlist)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Download_Playlist.png)](#playlist)
 ## Download control window
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/main/.github/Download_Overview.png)](#usage)
+[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/v1.2.0/.github/Download_Overview.png)](#usage)
 ## Settings
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/main/.github/Settings.png)](#settings)
+[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Settings.png)](#settings)
 
 # Credits:
 - <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Settings, Exit, Dropdown Arrow - Icons</a>
