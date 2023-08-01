@@ -159,7 +159,7 @@ class Downloader():
             y.start()
             y.join()
         self.load_config()
-        if __file__[-4:] == ".exe" and self.update_check:
+        if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
 
 
@@ -518,10 +518,12 @@ class Downloader():
             mw.ui.download_download_btn.disconnect(self.re_download_file_btn_connection)
         except AttributeError :
             pass
-        if not os.path.isfile(self.downloads[row].filename): 
+        status = mw.ui.tableWidget.item(row, 4).text()
+        if not os.path.isfile(self.downloads[row].filename) and status == "Finished": 
             item = QTableWidgetItem("Deleted")
             mw.ui.tableWidget.setItem(row, 4, item)
-        status = mw.ui.tableWidget.item(row, 4).text()
+            status = "Deleted"
+        
         if status == "Finished":
             mw.set_enabled(True, True, True)
         elif status == "Deleted" or status == "Download Failed":
@@ -695,7 +697,6 @@ class DataHandler():
         if os.path.isfile(self.filename):
             os.remove(self.filename)
     def play(self):
-        print(f"\"{self.filename}\"")
         mw.set_enabled(False, False, False)
         os.system(f"\"{self.filename}\"")
         
