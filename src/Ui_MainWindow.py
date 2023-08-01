@@ -223,6 +223,7 @@ class Ui_MainWindow(object):
         self.gridLayout.setContentsMargins(25, 25, 25, 25)
         self.url_entry = QLineEdit(self.frame)
         self.url_entry.setObjectName(u"url_entry")
+        self.url_entry.setEnabled(False)
         self.url_entry.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.url_entry, 0, 0, 1, 1)
@@ -268,7 +269,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1026, 375))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 100, 375))
         sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents.sizePolicy().hasHeightForWidth())
         self.scrollAreaWidgetContents.setSizePolicy(sizePolicy)
         self.scrollAreaWidgetContents.setMinimumSize(QSize(0, 0))

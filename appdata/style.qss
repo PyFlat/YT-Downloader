@@ -61,7 +61,6 @@ QLabel#top_label{
 	padding: 0px 10px 0px 10px;
 }
 
-
 QPushButton:disabled, QLineEdit:disabled{
 	color: #b2b2b2;
 	border-color: #b2b2b2;
@@ -148,6 +147,9 @@ QSlider::handle {
 	width: 20px;
 	border-radius: 10px;
 }
+QSlider::handle:pressed {
+	background: #50b8fe;
+}
 
 QSlider::groove:horizontal {
 	background: #414361;
@@ -155,7 +157,6 @@ QSlider::groove:horizontal {
 	border-radius: 10px;
 	
 }
-
 
 SliderLabel {
 	margin-bottom: 3px;

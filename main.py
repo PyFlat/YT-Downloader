@@ -11,7 +11,7 @@ from src.CustomWidgets.SLabel import SLabel
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.0.0"
+VERSION = "1.2.0"
 
 class Logger:
     def error(msg):
@@ -518,6 +518,9 @@ class Downloader():
             mw.ui.download_download_btn.disconnect(self.re_download_file_btn_connection)
         except AttributeError :
             pass
+        if not os.path.isfile(self.downloads[row].filename): 
+            item = QTableWidgetItem("Deleted")
+            mw.ui.tableWidget.setItem(row, 4, item)
         status = mw.ui.tableWidget.item(row, 4).text()
         if status == "Finished":
             mw.set_enabled(True, True, True)
