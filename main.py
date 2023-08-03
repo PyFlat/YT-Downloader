@@ -11,7 +11,7 @@ from src.CustomWidgets.SLabel import SLabel
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 
 class Logger:
     def error(msg):
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.top_label.hide()
         self.ui.download_btn.setEnabled(False)
+        self.ui.tableWidget.horizontalHeader().setVisible(True)
 
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
         
@@ -191,6 +192,7 @@ class Downloader():
         self.file = os.path.join(os.path.normpath(expanded_path), '').replace("\\", "/")
         self.update_config("DEFAULT", "download_path", self.file)
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
+        self.first_use = config["DEFAULT"].getboolean("first-use-since-update")
         self.update_config_version(config)
         if self.yt_dlp_installed == "False": 
             if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
@@ -203,6 +205,7 @@ class Downloader():
             self.import_yt_dl()
             if self.ffmpeg == "None":
                 self.user_info_no_ffmpeg()
+        if self.first_use: self.show_changelog()
 
     
     def import_yt_dl(self):
@@ -231,7 +234,14 @@ class Downloader():
         with open(Utils.get_abs_path("appdata/config.ini"), "w") as file:
             config.write(file)
 
-
+    def show_changelog(self):
+        self.update_config("DEFAULT", "first-use-since-update", "False")
+        text = open("appdata/changelog.md", "r").read()
+        msg_box = QMessageBox(mw)
+        msg_box.setTextFormat(Qt.RichText)
+        msg_box.setWindowTitle(f"Changelog - {VERSION}")
+        msg_box.setText(text)
+        msg_box.exec()
         
     def yt_search(self, text, pl_items, req):
         opts = {"quiet": True,
@@ -455,7 +465,7 @@ class Downloader():
         self.yt_dlp_progress_dialog.close()
         self.yt_dlp_download_thread = None
         self.yt_dlp_progress_dialog = None
-        if not success: return
+        if not success: self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok); return
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
@@ -487,6 +497,7 @@ class Downloader():
         if  not success: 
             self.ffmpeg_progress_dialog.close()
             self.ffmpeg_progress_dialog = None
+            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
             return
         zp = ZipFile("appdata/ffmpeg.zip")
         names_foo = [i for i in zp.namelist() if i.startswith("ffmpeg-master-latest-win64-gpl/")]
@@ -820,6 +831,7 @@ class GithubDownloader(QThread):
         self.save_path = save_path
 
     def run(self):
+        self.progress.emit(0)
         try:
             response = requests.get(self.url, stream=True, timeout=15)
             total_size = int(response.headers.get('content-length', 0))
@@ -827,13 +839,11 @@ class GithubDownloader(QThread):
 
             with open(self.save_path, 'wb') as file:
                 for data in response.iter_content(chunk_size=4096):
-                    if self.isInterruptionRequested():
-                        return
                     file.write(data)
                     downloaded_size += len(data)
                     progress = downloaded_size / total_size * 100
                     self.progress.emit(progress)
-            self.finished.emit(True)
+            self.finished.emit(True if progress == 100.0 else False)
         except requests.exceptions.ConnectionError:
             self.progress.emit(-1.0)
             self.finished.emit(False)
