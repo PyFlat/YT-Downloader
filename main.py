@@ -192,8 +192,9 @@ class Downloader():
         self.file = os.path.join(os.path.normpath(expanded_path), '').replace("\\", "/")
         self.update_config("DEFAULT", "download_path", self.file)
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
-        self.first_use = config["DEFAULT"].getboolean("first-use-since-update")
+        self.first_use = config["DEFAULT"].getboolean("first-use-since-update", fallback=True)
         self.update_config_version(config)
+        if self.first_use: self.show_changelog()
         if self.yt_dlp_installed == "False": 
             if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
                 self.download_yt_dlp()
@@ -205,7 +206,7 @@ class Downloader():
             self.import_yt_dl()
             if self.ffmpeg == "None":
                 self.user_info_no_ffmpeg()
-        if self.first_use: self.show_changelog()
+        
 
     
     def import_yt_dl(self):
