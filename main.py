@@ -155,6 +155,7 @@ class Downloader():
         self.downloads = []
         self.cur_process = []
         self.loading = False
+        self.delete_exe_files()
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
@@ -162,7 +163,12 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
-
+        
+    def delete_exe_files(self, folder_path="appdata"):
+        for filename in os.listdir(folder_path):
+            if filename.endswith(".exe"):
+                file_path = os.path.join(folder_path, filename)
+                os.remove(file_path)
 
     def update_file_box(self):
         if mw.ui.format_selection.currentText() == "Mp4":
@@ -195,23 +201,20 @@ class Downloader():
         self.first_use = config["DEFAULT"].getboolean("first-use-since-update", fallback=True)
         self.update_config_version(config)
         if self.first_use: self.show_changelog()
+
+        
         if self.yt_dlp_installed == "False": 
             if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
                 self.download_yt_dlp()
-                self.yt_dlp_download_thread.finished.connect(lambda: [self.import_yt_dl()])
             else:
                 mw.close()
                 sys.exit()
         else:
             self.import_yt_dl()
-            if self.ffmpeg == "None":
-                self.user_info_no_ffmpeg()
-        
 
-    
     def import_yt_dl(self):
         self.import_yt_dl_thread = ImportYTDLP()
-        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.url_entry.setEnabled(True)])
+        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.url_entry.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
         self.import_yt_dl_thread.start()
         
     def update_config_version(self, config):
@@ -241,6 +244,7 @@ class Downloader():
         msg_box = QMessageBox(mw)
         msg_box.setTextFormat(Qt.RichText)
         msg_box.setWindowTitle(f"Changelog - {VERSION}")
+        
         msg_box.setText(text)
         msg_box.exec()
         
@@ -429,12 +433,20 @@ class Downloader():
 
     def handle_update_available(self, update_available, tag, auto):
         if update_available:
-            self.yes_no_messagebox(f"""Current version: {VERSION} <br> 
-                                        New version: {tag} <br> 
-                                        Download the latest version here: <br>
-                                        <a style="color: white; font-weight: bold;" 
-                                        href='https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest'>PyFlat Youtube Downloader</a>""", 
-                                        QMessageBox.Information, "Update found", QMessageBox.Ok)
+            msg_box = QMessageBox(mw)
+            msg_box.setText(f"""Current version: {VERSION} <br> 
+                                New version: {tag} <br> 
+                                Download and install? <br>
+                                Not working with portable version""")
+            msg_box.setWindowTitle("Update found")
+            msg_box.setIcon(QMessageBox.Information)
+            download_and_install = QPushButton("Install Update")
+            msg_box.addButton(download_and_install, QMessageBox.ActionRole)
+            
+            skip = QPushButton("Skip Update")
+            msg_box.addButton(skip, QMessageBox.ActionRole)
+            res = msg_box.exec()
+            if res == 0: self.update_self(tag)
         elif not update_available and tag == "no_connection":
             self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
         elif not update_available and not auto:
@@ -444,6 +456,33 @@ class Downloader():
         self.update_thread = UpdateThread(auto)
         self.update_thread.update_available.connect(self.handle_update_available)
         self.update_thread.start()
+
+    def update_self(self, tag):
+        self.self_download_thread = GithubDownloader(f"https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest/download/win_installer_v{tag}.exe", f"appdata/win_installer_v{tag}.exe")
+        self.self_download_thread.progress.connect(self.update_progress_self)
+        self.self_download_thread.finished.connect(lambda success: self.download_finished_self(success, tag))
+
+        self.self_download_progress_dialog = ProgressDialog("update", mw)
+        self.self_download_progress_dialog.show()
+
+        self.self_download_thread.start()
+
+    def update_progress_self(self, progress):
+        if progress < 0:
+            self.self_download_progress_dialog.close()
+            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+        if self.self_download_progress_dialog:
+            self.self_download_progress_dialog.update_progress(progress)
+
+    def download_finished_self(self, success, tag):
+        self.self_download_progress_dialog.close()
+        self.self_download_thread = None
+        self.self_download_progress_dialog = None
+        if not success: self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok); return
+        if self.yes_no_messagebox("Download Finished\nStart installation?", QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
+            os.system(f"start appdata/win_installer_v{tag}.exe")
+            mw.close()
+            sys.exit(0)
 
     def download_yt_dlp(self):
         self.yt_dlp_download_thread = GithubDownloader("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", "appdata/yt_dlp")
@@ -471,9 +510,7 @@ class Downloader():
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
         self.import_yt_dl()
-        if self.ffmpeg == "None": self.user_info_no_ffmpeg()
 
-    
     def download_ffmpeg(self):
         if os.path.isdir("appdata/FFmpeg"):
             shutil.rmtree("appdata/FFmpeg")

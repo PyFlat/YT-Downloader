@@ -1,6 +1,7 @@
 <strong>New Features:</strong>
 <ul>
 <li style="text-align: left;">When the program is opened for the first time after installing or updating, the changelog is displayed.</li>
+<li style="text-align: left;">It is now possible to update directly if you are not using the portable version.</li>
 </ul>
 <br>
 <strong>Bug Fixes:</strong>
