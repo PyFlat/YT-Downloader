@@ -130,6 +130,10 @@ QMessageBox, QProgressDialog {
 	background-color: #323C5A;
 }
 
+QMessageBox QLabel{
+    padding-right: 20px
+}
+
 
 QMessageBox QPushButton, QProgressDialog QPushButton{
 	border: 2px solid white;
