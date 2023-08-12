@@ -57,19 +57,19 @@ All images were created with the *Show Thumbnails* setting: Off
 [![](.github/Search.png)](#search)
 ## Download-Page for videos
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Download_Video.png)](#video)
+[![](.github/Download_Video.png)](#video)
 ## Range-Selection-Page for playlists
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Select_Playlist_Range.png)](#playlist)
+[![](.github/Select_Playlist_Range.png)](#playlist)
 ## Download-Page for playlist
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Download_Playlist.png)](#playlist)
+[![](.github/Download_Playlist.png)](#playlist)
 ## Download control window
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/v1.2.0/.github/Download_Overview.png)](#usage)
+[![](.github/Download_Overview.png)](#usage)
 ## Settings
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Settings.png)](#settings)
+[![](.github/Settings.png)](#settings)
 
 # Credits:
 - <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Settings, Exit, Dropdown Arrow - Icons</a>
