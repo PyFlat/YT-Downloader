@@ -51,10 +51,10 @@ YOUTUBE DOWNLOADER
 All images were created with the *Show Thumbnails* setting: Off
 ## Start
 
-[![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Startpage.png)](#usage)
+[![](.github/Startpage.png)](#usage)
 ## Search
 
-[![](https://github.com/PyFlat-Studios-JR/YT-Downloader/blob/v1.2.0/.github/Search.png)](#search)
+[![](.github/Search.png)](#search)
 ## Download-Page for videos
 
 [![](https://github.com/JJSS-Johannes/YT-Downloader/blob/v1.2.0/.github/Download_Video.png)](#video)
