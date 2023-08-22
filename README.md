@@ -9,7 +9,7 @@ YOUTUBE DOWNLOADER
 
 # Installation:
 - Download the [latest version](https://github.com/PyFlat/YT-Downloader/releases/latest)
-- Zip Package:
+- Portable:
   - Unzip the .zip folder
   - Execute the .exe file
 - Installer:
