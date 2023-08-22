@@ -51,25 +51,25 @@ YOUTUBE DOWNLOADER
 All images were created with the *Show Thumbnails* setting: Off
 ## Start
 
-[![](.github/Startpage.png)](#usage)
+[![](showcase/Startpage.png)](#usage)
 ## Search
 
-[![](.github/Search.png)](#search)
+[![](showcase/Search.png)](#search)
 ## Download-Page for videos
 
-[![](.github/Download_Video.png)](#video)
+[![](showcase/Download_Video.png)](#video)
 ## Range-Selection-Page for playlists
 
-[![](.github/Select_Playlist_Range.png)](#playlist)
+[![](showcase/Select_Playlist_Range.png)](#playlist)
 ## Download-Page for playlist
 
-[![](.github/Download_Playlist.png)](#playlist)
+[![](showcase/Download_Playlist.png)](#playlist)
 ## Download control window
 
-[![](.github/Download_Overview.png)](#usage)
+[![](showcase/Download_Overview.png)](#usage)
 ## Settings
 
-[![](.github/Settings.png)](#settings)
+[![](showcase/Settings.png)](#settings)
 
 # Credits:
 - <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Settings, Exit, Dropdown Arrow - Icons</a>
