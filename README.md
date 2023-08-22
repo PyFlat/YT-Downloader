@@ -8,7 +8,7 @@ YOUTUBE DOWNLOADER
 * [Credits](#credits)
 
 # Installation:
-- Download the [latest version](https://github.com/JJSS-Johannes/YT-Downloader/releases/latest)
+- Download the [latest version](https://github.com/PyFlat/YT-Downloader/releases/latest)
 - Zip Package:
   - Unzip the .zip folder
   - Execute the .exe file
