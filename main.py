@@ -922,7 +922,7 @@ class UpdateThread(QThread):
     def run(self):
         from main import VERSION
         try:
-            f = urlopen("https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest").url
+            f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
         except URLError:
             self.update_available.emit(None, "no_connection", None)
             return
