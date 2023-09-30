@@ -1,3 +1,9 @@
+#TODO:
+# - Logging
+# - Issue (#2) (Fix)
+# - UI-Update --> Menubar
+
+
 import threading, datetime, os, configparser, sys, shutil, requests, re, copy
 
 from PySide6.QtWidgets import *
@@ -11,7 +17,7 @@ from src.CustomWidgets.SLabel import SLabel
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.2.1"
+VERSION = "1.3.0"
 
 class Logger:
     def error(msg):
@@ -38,14 +44,14 @@ class MainWindow(QMainWindow):
         self.ui.tableWidget.horizontalHeader().setVisible(True)
 
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
-        
-        
+
+
         self.ui.mainpages.setCurrentIndex(0)
         self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
-        
+
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
-        
+
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.setInterval(750)
@@ -57,32 +63,32 @@ class MainWindow(QMainWindow):
 
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(5)
-        
+
         self.ui.search_btn.setChecked(True)
-        
+
         self.create_search_widges()
 
         self.show()
-    
+
     def on_focus_out(self, event):
         selection_model = self.ui.tableWidget.selectionModel()
         selection_model.clearSelection()
         event.accept()
         timer = QTimer()
         timer.singleShot(250, lambda: self.set_enabled(False, False, False))
-        
+
     def set_enabled(self, enabled1:bool, enabled2:bool, enabled3:bool):
         self.ui.download_delete_btn.setEnabled(enabled1)
         self.ui.download_open_btn.setEnabled(enabled2)
         self.ui.download_download_btn.setEnabled(enabled3)
-        
+
     def bind_keys(self):
         self.ui.search_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(0)])
         self.ui.download_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(1)])
         self.ui.file_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(2)])
         self.ui.settings_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(3)])
         self.ui.exit_btn.clicked.connect(lambda: [self.close()])
-        
+
 
     def toggle_menu(self):
         width = self.ui.sidebar.width()
@@ -163,7 +169,7 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
-        
+
     def delete_exe_files(self, folder_path="appdata"):
         for filename in os.listdir(folder_path):
             if filename.endswith(".exe"):
@@ -202,8 +208,8 @@ class Downloader():
         self.update_config_version(config)
         if self.first_use: self.show_changelog()
 
-        
-        if self.yt_dlp_installed == "False": 
+
+        if self.yt_dlp_installed == "False":
             if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
                 self.download_yt_dlp()
             else:
@@ -216,7 +222,7 @@ class Downloader():
         self.import_yt_dl_thread = ImportYTDLP()
         self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.url_entry.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
         self.import_yt_dl_thread.start()
-        
+
     def update_config_version(self, config):
         self.update_check = config["DEFAULT"].getboolean("check-for-updates", fallback=True)
         mw.ui.update_check_box.setChecked(self.update_check)
@@ -230,7 +236,7 @@ class Downloader():
         self.stream_thumbnails = config["DEFAULT"].getboolean("thumbnail-streaming", fallback=True)
         mw.ui.thumbnail_check_box.setChecked(self.stream_thumbnails)
         self.update_config("DEFAULT", "thumbnail-streaming", str(self.stream_thumbnails))
-        
+
     def update_config(self, section, key, new_val):
         config = configparser.ConfigParser()
         config.read(Utils.get_abs_path("appdata/config.ini"))
@@ -244,10 +250,10 @@ class Downloader():
         msg_box = QMessageBox(mw)
         msg_box.setTextFormat(Qt.RichText)
         msg_box.setWindowTitle(f"Changelog - {VERSION}")
-        
+
         msg_box.setText(text)
         msg_box.exec()
-        
+
     def yt_search(self, text, pl_items, req):
         opts = {"quiet": True,
                 "noprogress": True,
@@ -277,32 +283,33 @@ class Downloader():
         else:
             if info == {} or info["webpage_url_domain"] == None:
                 self.search_thread.start()
-                text = "Searching..."                
+                text = "Searching..."
             else:
                 text = f"No valid video or playlist url!"
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, text))
             mw.invokeFunc(mw.ui.download_btn, "setEnabled", Qt.QueuedConnection, Q_ARG(bool, False))
         self.info_thread = None
-        
+
     def load_url(self, cur_link = None):
         if cur_link:
             if mw.timer.isActive():
                 return
-        
-        if not cur_link: 
+
+        if not cur_link:
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
         mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
-        if cur_link==None: cur_link = mw.ui.url_entry.text()   
+        if cur_link==None: cur_link = mw.ui.url_entry.text()
         if cur_link == "":
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
+            mw.invokeFunc(mw.ui.url_entry, "setDisabled", Qt.QueuedConnection, Q_ARG(bool, False))
             return
-        
+
         self.search_thread = YoutubeSearch(cur_link,"0:30", 30, self)
         self.search_thread.result.connect(self.store_result)
-        
+
         if "&list=" in cur_link and "?v=" in cur_link:
             cur_link = cur_link.split("&list=")[0]
-        if self.loading:return
+        if self.loading: return
         self.loading = True
         self.info_thread = LoadVideo(cur_link, self)
         self.info_thread.finished.connect(self.use_info)
@@ -330,7 +337,7 @@ class Downloader():
         elif event.button() == Qt.RightButton:
             self.yes_no_messagebox(f"""<p style="font-weight: bold;">Uploader:</p> {channel}
                                     <p style="font-weight: bold;">Title:</p> {title}
-                                    <p style="font-weight: bold;">URL:</p> 
+                                    <p style="font-weight: bold;">URL:</p>
                                     <a style="color: white; font-weight: bold;" href='{url}'>{url}</a>""", QMessageBox.Information, "Video", QMessageBox.Ok)
 
     def fill_new_widgs(self):
@@ -434,15 +441,15 @@ class Downloader():
     def handle_update_available(self, update_available, tag, auto):
         if update_available:
             msg_box = QMessageBox(mw)
-            msg_box.setText(f"""Current version: {VERSION} <br> 
-                                New version: {tag} <br> 
+            msg_box.setText(f"""Current version: {VERSION} <br>
+                                New version: {tag} <br>
                                 Download and install? <br>
                                 Not working with portable version""")
             msg_box.setWindowTitle("Update found")
             msg_box.setIcon(QMessageBox.Information)
             download_and_install = QPushButton("Install Update")
             msg_box.addButton(download_and_install, QMessageBox.ActionRole)
-            
+
             skip = QPushButton("Skip Update")
             msg_box.addButton(skip, QMessageBox.ActionRole)
             res = msg_box.exec()
@@ -532,7 +539,7 @@ class Downloader():
 
     def download_finished_ffmpeg(self, success):
         self.ffmpeg_download_thread = None
-        if  not success: 
+        if  not success:
             self.ffmpeg_progress_dialog.close()
             self.ffmpeg_progress_dialog = None
             self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
@@ -549,7 +556,7 @@ class Downloader():
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
         self.ffmpeg = Utils.get_abs_path("appdata/FFmpeg/bin")
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
-        
+
     def add_row(self, row_count, data):
         mw.ui.tableWidget.insertRow(row_count)
         for column, string in enumerate(data):
@@ -569,11 +576,11 @@ class Downloader():
         except AttributeError :
             pass
         status = mw.ui.tableWidget.item(row, 4).text()
-        if not os.path.isfile(self.downloads[row].filename) and status == "Finished": 
+        if not os.path.isfile(self.downloads[row].filename) and status == "Finished":
             item = QTableWidgetItem("Deleted")
             mw.ui.tableWidget.setItem(row, 4, item)
             status = "Deleted"
-        
+
         if status == "Finished":
             mw.set_enabled(True, True, True)
         elif status == "Deleted" or status == "Download Failed":
@@ -615,7 +622,7 @@ class DataHandler():
         for i, entrie in enumerate(data["entries"]):
             self.create_data_objects(entrie["url"], entrie, i)
         self.playlist_data_await = False
-        
+
     def create_data_objects(self, url, info, index):
         x = DataHandler(url, info, skip=True)
         self.playlist_data_objects[index] = x
@@ -643,11 +650,11 @@ class DataHandler():
     def prepare_for_download(self, row = None):
         mw.set_enabled(False, False, False)
         self.vid_ext = mw.ui.format_selection.currentText().lower()
-        self.vid_res = mw.ui.resolution_selection.currentText() 
+        self.vid_res = mw.ui.resolution_selection.currentText()
         self.vid_res = "Best Quality" if self.vid_res == "" else self.vid_res
-        
+
         if self.playlist: self.download_playlist();return
-        
+
         temp_vid_res = self.vid_res.split("p")[0]
         if ((temp_vid_res != "Best Quality") and (self.vid_ext != "mp3")) and not self.playlist:
             self.download_format = "bv[height<="+str(temp_vid_res)+"]+ba[ext=m4a]/b"
@@ -664,13 +671,13 @@ class DataHandler():
         if currently_processing in dl.cur_process:
             dl.yes_no_messagebox("You cant download the same file at the same time", QMessageBox.Warning, "Warning", QMessageBox.Ok)
             return
-        
+
         self.process = currently_processing
         dl.cur_process.append(currently_processing)
         if row != None:
             self.download(row)
             return
-        
+
         file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext, dl.file)
         file_name_thread.ret_filename.connect(self.check_if_exists)
         file_name_thread.start()
@@ -699,7 +706,7 @@ class DataHandler():
         start, stop = mw.ui.playlist_range_slider.value()
         for i in range(start-1, stop):
             self.playlist_data_objects[i].prepare_for_download()
-        
+
     def download(self, row=None):
         if row == None:
             data = [self.author, self.title, self.vid_ext.upper(), self.vid_res, "Started", ""]
@@ -720,16 +727,16 @@ class DataHandler():
         timer = QTimer()
         timer.singleShot(5000, lambda: mw.ui.top_label.setVisible(False))
         if row == None: dl.downloads.append(copy.copy(self))
-        
+
     def handle_download_finished(self, success, row):
         if mw.ui.tableWidget.item(row, 0).isSelected():
             mw.set_enabled(True, True, True)
         dl.cur_process.remove(dl.downloads[row].process)
-        
+
         if success:
             item  = QTableWidgetItem("Finished")
             mw.ui.tableWidget.setItem(row, 4, item)
-            
+
         else:
             item  = QTableWidgetItem("Download Failed")
             mw.ui.tableWidget.setItem(row, 4, item)
@@ -749,7 +756,7 @@ class DataHandler():
     def play(self):
         mw.set_enabled(False, False, False)
         os.system(f"\"{self.filename}\"")
-        
+
 class FileNameThread(QThread):
     ret_filename = Signal(str)
     def __init__(self, template, download_format, url, ext, file):
@@ -775,7 +782,7 @@ class FileNameThread(QThread):
                 filename = filename.split(self.file)[1]
                 compat_filename = re.sub(r'[\\/:"*?<>|&]+', '#', filename)
                 self.ret_filename.emit(self.file + compat_filename)
-            except DownloadError as e: 
+            except DownloadError as e:
                 if "urlopen error" in e.msg:
                     self.ret_filename.emit("Connection Error")
 
@@ -843,7 +850,7 @@ class FillWidgetThread(QThread):
                     mw.ui.info_start_label.setText("No Internet Connection")
                     mw.ui.url_entry.setEnabled(True)
                     return
-                    
+
                 img = QImage.fromData(image_byt)
                 pixmap = QPixmap.fromImage(img.scaled(325, 183))
                 mw.search_labels[i].setPixmap(pixmap)
@@ -905,7 +912,7 @@ class LoadVideo(QThread):
     def run(self):
         result = self.dl.get_video_information(self.url)
         self.finished.emit(result, self.url)
-        
+
 class ThreadWorker(QRunnable):
     def __init__(self, thread):
         super().__init__()
@@ -913,7 +920,7 @@ class ThreadWorker(QRunnable):
 
     def run(self):
         self.thread.run()
-        
+
 class UpdateThread(QThread):
     update_available = Signal(bool, str, bool)
     def __init__(self, auto):
@@ -935,7 +942,7 @@ class UpdateThread(QThread):
 class VideoDownloadThread(QThread):
     finished = Signal(bool, int)
     progress = Signal(str, int, str)
-    
+
     def __init__(self, url:str, format:str, ext:str, ffmpeg:str, file_template:str, row:int):
         super().__init__()
         self.url = url
@@ -989,8 +996,8 @@ class VideoDownloadThread(QThread):
 
         else:
             self.finished.emit(True, self.row)
-            
-        
+
+
     def _hook(self, d):
         if not self.is_paused:
             self.update_eta += 1
@@ -1005,7 +1012,7 @@ class VideoDownloadThread(QThread):
                 self.progress.emit(f"{pr}%", self.row, f"{eta} Seconds")
             elif d["status"] == "finished":
                 self.progress.emit("", self.row, "")
-            
+
     def _hook_postprocess(self, d):
         if d["status"] == "started":
             self.progress.emit("Postprocessing Started", self.row, "")
@@ -1023,7 +1030,7 @@ class YoutubeSearch(QThread):
     def run(self):
         result = self.dl.yt_search(self.url,self.range, self.amount)
         self.result.emit(result)
-        
+
 class ImportYTDLP(QThread):
     def __init__(self):
         super().__init__()
@@ -1032,11 +1039,10 @@ class ImportYTDLP(QThread):
         sys.path.insert(0, Utils.get_abs_path("appdata/yt_dlp"))
         from yt_dlp import YoutubeDL
         from yt_dlp.utils import DownloadError
-        
+
 
 if __name__ == "__main__":
     app = QApplication([])
     mw = MainWindow()
     dl = Downloader()
     sys.exit(app.exec())
-    
