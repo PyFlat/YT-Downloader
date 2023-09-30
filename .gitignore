@@ -20,3 +20,7 @@ build_exe.bat
 update_ui.py
 
 mainwindow.ui
+
+yt_dlp
+
+*.ini

@@ -510,7 +510,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setWordWrap(True)
         self.tableWidget.setCornerButtonEnabled(False)
         self.tableWidget.setRowCount(0)
-        self.tableWidget.horizontalHeader().setVisible(True)
+        self.tableWidget.horizontalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(160)
         self.tableWidget.horizontalHeader().setHighlightSections(True)
@@ -647,7 +647,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(2)
+        self.mainpages.setCurrentIndex(3)
         self.search_stack_widg.setCurrentIndex(1)
         self.download_2.setCurrentIndex(1)
 
@@ -656,7 +656,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.2.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.3.0", None))
         self.toggle_sidebar_btn.setText("")
         self.top_label.setText("")
         self.search_btn.setText(QCoreApplication.translate("MainWindow", u"  Search", None))
