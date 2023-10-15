@@ -24,3 +24,4 @@ mainwindow.ui
 yt_dlp
 
 *.ini
+FFmpeg/
