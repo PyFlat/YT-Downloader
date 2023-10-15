@@ -483,7 +483,6 @@ class Downloader():
 
     def download_finished_self(self, success, tag):
         self.self_download_progress_dialog.close()
-        self.self_download_thread = None
         self.self_download_progress_dialog = None
         if not success: self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok); return
         if self.yes_no_messagebox("Download Finished\nStart installation?", QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
@@ -510,7 +509,6 @@ class Downloader():
 
     def download_finished_yt_dlp(self, success):
         self.yt_dlp_progress_dialog.close()
-        self.yt_dlp_download_thread = None
         self.yt_dlp_progress_dialog = None
         if not success: self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok); return
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
@@ -538,8 +536,7 @@ class Downloader():
             self.ffmpeg_progress_dialog.update_progress(progress)
 
     def download_finished_ffmpeg(self, success):
-        self.ffmpeg_download_thread = None
-        if  not success:
+        if not success:
             self.ffmpeg_progress_dialog.close()
             self.ffmpeg_progress_dialog = None
             self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
