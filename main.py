@@ -751,8 +751,11 @@ class DataHandler():
 
     def download_playlist(self):
         start, stop = mw.ui.playlist_range_slider.value()
-        for i in range(start-1, stop):
-            self.playlist_data_objects[i].prepare_for_download()
+        def download_next(i):
+            if i < stop:
+                self.playlist_data_objects[i].prepare_for_download()
+                QTimer.singleShot(1000, lambda: download_next(i + 1))
+        download_next(start - 1)
 
     def download(self, row=None):
         if row == None:
