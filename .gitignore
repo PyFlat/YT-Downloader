@@ -14,8 +14,6 @@ build_exe.bat
 
 *.iss
 
-mainwindow.ui
-
 yt_dlp
 
 *.ini
