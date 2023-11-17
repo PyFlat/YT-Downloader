@@ -1,7 +1,6 @@
 #TODO:
 # - Logging
 # - Issue (#2) (Fix)
-# - UI-Update --> Menubar
 
 
 import threading, datetime, os, configparser, sys, shutil, requests, re, copy
@@ -45,7 +44,6 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
 
-
         self.ui.mainpages.setCurrentIndex(0)
         self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
@@ -61,8 +59,13 @@ class MainWindow(QMainWindow):
 
         self.bind_keys()
 
+        self.search_shortcut = QShortcut(QKeySequence("Return"), self)
+
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(5)
+
+        self.thread_pool = QThreadPool()
+        self.thread_pool.setMaxThreadCount(1)
 
         self.ui.search_btn.setChecked(True)
 
@@ -86,7 +89,6 @@ class MainWindow(QMainWindow):
         self.ui.search_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(0)])
         self.ui.download_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(1)])
         self.ui.file_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(2)])
-        self.ui.settings_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(3)])
         self.ui.exit_btn.clicked.connect(lambda: [self.close()])
 
 
@@ -138,23 +140,14 @@ class MainWindow(QMainWindow):
 
 class Downloader():
     def __init__(self):
-        mw.timer.timeout.connect(lambda:[self.load_url(), mw.ui.url_entry.setEnabled(False)])
-        mw.ui.url_entry.textChanged.connect(lambda:mw.timer.start())
+        mw.ui.searching_button.clicked.connect(lambda:[self.load_url(), mw.ui.searching_button.setEnabled(False)])
         mw.ui.format_selection.currentIndexChanged.connect(lambda:self.update_file_box())
         mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
-        mw.ui.change_location_btn.clicked.connect(lambda: self.change_location())
-        mw.ui.show_folder_btn.clicked.connect(lambda: self.show_in_explorer())
-        mw.ui.download_ffmpeg_btn.clicked.connect(lambda:self.download_ffmpeg())
-        mw.ui.change_ffmpeg_path_btn.clicked.connect(lambda: self.change_ffmpeg_location())
         mw.ui.next_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(0))
         mw.ui.last_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(1))
-        mw.ui.update_yt_dlp_btn.clicked.connect(lambda: [self.download_yt_dlp()])
         mw.ui.scrollArea.verticalScrollBar().valueChanged.connect(lambda: [self.fill_new_widgs()])
-        mw.ui.search_for_update_btn.clicked.connect(lambda: self.search_for_updates(False))
+        mw.search_shortcut.activated.connect(self.enter_pressed)
         mw.ui.tableWidget.cellClicked.connect(self.handle_clicked)
-        mw.ui.max_thread_slider.valueChanged.connect(lambda ev:[mw.threadpool.setMaxThreadCount(ev), self.update_config("DEFAULT", "max-download-threads", str(ev))])
-        mw.ui.thumbnail_check_box.clicked.connect(lambda ev:[setattr(self, "stream_thumbnails", ev), self.update_config("DEFAULT", "thumbnail-streaming", str(ev))])
-        mw.ui.update_check_box.clicked.connect(lambda ev:[setattr(self, "update_check", ev), self.update_config("DEFAULT", "check-for-updates", str(ev))])
         self.file_formats = ["Mp4", "Mp3"]
         self.search_activated = True
         self.new_widget_thread_running = False
@@ -162,6 +155,7 @@ class Downloader():
         self.cur_process = []
         self.loading = False
         self.delete_exe_files()
+        self.connect_menu_actions()
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
@@ -169,6 +163,58 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def enter_pressed(self):
+        if mw.ui.mainpages.currentIndex() == 0:
+            mw.ui.searching_button.click()
+
+    def connect_menu_actions(self):
+        mw.ui.actionChange_Download_Folder.triggered.connect(lambda: self.change_location())
+        mw.ui.actionReveal_in_File_Explorer.triggered.connect(lambda: self.show_in_explorer())
+        mw.ui.actionAutomatic_Update_Check.triggered.connect(lambda ev:[setattr(self, "update_check", ev), self.update_config("DEFAULT", "check-for-updates", str(ev))])
+        mw.ui.actionShow_Thumbnails.triggered.connect(lambda ev:[setattr(self, "stream_thumbnails", ev), self.update_config("DEFAULT", "thumbnail-streaming", str(ev))])
+        mw.ui.actionSet_FFmpeg_Path.triggered.connect(lambda: self.change_ffmpeg_location())
+        mw.ui.actionDownload_FFmpeg.triggered.connect(lambda: self.download_ffmpeg())
+        mw.ui.actionUpdate_Yt_dlp.triggered.connect(lambda: self.download_yt_dlp())
+        mw.ui.actionSearch_For_Updates.triggered.connect(lambda: self.search_for_updates(False))
+        mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
+
+    def change_max_threads(self):
+        dialog = QDialog(mw)
+
+        layout = QVBoxLayout()
+
+        layout.setContentsMargins(20, 10, 20, 10)
+        layout.setSpacing(25)
+
+        label = QLabel(f'Maximum Download Threads: {self.max_download_threads}')
+        layout.addWidget(label)
+
+        slider = QSlider()
+        slider.setOrientation(Qt.Orientation.Horizontal)
+        slider.setMinimum(1)
+        slider.setMaximum(10)
+        slider.setValue(self.max_download_threads)
+        slider.valueChanged.connect(lambda value: label.setText(f'Maximum Download Threads: {value}'))
+        layout.addWidget(slider)
+
+        apply_button = QPushButton('Apply')
+        apply_button.clicked.connect(lambda: save_maximum_download_threads())
+
+        def save_maximum_download_threads():
+            mw.threadpool.setMaxThreadCount(slider.value())
+            self.update_config("DEFAULT", "max-download-threads", str(slider.value()))
+            self.max_download_threads = slider.value()
+            dialog.accept()
+
+        layout.addWidget(apply_button)
+
+        dialog.setLayout(layout)
+
+        dialog.setWindowTitle('Set Maximum Download Threads')
+        dialog.setFixedSize(375, 175)
+
+        dialog.exec()
 
     def delete_exe_files(self, folder_path="appdata"):
         for filename in os.listdir(folder_path):
@@ -220,21 +266,19 @@ class Downloader():
 
     def import_yt_dl(self):
         self.import_yt_dl_thread = ImportYTDLP()
-        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.url_entry.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
+        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.searching_button.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
         self.import_yt_dl_thread.start()
 
     def update_config_version(self, config):
         self.update_check = config["DEFAULT"].getboolean("check-for-updates", fallback=True)
-        mw.ui.update_check_box.setChecked(self.update_check)
+        mw.ui.actionAutomatic_Update_Check.setChecked(self.update_check)
         self.update_config("DEFAULT", "check-for-updates", str(self.update_check))
 
-        max_download_threads = int(config["DEFAULT"].get("max-download-threads", fallback=1))
-        mw.threadpool.setMaxThreadCount(max_download_threads)
-        mw.ui.max_thread_slider.setValue(max_download_threads)
-        self.update_config("DEFAULT", "max-download-threads", str(max_download_threads))
+        self.max_download_threads = int(config["DEFAULT"].get("max-download-threads", fallback=1))
+        mw.threadpool.setMaxThreadCount(self.max_download_threads)
 
         self.stream_thumbnails = config["DEFAULT"].getboolean("thumbnail-streaming", fallback=True)
-        mw.ui.thumbnail_check_box.setChecked(self.stream_thumbnails)
+        mw.ui.actionShow_Thumbnails.setChecked(self.stream_thumbnails)
         self.update_config("DEFAULT", "thumbnail-streaming", str(self.stream_thumbnails))
 
     def update_config(self, section, key, new_val):
@@ -301,7 +345,7 @@ class Downloader():
         if cur_link==None: cur_link = mw.ui.url_entry.text()
         if cur_link == "":
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
-            mw.invokeFunc(mw.ui.url_entry, "setDisabled", Qt.QueuedConnection, Q_ARG(bool, False))
+            mw.invokeFunc(mw.ui.searching_button, "setDisabled", Qt.QueuedConnection, Q_ARG(bool, False))
             return
 
         self.search_thread = YoutubeSearch(cur_link,"0:30", 30, self)
@@ -323,11 +367,11 @@ class Downloader():
         mw.create_search_widges()
         mw.invokeFunc(mw.ui.scrollArea.verticalScrollBar(), "setValue", Qt.QueuedConnection, Q_ARG(int, 0))
         if data == []:
-            mw.ui.url_entry.setEnabled(True)
+            mw.ui.searching_button.setEnabled(True)
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "No video found"))
             return
         self.fill_widget_thread = FillWidgetThread(data)
-        self.fill_widget_thread.finished.connect(lambda: mw.ui.url_entry.setEnabled(True))
+        self.fill_widget_thread.finished.connect(lambda: mw.ui.searching_button.setEnabled(True))
         self.fill_widget_thread.start()
         mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
 
@@ -343,10 +387,10 @@ class Downloader():
     def fill_new_widgs(self):
         if self.new_widget_thread_running or not self.search_activated: return
         if mw.ui.scrollArea.verticalScrollBar().value() == mw.ui.scrollArea.verticalScrollBar().maximum():
-            mw.ui.url_entry.setEnabled(False)
+            mw.ui.searching_button.setEnabled(False)
             mw.create_search_widges(True)
             self.fill_new_widgs_thread = FillWidgetThread()
-            self.fill_new_widgs_thread.finished.connect(lambda: mw.ui.url_entry.setEnabled(True))
+            self.fill_new_widgs_thread.finished.connect(lambda: mw.ui.searching_button.setEnabled(True))
             self.fill_new_widgs_thread.start()
         else:
             return
@@ -363,17 +407,21 @@ class Downloader():
             inf = ydl.extract_info(url, False)
             info = ydl.sanitize_info(inf)
         except DownloadError as e:
+            info = None
             if "urlopen error" in e.msg:
                 info = False
-            info = None
+        except Exception as e:
+            if e.__class__.__name__ == "NoSupportingHandlers":
+                info = None
         self.info  = info
         return info
 
     def update_main_frame(self):
         mw.ui.download_btn.setEnabled(True)
         mw.ui.download_btn.click()
-        mw.ui.url_entry.setEnabled(True)
+        mw.ui.searching_button.setEnabled(True)
         mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
+        mw.ui.image_label.clear()
         if self.stream_thumbnails:
             img = QImage()
             img.loadFromData(self.data.image_byt)
@@ -434,9 +482,8 @@ class Downloader():
             return False
 
     def user_info_no_ffmpeg(self):
-        self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation in the settings.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
-        mw.invokeFunc(mw.ui.mainpages, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 3))
-        mw.ui.settings_btn.click()
+        self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation in the menubar under tools.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+
 
     def handle_update_available(self, update_available, tag, auto):
         if update_available:
@@ -595,6 +642,7 @@ class DataHandler():
         self.author = info["channel"]
         self.info = info
         self.file_name_threads = []
+
         if skip:return
         if dl.stream_thumbnails:
             self.thumbnail_url = self.get_thumbnail_url()
@@ -621,6 +669,7 @@ class DataHandler():
         self.playlist_data_await = False
 
     def create_data_objects(self, url, info, index):
+        if "ERROR: " in url: print("WARNING")
         x = DataHandler(url, info, skip=True)
         self.playlist_data_objects[index] = x
         if not None in self.playlist_data_objects:
@@ -633,6 +682,7 @@ class DataHandler():
                 if int(thumbnail["width"]) >= 300 and int(thumbnail["width"]) <= 640:
                     x.append(thumbnail["url"])
         return x[-1]
+
     def get_available_resolutions(self):
         resolution = []
         for stream in self.info["formats"]:
@@ -674,7 +724,6 @@ class DataHandler():
         if row != None:
             self.download(row)
             return
-
         file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext, dl.file)
         file_name_thread.ret_filename.connect(self.check_if_exists)
         file_name_thread.start()
@@ -699,6 +748,7 @@ class DataHandler():
                 download.download(i)
                 return
         self.download()
+
     def download_playlist(self):
         start, stop = mw.ui.playlist_range_slider.value()
         for i in range(start-1, stop):
@@ -719,10 +769,6 @@ class DataHandler():
         dl_thread.progress.connect(self.update_progress)
         thread_worker = ThreadWorker(dl_thread)
         mw.threadpool.start(thread_worker)
-        mw.ui.top_label.setText("Download Started")
-        mw.ui.top_label.setVisible(True)
-        timer = QTimer()
-        timer.singleShot(5000, lambda: mw.ui.top_label.setVisible(False))
         if row == None: dl.downloads.append(copy.copy(self))
 
     def handle_download_finished(self, success, row):
@@ -803,7 +849,7 @@ class FillWidgetThread(QThread):
         if self.data == "Connection Error":
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
             mw.ui.info_start_label.setText("No Internet Connection")
-            mw.ui.url_entry.setEnabled(True)
+            mw.ui.searching_button.setEnabled(True)
             return
 
         new_widgs = not bool(self.data)
@@ -817,7 +863,7 @@ class FillWidgetThread(QThread):
                 mw.search_labels = mw.search_labels[:dl.search]
                 mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
                 mw.ui.info_start_label.setText("No Internet Connection")
-                mw.ui.url_entry.setEnabled(True)
+                mw.ui.searching_button.setEnabled(True)
                 dl.new_widget_thread_running = False
                 return
 
@@ -845,7 +891,7 @@ class FillWidgetThread(QThread):
                 except Exception:
                     mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
                     mw.ui.info_start_label.setText("No Internet Connection")
-                    mw.ui.url_entry.setEnabled(True)
+                    mw.ui.searching_button.setEnabled(True)
                     return
 
                 img = QImage.fromData(image_byt)
@@ -861,7 +907,6 @@ class FillWidgetThread(QThread):
             dl.search += search_len
             dl.new_widget_thread_running = False
         self.finished.emit(True)
-
 
 class GithubDownloader(QThread):
     progress = Signal(float)
@@ -947,9 +992,9 @@ class VideoDownloadThread(QThread):
         self.extension = ext
         self.ffmpeg = ffmpeg
         self.file_template = file_template
-        self.row = row
         self.update_eta = 0
         self.is_paused = False
+        self.row = row
     def run(self):
         if self.extension == "mp3":
             ydl_opts = {
@@ -989,7 +1034,7 @@ class VideoDownloadThread(QThread):
             if "urlopen error" in e.msg or "The read operation timed out" in e.msg:
                 self.finished.emit(False, self.row)
             else:
-                print(e)
+                print("")
 
         else:
             self.finished.emit(True, self.row)

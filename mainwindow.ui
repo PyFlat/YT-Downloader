@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1150</width>
-    <height>579</height>
+    <height>584</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,20 +52,20 @@ QPushButton {
 	text-align: center;
 	padding: 0px 10px 0px 10px;
 }
-QPushButton#search_btn, 
+QPushButton#search_btn,
 QPushButton#settings_btn,
 QPushButton#download_btn,
 QPushButton#file_btn,
-QPushButton#exit_btn, 
+QPushButton#exit_btn,
 QPushButton#toggle_sidebar_btn  {
 	border-radius: 0px;
 	border: 0;
 	text-align: left;
 	padding-left: 12.5px;
 }
-QPushButton#search_btn:checked, 
-QPushButton#settings_btn:checked, 
-QPushButton#download_btn:checked, 
+QPushButton#search_btn:checked,
+QPushButton#settings_btn:checked,
+QPushButton#download_btn:checked,
 QPushButton#file_btn:checked {
 	border-right: 3px solid white;
 
@@ -87,10 +87,13 @@ QLabel#search_labels, QLineEdit, QLabel#image_label, QLabel#top_label{
 	border: 3px solid white;
 	border-radius: 5px;
 }
+QLabel#search_labels:disabled{
+	border-color: black;
+}
+
 QLabel#top_label{
 	padding: 0px 10px 0px 10px;
 }
-
 
 QPushButton:disabled, QLineEdit:disabled{
 	color: #b2b2b2;
@@ -123,7 +126,7 @@ QComboBox::down-arrow:disabled {
 QListView {
 	background-color: #323C5A;
 	padding: 5px;
-	
+
 }
 
 QComboBox:drop-down {
@@ -161,6 +164,10 @@ QMessageBox, QProgressDialog {
 	background-color: #323C5A;
 }
 
+QMessageBox QLabel{
+    padding-right: 20px
+}
+
 
 QMessageBox QPushButton, QProgressDialog QPushButton{
 	border: 2px solid white;
@@ -178,14 +185,16 @@ QSlider::handle {
 	width: 20px;
 	border-radius: 10px;
 }
+QSlider::handle:pressed {
+	background: #50b8fe;
+}
 
 QSlider::groove:horizontal {
 	background: #414361;
 	height: 20px;
 	border-radius: 10px;
-	
-}
 
+}
 
 SliderLabel {
 	margin-bottom: 3px;
@@ -237,7 +246,11 @@ QTableView::item{
 
 QTableView::item:selected{
 	background-color: #515670;
-}</string>
+}
+
+QMenu {icon-size: 25px;}
+
+QMenu::item {background: transparent;}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -539,35 +552,6 @@ QTableView::item:selected{
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QPushButton" name="settings_btn">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>  Settings</string>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>appdata/images/settings.png</normaloff>appdata/images/settings.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>45</width>
-                 <height>45</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="autoExclusive">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
@@ -632,6 +616,12 @@ QTableView::item:selected{
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>500</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -663,7 +653,7 @@ QTableView::item:selected{
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>3</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="mpage1">
              <property name="sizePolicy">
@@ -724,23 +714,7 @@ QTableView::item:selected{
                  <property name="verticalSpacing">
                   <number>25</number>
                  </property>
-                 <item row="0" column="0">
-                  <widget class="QLineEdit" name="url_entry">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                   <property name="placeholderText">
-                    <string>Insert Video or Playlist URL</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
+                 <item row="2" column="0">
                   <widget class="QStackedWidget" name="search_stack_widg">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -749,7 +723,7 @@ QTableView::item:selected{
                     </sizepolicy>
                    </property>
                    <property name="currentIndex">
-                    <number>1</number>
+                    <number>0</number>
                    </property>
                    <widget class="QWidget" name="page">
                     <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -837,7 +811,7 @@ QTableView::item:selected{
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>100</width>
+                          <width>1026</width>
                           <height>375</height>
                          </rect>
                         </property>
@@ -878,6 +852,59 @@ QTableView::item:selected{
                      </item>
                     </layout>
                    </widget>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QFrame" name="frame_3">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <property name="spacing">
+                     <number>20</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QLineEdit" name="url_entry">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                      <property name="placeholderText">
+                       <string>Insert Video or Playlist URL</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="searching_button">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Search</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>
@@ -928,6 +955,12 @@ QTableView::item:selected{
                  </property>
                  <item>
                   <widget class="QFrame" name="image_frame">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="minimumSize">
                     <size>
                      <width>480</width>
@@ -1092,13 +1125,13 @@ QTableView::item:selected{
                       <number>15</number>
                      </property>
                      <property name="leftMargin">
-                      <number>0</number>
+                      <number>300</number>
                      </property>
                      <property name="topMargin">
                       <number>0</number>
                      </property>
                      <property name="rightMargin">
-                      <number>0</number>
+                      <number>300</number>
                      </property>
                      <property name="bottomMargin">
                       <number>0</number>
@@ -1108,20 +1141,6 @@ QTableView::item:selected{
                      </item>
                      <item>
                       <widget class="QComboBox" name="resolution_selection"/>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="change_location_btn">
-                       <property name="text">
-                        <string>Change Download Folder</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="show_folder_btn">
-                       <property name="text">
-                        <string>Show Folder in Explorer</string>
-                       </property>
-                      </widget>
                      </item>
                     </layout>
                    </widget>
@@ -1176,7 +1195,7 @@ QTableView::item:selected{
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>40</height>
+                      <height>30</height>
                      </size>
                     </property>
                     <property name="text">
@@ -1198,7 +1217,13 @@ QTableView::item:selected{
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>20</height>
+                      <height>80</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>80</height>
                      </size>
                     </property>
                     <property name="orientation">
@@ -1401,123 +1426,6 @@ QTableView::item:selected{
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="mpage3">
-             <layout class="QVBoxLayout" name="verticalLayout_11">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item alignment="Qt::AlignTop">
-               <widget class="QFrame" name="selection_frame_2">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_3">
-                 <property name="leftMargin">
-                  <number>10</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>10</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>10</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>10</number>
-                 </property>
-                 <property name="horizontalSpacing">
-                  <number>10</number>
-                 </property>
-                 <property name="verticalSpacing">
-                  <number>25</number>
-                 </property>
-                 <item row="1" column="2" colspan="2">
-                  <widget class="QLabeledSlider" name="max_thread_slider">
-                   <property name="styleSheet">
-                    <string notr="true">QSlider::groove:horizontal{background: #2A2D43}</string>
-                   </property>
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>10</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QPushButton" name="change_ffmpeg_path_btn">
-                   <property name="text">
-                    <string>Change FFmpeg Path</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QPushButton" name="download_ffmpeg_btn">
-                   <property name="text">
-                    <string>Download FFmpeg</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QCheckBox" name="update_check_box">
-                   <property name="text">
-                    <string>Check For Updates</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QPushButton" name="search_for_update_btn">
-                   <property name="text">
-                    <string>Search For Updates</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="label">
-                   <property name="text">
-                    <string>Set Maximum Threads: </string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QPushButton" name="update_yt_dlp_btn">
-                   <property name="text">
-                    <string>Update yt-dlp</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QCheckBox" name="thumbnail_check_box">
-                   <property name="text">
-                    <string>Show Thumbnails</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
            </widget>
           </item>
          </layout>
@@ -1543,15 +1451,20 @@ QTableView::item:selected{
     </property>
     <addaction name="actionAutomatic_Update_Check"/>
     <addaction name="actionShow_Thumbnails"/>
+    <addaction name="actionDefault_Resolution"/>
+    <addaction name="actionMaximum_Threads"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
     <addaction name="actionSearch_For_Updates"/>
-    <addaction name="actionAbout"/>
+    <addaction name="separator"/>
     <addaction name="actionShow_on_Github"/>
+    <addaction name="separator"/>
     <addaction name="actionShow_Changelog"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -1559,43 +1472,73 @@ QTableView::item:selected{
     </property>
     <addaction name="actionSet_FFmpeg_Path"/>
     <addaction name="actionDownload_FFmpeg"/>
+    <addaction name="separator"/>
     <addaction name="actionUpdate_Yt_dlp"/>
    </widget>
+   <widget class="QMenu" name="menuFile_2">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionChange_Download_Folder"/>
+    <addaction name="actionReveal_in_File_Explorer"/>
+   </widget>
+   <addaction name="menuFile_2"/>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionSearch_For_Updates">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Search For Updates</string>
+    <string>Search for Updates</string>
    </property>
   </action>
   <action name="actionAbout">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>About</string>
    </property>
   </action>
   <action name="actionShow_on_Github">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Show on Github</string>
    </property>
   </action>
   <action name="actionShow_Changelog">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Show Changelog</string>
    </property>
   </action>
   <action name="actionSet_FFmpeg_Path">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Set FFmpeg-Path</string>
    </property>
   </action>
   <action name="actionDownload_FFmpeg">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Download FFmpeg</string>
    </property>
   </action>
   <action name="actionUpdate_Yt_dlp">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Update Yt-dlp</string>
    </property>
@@ -1604,16 +1547,54 @@ QTableView::item:selected{
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <selectedoff>appdata/images/square.png</selectedoff>
+     <selectedon>appdata/images/check-square.png</selectedon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>Automatic Update Check</string>
+    <string>Auto Update Check</string>
    </property>
   </action>
   <action name="actionShow_Thumbnails">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <selectedoff>appdata/images/square.png</selectedoff>
+     <selectedon>appdata/images/check-square.png</selectedon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Show Thumbnails</string>
+   </property>
+  </action>
+  <action name="actionChange_Download_Folder">
+   <property name="text">
+    <string>Change Download Folder</string>
+   </property>
+  </action>
+  <action name="actionReveal_in_File_Explorer">
+   <property name="text">
+    <string>Reveal in File Explorer</string>
+   </property>
+  </action>
+  <action name="actionDefault_Resolution">
+   <property name="text">
+    <string>Default Resolution</string>
+   </property>
+  </action>
+  <action name="actionMaximum_Threads">
+   <property name="text">
+    <string>Maximum Threads</string>
    </property>
   </action>
  </widget>
@@ -1625,11 +1606,6 @@ QTableView::item:selected{
    <header>customtablewidget.h</header>
   </customwidget>
   <customwidget>
-   <class>QLabeledSlider</class>
-   <extends>QSlider</extends>
-   <header>qlabeledslider.h</header>
-  </customwidget>
-  <customwidget>
    <class>QLabeledRangeSlider</class>
    <extends>QSlider</extends>
    <header>qlabeledrangeslider.h</header>
@@ -1638,19 +1614,12 @@ QTableView::item:selected{
  </customwidgets>
  <tabstops>
   <tabstop>search_btn</tabstop>
-  <tabstop>url_entry</tabstop>
   <tabstop>download_btn</tabstop>
-  <tabstop>settings_btn</tabstop>
   <tabstop>toggle_sidebar_btn</tabstop>
   <tabstop>exit_btn</tabstop>
   <tabstop>resolution_selection</tabstop>
-  <tabstop>change_location_btn</tabstop>
-  <tabstop>show_folder_btn</tabstop>
   <tabstop>last_page_btn</tabstop>
   <tabstop>download_button</tabstop>
-  <tabstop>change_ffmpeg_path_btn</tabstop>
-  <tabstop>download_ffmpeg_btn</tabstop>
-  <tabstop>update_yt_dlp_btn</tabstop>
   <tabstop>format_selection</tabstop>
   <tabstop>scrollArea</tabstop>
  </tabstops>
