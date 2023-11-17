@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QCheckBox
     QComboBox, QFrame, QGridLayout, QHBoxLayout,
     QLabel, QLayout, QLineEdit,
     QPushButton, QScrollArea, QSizePolicy,
-    QStackedWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+    QStackedWidget, QTableWidgetItem, QVBoxLayout, QWidget, QMenuBar, QMenu)
 
 from src.CustomWidgets.CustomTableWidget import CustomTableWidget
 from superqt import QLabeledRangeSlider, QLabeledSlider
@@ -629,6 +629,12 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.main_frame)
 
         MainWindow.setCentralWidget(self.centralwidget)
+        self.menuBar = QMenuBar(MainWindow)
+        self.menuBar.setObjectName(u"menuBar")
+        self.menuBar.setGeometry(QRect(0, 0, 1150, 37))
+        self.menuFile = QMenu(self.menuBar)
+        self.menuFile.setObjectName(u"menuFile")
+        MainWindow.setMenuBar(self.menuBar)
         QWidget.setTabOrder(self.search_btn, self.url_entry)
         QWidget.setTabOrder(self.url_entry, self.download_btn)
         QWidget.setTabOrder(self.download_btn, self.settings_btn)
@@ -644,6 +650,8 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.download_ffmpeg_btn, self.update_yt_dlp_btn)
         QWidget.setTabOrder(self.update_yt_dlp_btn, self.format_selection)
         QWidget.setTabOrder(self.format_selection, self.scrollArea)
+
+        self.menuBar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
 
@@ -700,5 +708,6 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"Set Maximum Threads: ", None))
         self.update_yt_dlp_btn.setText(QCoreApplication.translate("MainWindow", u"Update yt-dlp", None))
         self.thumbnail_check_box.setText(QCoreApplication.translate("MainWindow", u"Show Thumbnails", None))
+        self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi
 

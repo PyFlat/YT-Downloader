@@ -3,11 +3,8 @@
 build/
 Downloads/
 
-ui_to_py.bat
 
 setup.py
-
-mainwindow.ui
 
 mainwindow_ui.py
 
@@ -16,8 +13,6 @@ ui_mainwindow.py
 build_exe.bat
 
 *.iss
-
-update_ui.py
 
 mainwindow.ui
 
