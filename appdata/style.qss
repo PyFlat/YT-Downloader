@@ -18,20 +18,20 @@ QPushButton {
 	text-align: center;
 	padding: 0px 10px 0px 10px;
 }
-QPushButton#search_btn, 
+QPushButton#search_btn,
 QPushButton#settings_btn,
 QPushButton#download_btn,
 QPushButton#file_btn,
-QPushButton#exit_btn, 
+QPushButton#exit_btn,
 QPushButton#toggle_sidebar_btn  {
 	border-radius: 0px;
 	border: 0;
 	text-align: left;
 	padding-left: 12.5px;
 }
-QPushButton#search_btn:checked, 
-QPushButton#settings_btn:checked, 
-QPushButton#download_btn:checked, 
+QPushButton#search_btn:checked,
+QPushButton#settings_btn:checked,
+QPushButton#download_btn:checked,
 QPushButton#file_btn:checked {
 	border-right: 3px solid white;
 
@@ -92,7 +92,7 @@ QComboBox::down-arrow:disabled {
 QListView {
 	background-color: #323C5A;
 	padding: 5px;
-	
+
 }
 
 QComboBox:drop-down {
@@ -159,7 +159,7 @@ QSlider::groove:horizontal {
 	background: #414361;
 	height: 20px;
 	border-radius: 10px;
-	
+
 }
 
 SliderLabel {
@@ -213,3 +213,7 @@ QTableView::item{
 QTableView::item:selected{
 	background-color: #515670;
 }
+
+QMenu {icon-size: 25px;}
+
+QMenu::item {background: transparent;}
