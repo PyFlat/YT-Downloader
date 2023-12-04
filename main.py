@@ -53,9 +53,6 @@ class MainWindow(QMainWindow):
 
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
 
-        self.timer2 = QTimer()
-        self.timer2.setSingleShot(True)
-
         self.bind_keys()
 
         self.search_shortcut = QShortcut(QKeySequence("Return"), self)
@@ -263,18 +260,23 @@ class Downloader():
 
 
         if self.yt_dlp_installed == "False":
-            if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
-                self.download_yt_dlp()
-            else:
-                mw.close()
-                sys.exit()
+            self.user_info_no_yt_dlp()
         else:
             self.import_yt_dl()
+
+    def user_info_no_yt_dlp(self):
+        if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
+            self.download_yt_dlp()
+        else:
+            mw.close()
+            sys.exit()
+
 
     def import_yt_dl(self):
         logger.info("Importing yt-dlp")
         self.import_yt_dl_thread = ImportYTDLP()
         self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.searching_button.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
+        self.import_yt_dl_thread.result.connect(lambda e: self.user_info_no_yt_dlp() if not e else ())
         self.import_yt_dl_thread.start()
 
     def update_config_version(self, config):
@@ -604,6 +606,7 @@ class Downloader():
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
         self.import_yt_dl()
+
 
     def download_ffmpeg(self):
         logger.info("Download FFmpeg started")
@@ -1052,6 +1055,7 @@ class VideoDownloadThread(QThread):
         self.update_eta = 0
         self.is_paused = False
         self.row = row
+
     def run(self):
         if self.extension == "mp3":
             ydl_opts = {
@@ -1097,7 +1101,6 @@ class VideoDownloadThread(QThread):
         else:
             self.finished.emit(True, self.row)
 
-
     def _hook(self, d):
         if not self.is_paused:
             self.update_eta += 1
@@ -1132,13 +1135,27 @@ class YoutubeSearch(QThread):
         self.result.emit(result)
 
 class ImportYTDLP(QThread):
+    result = Signal(bool)
     def __init__(self):
         super().__init__()
     def run(self):
         global YoutubeDL, DownloadError
-        sys.path.insert(0, Utils.get_abs_path("appdata/yt_dlp"))
-        from yt_dlp import YoutubeDL
-        from yt_dlp.utils import DownloadError
+        if Utils.get_abs_path("appdata/yt_dlp") in sys.path:
+            sys.path.remove(Utils.get_abs_path("appdata/yt_dlp"))
+        if os.path.isfile(Utils.get_abs_path("appdata/yt_dlp")):
+            sys.path.insert(0, Utils.get_abs_path("appdata/yt_dlp"))
+        try:
+            from yt_dlp import YoutubeDL
+            from yt_dlp.utils import DownloadError
+            logger.info("Imported yt-dlp succesfully")
+            self.result.emit(True)
+        except ModuleNotFoundError as e:
+            logger.error(f"An error occured, that yt-dlp doesn't exist. Probably it isn't downloaded!")
+            self.result.emit(False)
+        except Exception as e:
+            logger.error(f"An unnokwn error occured when trying to import yt-dlp: {e}")
+            self.result.emit(True)
+
 
 
 if __name__ == "__main__":
