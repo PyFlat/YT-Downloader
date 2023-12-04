@@ -3,6 +3,7 @@
 build/
 Downloads/
 
+logs/
 
 setup.py
 
