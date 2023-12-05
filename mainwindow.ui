@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1150</width>
-    <height>584</height>
+    <height>550</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,12 +22,6 @@
     <height>550</height>
    </size>
   </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>16777215</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Youtube Downloader v1.3.0</string>
   </property>
@@ -40,7 +34,7 @@
 	background-color:  #323C5A;
 }
 
-QFrame#sidebar, QFrame#topbar, QFrame#topframe, QFrame#sb_top_frame{
+QFrame#sidebar, QMenuBar, QFrame#sb_top_frame{
 	background-color: #2A2D43;
 }
 
@@ -53,7 +47,6 @@ QPushButton {
 	padding: 0px 10px 0px 10px;
 }
 QPushButton#search_btn,
-QPushButton#settings_btn,
 QPushButton#download_btn,
 QPushButton#file_btn,
 QPushButton#exit_btn,
@@ -64,7 +57,6 @@ QPushButton#toggle_sidebar_btn  {
 	padding-left: 12.5px;
 }
 QPushButton#search_btn:checked,
-QPushButton#settings_btn:checked,
 QPushButton#download_btn:checked,
 QPushButton#file_btn:checked {
 	border-right: 3px solid white;
@@ -82,17 +74,13 @@ QLabel{
 	qproperty-alignment: AlignCenter;
 }
 
-QLabel#search_labels, QLineEdit, QLabel#image_label, QLabel#top_label{
+QLabel#search_labels, QLineEdit, QLabel#image_label{
 	background: #2A2D43;
 	border: 3px solid white;
 	border-radius: 5px;
 }
 QLabel#search_labels:disabled{
 	border-color: black;
-}
-
-QLabel#top_label{
-	padding: 0px 10px 0px 10px;
 }
 
 QPushButton:disabled, QLineEdit:disabled{
@@ -250,7 +238,25 @@ QTableView::item:selected{
 
 QMenu {icon-size: 25px;}
 
-QMenu::item {background: transparent;}</string>
+QMenu::item {background: transparent;}
+
+QMenuBar::item:selected{
+    background: #3f435a;
+}
+
+/* QScrollBar {
+    width: 8px;
+} */
+
+/* QScrollBar::handle:vertical {
+    background: white;
+    border-radius: 5px;
+} */
+
+/* QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
+    border: none;
+    background: none;
+} */</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -275,105 +281,6 @@ QMenu::item {background: transparent;}</string>
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
-     <widget class="QFrame" name="topbar">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="toggle_sidebar_btn">
-         <property name="maximumSize">
-          <size>
-           <width>70</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>appdata/images/menu.png</normaloff>appdata/images/menu.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>45</width>
-           <height>45</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="topframe">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item alignment="Qt::AlignHCenter">
-           <widget class="QLabel" name="top_label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item>
      <widget class="QFrame" name="main_frame">
       <property name="sizePolicy">
@@ -453,7 +360,7 @@ QMenu::item {background: transparent;}</string>
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>25</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
@@ -461,6 +368,39 @@ QMenu::item {background: transparent;}</string>
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item>
+              <widget class="QPushButton" name="toggle_sidebar_btn">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>appdata/images/menu.png</normaloff>appdata/images/menu.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>45</width>
+                 <height>45</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item>
               <widget class="QPushButton" name="search_btn">
                <property name="minimumSize">
@@ -616,12 +556,6 @@ QMenu::item {background: transparent;}</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>500</height>
-          </size>
-         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -653,7 +587,7 @@ QMenu::item {background: transparent;}</string>
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="mpage1">
              <property name="sizePolicy">
@@ -723,7 +657,7 @@ QMenu::item {background: transparent;}</string>
                     </sizepolicy>
                    </property>
                    <property name="currentIndex">
-                    <number>0</number>
+                    <number>1</number>
                    </property>
                    <widget class="QWidget" name="page">
                     <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -779,18 +713,6 @@ QMenu::item {background: transparent;}</string>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>375</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
                        <property name="frameShape">
                         <enum>QFrame::NoFrame</enum>
                        </property>
@@ -812,7 +734,7 @@ QMenu::item {background: transparent;}</string>
                           <x>0</x>
                           <y>0</y>
                           <width>1026</width>
-                          <height>375</height>
+                          <height>69</height>
                          </rect>
                         </property>
                         <property name="sizePolicy">
@@ -843,8 +765,11 @@ QMenu::item {background: transparent;}</string>
                          <property name="bottomMargin">
                           <number>10</number>
                          </property>
-                         <property name="spacing">
-                          <number>5</number>
+                         <property name="horizontalSpacing">
+                          <number>0</number>
+                         </property>
+                         <property name="verticalSpacing">
+                          <number>10</number>
                          </property>
                         </layout>
                        </widget>
@@ -867,13 +792,13 @@ QMenu::item {background: transparent;}</string>
                      <number>20</number>
                     </property>
                     <property name="leftMargin">
-                     <number>0</number>
+                     <number>10</number>
                     </property>
                     <property name="topMargin">
                      <number>0</number>
                     </property>
                     <property name="rightMargin">
-                     <number>0</number>
+                     <number>10</number>
                     </property>
                     <property name="bottomMargin">
                      <number>0</number>
@@ -1217,7 +1142,7 @@ QMenu::item {background: transparent;}</string>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>80</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -1615,7 +1540,6 @@ QMenu::item {background: transparent;}</string>
  <tabstops>
   <tabstop>search_btn</tabstop>
   <tabstop>download_btn</tabstop>
-  <tabstop>toggle_sidebar_btn</tabstop>
   <tabstop>exit_btn</tabstop>
   <tabstop>resolution_selection</tabstop>
   <tabstop>last_page_btn</tabstop>

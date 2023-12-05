@@ -6,7 +6,7 @@
 	background-color:  #323C5A;
 }
 
-QFrame#sidebar, QFrame#topbar, QFrame#topframe, QFrame#sb_top_frame{
+QFrame#sidebar, QMenuBar, QFrame#sb_top_frame{
 	background-color: #2A2D43;
 }
 
@@ -19,7 +19,6 @@ QPushButton {
 	padding: 0px 10px 0px 10px;
 }
 QPushButton#search_btn,
-QPushButton#settings_btn,
 QPushButton#download_btn,
 QPushButton#file_btn,
 QPushButton#exit_btn,
@@ -30,7 +29,6 @@ QPushButton#toggle_sidebar_btn  {
 	padding-left: 12.5px;
 }
 QPushButton#search_btn:checked,
-QPushButton#settings_btn:checked,
 QPushButton#download_btn:checked,
 QPushButton#file_btn:checked {
 	border-right: 3px solid white;
@@ -48,17 +46,13 @@ QLabel{
 	qproperty-alignment: AlignCenter;
 }
 
-QLabel#search_labels, QLineEdit, QLabel#image_label, QLabel#top_label{
+QLabel#search_labels, QLineEdit, QLabel#image_label{
 	background: #2A2D43;
 	border: 3px solid white;
 	border-radius: 5px;
 }
 QLabel#search_labels:disabled{
 	border-color: black;
-}
-
-QLabel#top_label{
-	padding: 0px 10px 0px 10px;
 }
 
 QPushButton:disabled, QLineEdit:disabled{
@@ -222,16 +216,22 @@ QMenuBar::item:selected{
     background: #3f435a;
 }
 
-/* QScrollBar {
+QScrollBar {
     width: 8px;
-} */
-
-/* QScrollBar::handle:vertical {
-    background: white;
-    border-radius: 5px;
-} */
-
-/* QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
-    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
+    border: 0;
     background: none;
-} */
+}
+
+QScrollBar::handle:vertical {
+    background: white;
+    border: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
+    background: #323C5A;
+}

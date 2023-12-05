@@ -45,7 +45,6 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
-        self.ui.top_label.hide()
         self.ui.download_btn.setEnabled(False)
         self.ui.tableWidget.horizontalHeader().setVisible(True)
 
@@ -135,7 +134,7 @@ class MainWindow(QMainWindow):
         return super().closeEvent(event)
 
     def paintEvent(self, event: QPaintEvent):
-        self.ui.scrollArea.setMinimumHeight(self.geometry().height()-175)
+        self.ui.scrollArea.setMinimumHeight(self.geometry().height()-150)
         return super().paintEvent(event)
 
 class Downloader():
