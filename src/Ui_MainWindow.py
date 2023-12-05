@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QCheckBox
     QComboBox, QFrame, QGridLayout, QHBoxLayout,
     QLabel, QLayout, QLineEdit,
     QPushButton, QScrollArea, QSizePolicy,
-    QStackedWidget, QTableWidgetItem, QVBoxLayout, QWidget, QMenuBar, QMenu)
+    QStackedWidget, QTableWidgetItem, QVBoxLayout, QWidget, QMenuBar, QMenu, QSpacerItem)
 
 from src.CustomWidgets.CustomTableWidget import CustomTableWidget
 from superqt import QLabeledRangeSlider, QLabeledSlider
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1150, 600)
+        MainWindow.resize(1150, 550)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -74,48 +74,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.topbar = QFrame(self.centralwidget)
-        self.topbar.setObjectName(u"topbar")
-        self.topbar.setMinimumSize(QSize(0, 50))
-        self.topbar.setMaximumSize(QSize(16777215, 50))
-        self.topbar.setStyleSheet(u"")
-        self.topbar.setFrameShape(QFrame.NoFrame)
-        self.topbar.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout = QHBoxLayout(self.topbar)
-        self.horizontalLayout.setSpacing(0)
-        self.horizontalLayout.setContentsMargins(10, 10, 10, 10)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.toggle_sidebar_btn = QPushButton(self.topbar)
-        self.toggle_sidebar_btn.setObjectName(u"toggle_sidebar_btn")
-        self.toggle_sidebar_btn.setMaximumSize(QSize(70, 50))
-        icon1 = QIcon()
-        icon1.addFile(u"appdata/images/menu.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.toggle_sidebar_btn.setIcon(icon1)
-        self.toggle_sidebar_btn.setIconSize(QSize(45, 45))
-
-        self.horizontalLayout.addWidget(self.toggle_sidebar_btn)
-
-        self.topframe = QFrame(self.topbar)
-        self.topframe.setObjectName(u"topframe")
-        self.topframe.setFrameShape(QFrame.StyledPanel)
-        self.topframe.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_7 = QHBoxLayout(self.topframe)
-        self.horizontalLayout_7.setSpacing(0)
-        self.horizontalLayout_7.setContentsMargins(10, 10, 10, 10)
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.horizontalLayout_7.setContentsMargins(0, 5, 0, 5)
-        self.top_label = QLabel(self.topframe)
-        self.top_label.setObjectName(u"top_label")
-
-        self.horizontalLayout_7.addWidget(self.top_label, 0, Qt.AlignHCenter)
-
-
-        self.horizontalLayout.addWidget(self.topframe)
-
-
-        self.verticalLayout.addWidget(self.topbar)
-
         self.main_frame = QFrame(self.centralwidget)
         self.main_frame.setObjectName(u"main_frame")
         sizePolicy.setHeightForWidth(self.main_frame.sizePolicy().hasHeightForWidth())
@@ -146,7 +104,20 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setSpacing(0)
         self.verticalLayout_5.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalLayout_5.setContentsMargins(0, 25, 0, 0)
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.toggle_sidebar_btn = QPushButton(self.sb_top_frame)
+        self.toggle_sidebar_btn.setObjectName(u"toggle_sidebar_btn")
+        icon1 = QIcon()
+        icon1.addFile(u"appdata/images/menu.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.toggle_sidebar_btn.setIcon(icon1)
+        self.toggle_sidebar_btn.setIconSize(QSize(45, 45))
+
+        self.verticalLayout_5.addWidget(self.toggle_sidebar_btn)
+
+        self.verticalSpacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer)
+
         self.search_btn = QPushButton(self.sb_top_frame)
         self.search_btn.setObjectName(u"search_btn")
         self.search_btn.setMinimumSize(QSize(0, 50))
@@ -217,7 +188,6 @@ class Ui_MainWindow(object):
         self.frame_5.setObjectName(u"frame_5")
         sizePolicy.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
         self.frame_5.setSizePolicy(sizePolicy)
-        self.frame_5.setMinimumSize(QSize(0, 500))
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_3 = QHBoxLayout(self.frame_5)
@@ -284,8 +254,6 @@ class Ui_MainWindow(object):
         self.scrollArea.setObjectName(u"scrollArea")
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
         self.scrollArea.setSizePolicy(sizePolicy)
-        self.scrollArea.setMinimumSize(QSize(0, 375))
-        self.scrollArea.setMaximumSize(QSize(16777215, 16777215))
         self.scrollArea.setFrameShape(QFrame.NoFrame)
         self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -293,15 +261,17 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1026, 375))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1026, 69))
         sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents.sizePolicy().hasHeightForWidth())
         self.scrollAreaWidgetContents.setSizePolicy(sizePolicy)
         self.scrollAreaWidgetContents.setMinimumSize(QSize(0, 0))
         self.gridLayout_2 = QGridLayout(self.scrollAreaWidgetContents)
-        self.gridLayout_2.setSpacing(5)
+        self.gridLayout_2.setSpacing(10)
         self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
+        self.gridLayout_2.setHorizontalSpacing(0)
+        self.gridLayout_2.setVerticalSpacing(10)
         self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -319,7 +289,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.setSpacing(20)
         self.horizontalLayout_11.setContentsMargins(10, 10, 10, 10)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_11.setContentsMargins(10, 0, 10, 0)
         self.url_entry = QLineEdit(self.frame_3)
         self.url_entry.setObjectName(u"url_entry")
         self.url_entry.setEnabled(True)
@@ -494,7 +464,7 @@ class Ui_MainWindow(object):
         self.playlist_range_slider.setObjectName(u"playlist_range_slider")
         sizePolicy.setHeightForWidth(self.playlist_range_slider.sizePolicy().hasHeightForWidth())
         self.playlist_range_slider.setSizePolicy(sizePolicy)
-        self.playlist_range_slider.setMinimumSize(QSize(0, 80))
+        self.playlist_range_slider.setMinimumSize(QSize(0, 20))
         self.playlist_range_slider.setMaximumSize(QSize(16777215, 80))
         self.playlist_range_slider.setOrientation(Qt.Horizontal)
 
@@ -617,8 +587,7 @@ class Ui_MainWindow(object):
         self.menuFile_2.setObjectName(u"menuFile_2")
         MainWindow.setMenuBar(self.menuBar)
         QWidget.setTabOrder(self.search_btn, self.download_btn)
-        QWidget.setTabOrder(self.download_btn, self.toggle_sidebar_btn)
-        QWidget.setTabOrder(self.toggle_sidebar_btn, self.exit_btn)
+        QWidget.setTabOrder(self.download_btn, self.exit_btn)
         QWidget.setTabOrder(self.exit_btn, self.resolution_selection)
         QWidget.setTabOrder(self.resolution_selection, self.last_page_btn)
         QWidget.setTabOrder(self.last_page_btn, self.download_button)
@@ -649,8 +618,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(1)
-        self.search_stack_widg.setCurrentIndex(0)
+        self.mainpages.setCurrentIndex(0)
+        self.search_stack_widg.setCurrentIndex(1)
         self.download_2.setCurrentIndex(1)
 
 
@@ -673,7 +642,6 @@ class Ui_MainWindow(object):
         self.actionDefault_Resolution.setText(QCoreApplication.translate("MainWindow", u"Default Resolution", None))
         self.actionMaximum_Threads.setText(QCoreApplication.translate("MainWindow", u"Maximum Threads", None))
         self.toggle_sidebar_btn.setText("")
-        self.top_label.setText("")
         self.search_btn.setText(QCoreApplication.translate("MainWindow", u"  Search", None))
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"  Download", None))
         self.file_btn.setText(QCoreApplication.translate("MainWindow", u"  Files", None))
