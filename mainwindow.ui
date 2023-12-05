@@ -1394,8 +1394,6 @@ QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
     <addaction name="actionShow_on_Github"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Changelog"/>
-    <addaction name="separator"/>
-    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">

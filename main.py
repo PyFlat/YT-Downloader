@@ -179,6 +179,7 @@ class Downloader():
         mw.ui.actionSearch_For_Updates.triggered.connect(lambda: self.search_for_updates(False))
         mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
         mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
+        mw.ui.actionShow_on_Github.triggered.connect(lambda: self.show_on_github())
 
     def change_max_threads(self):
         dialog = QDialog(mw)
@@ -544,6 +545,9 @@ class Downloader():
         self.update_thread = UpdateThread(auto)
         self.update_thread.update_available.connect(self.handle_update_available)
         self.update_thread.start()
+
+    def show_on_github(self):
+        os.popen("start https://github.com/PyFlat/YT-Downloader")
 
     def update_self(self, tag):
         logger.info("Update download started")

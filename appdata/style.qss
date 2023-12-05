@@ -210,6 +210,13 @@ QTableView::item:selected{
 
 QMenu {icon-size: 25px;}
 
+QMenu::separator {
+    height: 2px;
+    background: white;
+    margin: 0 12px;
+}
+
+
 QMenu::item {background: transparent;}
 
 QMenuBar::item:selected{
