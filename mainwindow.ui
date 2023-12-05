@@ -244,19 +244,25 @@ QMenuBar::item:selected{
     background: #3f435a;
 }
 
-/* QScrollBar {
+QScrollBar {
     width: 8px;
-} */
-
-/* QScrollBar::handle:vertical {
-    background: white;
-    border-radius: 5px;
-} */
-
-/* QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
-    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
+    border: 0;
     background: none;
-} */</string>
+}
+
+QScrollBar::handle:vertical {
+    background: white;
+    border: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
+    background: #323C5A;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -734,7 +740,7 @@ QMenuBar::item:selected{
                           <x>0</x>
                           <y>0</y>
                           <width>1026</width>
-                          <height>69</height>
+                          <height>20</height>
                          </rect>
                         </property>
                         <property name="sizePolicy">

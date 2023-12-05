@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
 
         self.ui.mainpages.setCurrentIndex(0)
-        self.ui.search_stack_widg.setCurrentIndex(1)
+        self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
 
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
@@ -150,6 +150,7 @@ class Downloader():
         self.file_formats = ["Mp4", "Mp3"]
         self.search_activated = True
         self.new_widget_thread_running = False
+        self.update_thread = None
         self.downloads = []
         self.cur_process = []
         self.loading = False
@@ -515,6 +516,7 @@ class Downloader():
         self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation in the menubar under tools.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
 
     def handle_update_available(self, update_available, tag, auto):
+        self.update_thread = None
         if update_available:
             msg_box = QMessageBox(mw)
             msg_box.setText(f"""Current version: {VERSION} <br>
@@ -536,6 +538,8 @@ class Downloader():
             self.yes_no_messagebox("No update available.", QMessageBox.Information, "No update found", QMessageBox.Ok)
 
     def search_for_updates(self, auto = True):
+        if self.update_thread != None:
+            return
         logger.info("Started searching for updates")
         self.update_thread = UpdateThread(auto)
         self.update_thread.update_available.connect(self.handle_update_available)
