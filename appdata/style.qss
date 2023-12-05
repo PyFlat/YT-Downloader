@@ -217,3 +217,21 @@ QTableView::item:selected{
 QMenu {icon-size: 25px;}
 
 QMenu::item {background: transparent;}
+
+QMenuBar::item:selected{
+    background: #3f435a;
+}
+
+/* QScrollBar {
+    width: 8px;
+} */
+
+/* QScrollBar::handle:vertical {
+    background: white;
+    border-radius: 5px;
+} */
+
+/* QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
+    border: none;
+    background: none;
+} */
