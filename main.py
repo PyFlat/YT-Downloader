@@ -1,10 +1,16 @@
 #TODO:
 # - Logging
+from src.Logger import Logger
+import sys, logging
+logger_object = Logger()
+logger = logger_object.logger
+logger.info("Logging Started")
 
+def exception_hook(exc_type, exc_value, exc_traceback):
+    logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
+sys.excepthook = exception_hook
 
-import logging
-import threading, datetime, os, configparser, sys, shutil, requests, re, copy
-import PySide6.QtGui
+import threading, datetime, os, configparser, shutil, requests, re, copy
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -13,7 +19,6 @@ from zipfile import ZipFile
 from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
-from src.Logger import Logger
 
 from urllib.request import urlopen
 from urllib.error import URLError
@@ -38,7 +43,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
-        logger.info("Building UI")
         self.ui.setupUi(self)
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.top_label.hide()
@@ -48,7 +52,7 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
 
         self.ui.mainpages.setCurrentIndex(0)
-        self.ui.search_stack_widg.setCurrentIndex(0)
+        self.ui.search_stack_widg.setCurrentIndex(1)
         self.ui.download_2.setCurrentIndex(0)
 
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
@@ -60,14 +64,9 @@ class MainWindow(QMainWindow):
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(5)
 
-        self.thread_pool = QThreadPool()
-        self.thread_pool.setMaxThreadCount(1)
-
         self.ui.search_btn.setChecked(True)
 
         self.create_search_widges()
-
-        logger.info("Finished UI Startup")
 
         self.show()
 
@@ -141,7 +140,6 @@ class MainWindow(QMainWindow):
 
 class Downloader():
     def __init__(self):
-        logger.info("Initializing Downloader")
         mw.ui.searching_button.clicked.connect(lambda:[self.load_url(), mw.ui.searching_button.setEnabled(False)])
         mw.ui.format_selection.currentIndexChanged.connect(lambda:self.update_file_box())
         mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
@@ -180,6 +178,7 @@ class Downloader():
         mw.ui.actionUpdate_Yt_dlp.triggered.connect(lambda: self.download_yt_dlp())
         mw.ui.actionSearch_For_Updates.triggered.connect(lambda: self.search_for_updates(False))
         mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
+        mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
 
     def change_max_threads(self):
         dialog = QDialog(mw)
@@ -852,12 +851,15 @@ class DataHandler():
         item  = QTableWidgetItem("Deleted")
         mw.ui.tableWidget.setItem(row, 4, item)
         if os.path.isfile(self.filename):
-            logger.debug(f"Deleting file: {self.filename}")
+            logger.info("Deleting file")
+            logger.debug(f"Filename: \"{self.filename}\"")
+
             os.remove(self.filename)
 
     def play(self):
         mw.set_enabled(False, False, False)
-        logger.debug(f"Opening file with cmd: \"{self.filename}\"")
+        logger.info(f"Opening file with cmd, file-extension: {self.vid_ext}")
+        logger.debug(f"Filename: \"{self.filename}\"")
         os.popen(f"\"{self.filename}\"")
 
 class FileNameThread(QThread):
@@ -978,6 +980,7 @@ class GithubDownloader(QThread):
         self.save_path = save_path
 
     def run(self):
+        logger.info(f"Download started for {self.url}")
         self.progress.emit(0)
         try:
             response = requests.get(self.url, stream=True, timeout=15)
@@ -990,8 +993,11 @@ class GithubDownloader(QThread):
                     downloaded_size += len(data)
                     progress = downloaded_size / total_size * 100
                     self.progress.emit(progress)
+            logger.info(f"Downloaod of {self.url} finished")
             self.finished.emit(True if progress == 100.0 else False)
+
         except requests.exceptions.ConnectionError:
+            logger.error(f"Internet connection error when trying to download {self.url}")
             self.progress.emit(-1.0)
             self.finished.emit(False)
 
@@ -1033,6 +1039,7 @@ class UpdateThread(QThread):
         try:
             f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
         except URLError:
+            logger.error("Internet connection error")
             self.update_available.emit(None, "no_connection", None)
             return
         tag = f.split("/")[-1]
@@ -1094,9 +1101,10 @@ class VideoDownloadThread(QThread):
 
         except DownloadError as e:
             if "urlopen error" in e.msg or "The read operation timed out" in e.msg:
+                logger.error(f"A network error occured: {e.msg}")
                 self.finished.emit(False, self.row)
             else:
-                print("")
+                logger.error(f"An unnokwn download error occured: {e.msg}")
 
         else:
             self.finished.emit(True, self.row)
@@ -1160,9 +1168,6 @@ class ImportYTDLP(QThread):
 
 if __name__ == "__main__":
     app = QApplication([])
-    logger_object = Logger()
-    logger = logger_object.logger
-    logger.info("Logging Started")
     mw = MainWindow()
     dl = Downloader()
     sys.exit(app.exec())
