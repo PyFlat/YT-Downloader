@@ -1177,29 +1177,51 @@ class ScreenShot(QThread):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
     def run(self):
+        if not os.path.isdir("imgs"):
+            os.mkdir("imgs")
+        if os.path.isfile(f"{dl.file}Rick Astley - Never Gonna Give You Up (Official Music Video)(1080p).mp4"):
+            os.remove(f"{dl.file}Rick Astley - Never Gonna Give You Up (Official Music Video)(1080p).mp4")
         screenshot = mw.grab()
-        screenshot.save('screenshot.png', 'png')
+        screenshot.save('showcase/Startpage.png', 'png')
 
 
         mw.ui.url_entry.setText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-        #self.msleep(3000)
+        self.msleep(3000)
         mw.ui.searching_button.click()
 
-        #self.msleep(5000)
+        self.msleep(5000)
 
         screenshot = mw.grab()
-        screenshot.save('screenshot2.png', 'png')
+        screenshot.save('showcase/Download_Video.png', 'png')
 
         mw.ui.download_button.click()
 
-        #self.msleep(6000)
+        self.msleep(6000)
 
         mw.ui.file_btn.click()
 
-        #self.msleep(1000)
+        self.msleep(1000)
 
         screenshot = mw.grab()
-        screenshot.save('screenshot3.png', 'png')
+        screenshot.save('showcase/Download_Overview.png', 'png')
+
+        mw.ui.url_entry.setText("Rick Astley")
+        mw.ui.searching_button.click()
+        mw.ui.search_btn.click()
+        self.msleep(5000)
+        screenshot = mw.grab()
+        screenshot.save("showcase/Search.png", "png")
+
+        mw.ui.url_entry.setText("https://www.youtube.com/playlist?list=PL7oy-W4T92tJuncyNL2xk8F4PGzz0jvtb")
+        mw.ui.searching_button.click()
+        self.msleep(5000)
+        screenshot = mw.grab()
+        screenshot.save("showcase/Select_Playlist_Range.png", "png")
+
+        mw.ui.next_page_btn.click()
+
+        screenshot = mw.grab()
+        screenshot.save("showcase/Download_Playlist.png", "png")
 
 
 
@@ -1208,6 +1230,6 @@ if __name__ == "__main__":
     app = QApplication([])
     mw = MainWindow()
     dl = Downloader()
-    thread = ScreenShot(mw)
-    thread.start()
+    # thread = ScreenShot(mw)
+    # thread.start()
     sys.exit(app.exec())
