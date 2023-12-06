@@ -10,7 +10,7 @@ def exception_hook(exc_type, exc_value, exc_traceback):
     logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
 sys.excepthook = exception_hook
 
-import threading, datetime, os, configparser, shutil, requests, re, copy
+import threading, datetime, os, configparser, shutil, requests, re, copy, time
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -53,6 +53,8 @@ class MainWindow(QMainWindow):
         self.ui.mainpages.setCurrentIndex(0)
         self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
+
+        self.ui.tableWidget.verticalScrollBar().setObjectName("test")
 
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
 
@@ -1171,10 +1173,41 @@ class ImportYTDLP(QThread):
             logger.error(f"An unnokwn error occured when trying to import yt-dlp: {e}")
             self.result.emit(True)
 
+class ScreenShot(QThread):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+    def run(self):
+        screenshot = mw.grab()
+        screenshot.save('screenshot.png', 'png')
+
+
+        mw.ui.url_entry.setText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        #self.msleep(3000)
+        mw.ui.searching_button.click()
+
+        #self.msleep(5000)
+
+        screenshot = mw.grab()
+        screenshot.save('screenshot2.png', 'png')
+
+        mw.ui.download_button.click()
+
+        #self.msleep(6000)
+
+        mw.ui.file_btn.click()
+
+        #self.msleep(1000)
+
+        screenshot = mw.grab()
+        screenshot.save('screenshot3.png', 'png')
+
+
 
 
 if __name__ == "__main__":
     app = QApplication([])
     mw = MainWindow()
     dl = Downloader()
+    thread = ScreenShot(mw)
+    thread.start()
     sys.exit(app.exec())

@@ -238,6 +238,13 @@ QTableView::item:selected{
 
 QMenu {icon-size: 25px;}
 
+QMenu::separator {
+    height: 2px;
+    background: white;
+    margin: 0 12px;
+}
+
+
 QMenu::item {background: transparent;}
 
 QMenuBar::item:selected{
@@ -254,7 +261,7 @@ QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
     background: none;
 }
 
-QScrollBar::handle:vertical {
+QScrollBar::handle:vertical{
     background: white;
     border: 0;
     border-radius: 4px;
@@ -262,7 +269,15 @@ QScrollBar::handle:vertical {
 
 QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
     background: #323C5A;
-}</string>
+}
+
+QTableWidget QScrollBar{
+    width: 12px;
+    margin-left: 5px;
+    border: 0;
+    padding: 0;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -593,7 +608,7 @@ QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="mpage1">
              <property name="sizePolicy">
@@ -1390,9 +1405,7 @@ QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
      <string>Help</string>
     </property>
     <addaction name="actionSearch_For_Updates"/>
-    <addaction name="separator"/>
     <addaction name="actionShow_on_Github"/>
-    <addaction name="separator"/>
     <addaction name="actionShow_Changelog"/>
    </widget>
    <widget class="QMenu" name="menuTools">
@@ -1401,7 +1414,6 @@ QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
     </property>
     <addaction name="actionSet_FFmpeg_Path"/>
     <addaction name="actionDownload_FFmpeg"/>
-    <addaction name="separator"/>
     <addaction name="actionUpdate_Yt_dlp"/>
    </widget>
    <widget class="QMenu" name="menuFile_2">

@@ -51,6 +51,9 @@ QLabel#search_labels, QLineEdit, QLabel#image_label{
 	border: 3px solid white;
 	border-radius: 5px;
 }
+QLineEdit{
+    border-width: 2px;
+}
 QLabel#search_labels:disabled{
 	border-color: black;
 }
@@ -208,16 +211,18 @@ QTableView::item:selected{
 	background-color: #515670;
 }
 
-QMenu {icon-size: 25px;}
-
-QMenu::separator {
-    height: 2px;
-    background: white;
-    margin: 0 12px;
+QMenu {
+    icon-size: 25px;
+    border: 1px solid white;
+    border-radius: 2px;
 }
 
-
-QMenu::item {background: transparent;}
+QMenu::item {
+    background: transparent;
+}
+QMenu::item:selected {
+    background: #515670;
+}
 
 QMenuBar::item:selected{
     background: #3f435a;
@@ -233,7 +238,7 @@ QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
     background: none;
 }
 
-QScrollBar::handle:vertical {
+QScrollBar::handle:vertical{
     background: white;
     border: 0;
     border-radius: 4px;
@@ -241,4 +246,11 @@ QScrollBar::handle:vertical {
 
 QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
     background: #323C5A;
+}
+
+QTableWidget QScrollBar{
+    width: 12px;
+    margin-left: 5px;
+    border: 0;
+    padding: 0;
 }
