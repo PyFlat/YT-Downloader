@@ -603,20 +603,17 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionDefault_Resolution)
         self.menuFile.addAction(self.actionMaximum_Threads)
         self.menuHelp.addAction(self.actionSearch_For_Updates)
-        self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionShow_on_Github)
-        self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionShow_Changelog)
         self.menuTools.addAction(self.actionSet_FFmpeg_Path)
         self.menuTools.addAction(self.actionDownload_FFmpeg)
-        self.menuTools.addSeparator()
         self.menuTools.addAction(self.actionUpdate_Yt_dlp)
         self.menuFile_2.addAction(self.actionChange_Download_Folder)
         self.menuFile_2.addAction(self.actionReveal_in_File_Explorer)
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(0)
+        self.mainpages.setCurrentIndex(2)
         self.search_stack_widg.setCurrentIndex(1)
         self.download_2.setCurrentIndex(1)
 
