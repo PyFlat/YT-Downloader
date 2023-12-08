@@ -125,13 +125,13 @@ class MainWindow(QMainWindow):
             if not self.ui.scrollArea.verticalScrollBar().value() == self.ui.scrollArea.verticalScrollBar().maximum(): return
         for _ in range(0,10):
             for i in range(0,3):
-                label = SLabel(self.ui.url_entry, self.ui.scrollAreaWidgetContents)
+                label = SLabel(self.ui.searching_button, self.ui.scrollAreaWidgetContents)
                 self.search_labels.append(label)
                 self.ui.gridLayout_2.addWidget(label, self.column, i)
-                self.ui.gridLayout_2.setAlignment(label, Qt.AlignTop | Qt.AlignLeft)
+                self.ui.gridLayout_2.setAlignment(label, Qt.AlignTop | Qt.AlignCenter)
             self.column += 1
 
-    def closeEvent(self, event: QCloseEvent) -> None:
+    def closeEvent(self, event: QCloseEvent):
         logger.info("Closing the application")
         return super().closeEvent(event)
 
@@ -150,6 +150,7 @@ class Downloader():
         mw.search_shortcut.activated.connect(self.enter_pressed)
         mw.ui.tableWidget.cellClicked.connect(self.handle_clicked)
         self.file_formats = ["Mp4", "Mp3"]
+        self.resolutions = ['Best Quality', '4320p', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p']
         self.search_activated = True
         self.new_widget_thread_running = False
         self.update_thread = None
@@ -182,6 +183,7 @@ class Downloader():
         mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
         mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
         mw.ui.actionShow_on_Github.triggered.connect(lambda: self.show_on_github())
+        mw.ui.actionDefault_Resolution.triggered.connect(lambda: self.change_default_resolution())
 
     def change_max_threads(self):
         dialog = QDialog(mw)
@@ -220,6 +222,39 @@ class Downloader():
 
         dialog.exec()
 
+    def change_default_resolution(self):
+        dialog = QDialog(mw)
+
+        layout = QVBoxLayout()
+
+        layout.setContentsMargins(20, 10, 20, 10)
+        layout.setSpacing(25)
+
+        combobox = QComboBox()
+        combobox.clear()
+        combobox.addItems(self.resolutions)
+        if self.default_resolution in self.resolutions:
+            combobox.setCurrentIndex(self.resolutions.index(self.default_resolution))
+
+        layout.addWidget(combobox)
+
+        apply_button = QPushButton('Apply')
+        apply_button.clicked.connect(lambda: save_default_resolution())
+
+        def save_default_resolution():
+            self.default_resolution = combobox.currentText()
+            self.update_config("DEFAULT", "default-resolution", self.default_resolution)
+            dialog.accept()
+
+        layout.addWidget(apply_button, 0, Qt.AlignCenter)
+
+        dialog.setLayout(layout)
+
+        dialog.setWindowTitle('Set Default Resolution')
+        dialog.setFixedSize(300, 125)
+
+        dialog.exec()
+
     def delete_exe_files(self, folder_path="appdata"):
         for filename in os.listdir(folder_path):
             if filename.endswith(".exe"):
@@ -229,6 +264,9 @@ class Downloader():
     def update_file_box(self):
         if mw.ui.format_selection.currentText() == "Mp4":
             mw.ui.resolution_selection.setEnabled(True)
+            if self.default_resolution != None:
+                if self.default_resolution in self.data.resolutions:
+                    mw.ui.resolution_selection.setCurrentIndex(self.data.resolutions.index(self.default_resolution))
         else:
             mw.ui.resolution_selection.setEnabled(False)
             mw.ui.resolution_selection.setCurrentIndex(0)
@@ -242,7 +280,9 @@ class Downloader():
                             "yt-dlp-date": "False",
                             "check-for-updates": "True",
                             "max-download-threads": "1",
-                            "thumbnail-streaming": "True"}
+                            "thumbnail-streaming": "True",
+                            "log-level": "info",
+                            "default-resolution": "None"}
         with open(Utils.get_abs_path("appdata/config.ini"), "w+") as file:
             config.write(file)
 
@@ -259,8 +299,6 @@ class Downloader():
         self.first_use = config["DEFAULT"].getboolean("first-use-since-update", fallback=True)
         self.update_config_version(config)
         if self.first_use: self.show_changelog()
-
-
         if self.yt_dlp_installed == "False":
             self.user_info_no_yt_dlp()
         else:
@@ -272,7 +310,6 @@ class Downloader():
         else:
             mw.close()
             sys.exit()
-
 
     def import_yt_dl(self):
         logger.info("Importing yt-dlp")
@@ -288,6 +325,7 @@ class Downloader():
 
         self.max_download_threads = int(config["DEFAULT"].get("max-download-threads", fallback=1))
         mw.threadpool.setMaxThreadCount(self.max_download_threads)
+        self.update_config("DEFAULT", "max-download-threads", str(self.max_download_threads))
 
         self.stream_thumbnails = config["DEFAULT"].getboolean("thumbnail-streaming", fallback=True)
         mw.ui.actionShow_Thumbnails.setChecked(self.stream_thumbnails)
@@ -295,6 +333,9 @@ class Downloader():
 
         self.log_level = config["DEFAULT"].get("log-level", fallback="info")
         self.update_log_level(self.log_level)
+
+        self.default_resolution = config["DEFAULT"].get("default-resolution", fallback=None)
+        self.update_config("DEFAULT", "default-resolution", str(self.default_resolution))
 
     def update_log_level(self, level):
         self.update_config("DEFAULT", "log-level", level)
@@ -469,6 +510,9 @@ class Downloader():
         mw.ui.resolution_selection.clear()
         mw.ui.format_selection.addItems(self.file_formats)
         mw.ui.resolution_selection.addItems(self.data.resolutions)
+        if self.default_resolution != None:
+            if self.default_resolution in self.data.resolutions:
+                mw.ui.resolution_selection.setCurrentIndex(self.data.resolutions.index(self.default_resolution))
         if not self.playlist:
             mw.ui.date_label.setText(f"Upload Date: {self.data.upload_date}")
             mw.ui.duration_label.setText(f"Video Length: {self.data.duration}")
@@ -615,7 +659,6 @@ class Downloader():
         self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
         self.import_yt_dl()
 
-
     def download_ffmpeg(self):
         logger.info("Download FFmpeg started")
         if os.path.isdir("appdata/FFmpeg"):
@@ -708,7 +751,7 @@ class DataHandler():
         if self.playlist:
             self.playlist_count = info["playlist_count"]
             mw.ui.download_button.setDisabled(True)
-            self.resolutions = ['Best Quality', '4320p', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p']
+            self.resolutions = dl.resolutions
             self.playlist_url_thread = LoadPlaylistURLS(info["webpage_url"])
             self.playlist_url_thread.finished.connect(self.store_playlist_urls)
             self.playlist_url_thread.start()
@@ -1106,6 +1149,7 @@ class VideoDownloadThread(QThread):
                 }
         try:
             logger.info(f"Video download started")
+            logger.debug(f"Video url: {self.url}")
             YoutubeDL(ydl_opts).download(self.url)
 
         except DownloadError as e:
@@ -1116,6 +1160,7 @@ class VideoDownloadThread(QThread):
                 logger.error(f"An unnokwn download error occured: {e.msg}")
 
         else:
+            logger.info(f"Video downloaded successfully")
             self.finished.emit(True, self.row)
 
     def _hook(self, d):
