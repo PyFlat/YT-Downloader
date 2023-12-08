@@ -270,8 +270,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
-        self.gridLayout_2.setHorizontalSpacing(0)
-        self.gridLayout_2.setVerticalSpacing(10)
+        self.gridLayout_2.setHorizontalSpacing(8)
+        self.gridLayout_2.setVerticalSpacing(5)
         self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -613,7 +613,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(2)
+        self.mainpages.setCurrentIndex(0)
         self.search_stack_widg.setCurrentIndex(1)
         self.download_2.setCurrentIndex(1)
 
