@@ -749,6 +749,9 @@ QTableWidget QScrollBar{
                        <property name="widgetResizable">
                         <bool>true</bool>
                        </property>
+                       <property name="alignment">
+                        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                       </property>
                        <widget class="QWidget" name="scrollAreaWidgetContents">
                         <property name="geometry">
                          <rect>
@@ -787,7 +790,7 @@ QTableWidget QScrollBar{
                           <number>10</number>
                          </property>
                          <property name="horizontalSpacing">
-                          <number>8</number>
+                          <number>3</number>
                          </property>
                          <property name="verticalSpacing">
                           <number>5</number>
