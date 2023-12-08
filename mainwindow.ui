@@ -608,7 +608,7 @@ QTableWidget QScrollBar{
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="mpage1">
              <property name="sizePolicy">
@@ -787,10 +787,10 @@ QTableWidget QScrollBar{
                           <number>10</number>
                          </property>
                          <property name="horizontalSpacing">
-                          <number>0</number>
+                          <number>8</number>
                          </property>
                          <property name="verticalSpacing">
-                          <number>10</number>
+                          <number>5</number>
                          </property>
                         </layout>
                        </widget>
