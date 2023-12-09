@@ -355,11 +355,21 @@ class Downloader():
     def show_changelog(self):
         self.update_config("DEFAULT", "first-use-since-update", "False")
         text = open("appdata/changelog.md", "r").read()
-        msg_box = QMessageBox(mw)
-        msg_box.setTextFormat(Qt.RichText)
-        msg_box.setWindowTitle(f"Changelog - {VERSION}")
 
-        msg_box.setText(text)
+        text_browser = QTextBrowser()
+        text_browser.setHtml(text)
+
+        text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        text_browser.setMinimumSize(600, 300)
+
+        msg_box = QMessageBox(mw)
+        msg_box.setWindowTitle(f"Changelog - {VERSION}")
+        msg_box.setTextFormat(Qt.RichText)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)
+        msg_box.setEscapeButton(QMessageBox.Ok)
+        msg_box.setText(f"Changelog for version {VERSION}")
+        msg_box.layout().addWidget(text_browser, 1, 0, 1, msg_box.layout().columnCount())
         msg_box.exec()
 
     def yt_search(self, text, pl_items, req):

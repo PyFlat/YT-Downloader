@@ -254,3 +254,7 @@ QTableWidget QScrollBar{
     border: 0;
     padding: 0;
 }
+
+QTextBrowser {
+    border: none;
+}
