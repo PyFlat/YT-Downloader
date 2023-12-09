@@ -10,7 +10,7 @@ def exception_hook(exc_type, exc_value, exc_traceback):
     logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
 sys.excepthook = exception_hook
 
-import threading, datetime, os, configparser, shutil, requests, re, copy, time
+import threading, datetime, os, configparser, shutil, requests, re, copy
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -1222,8 +1222,6 @@ class ScreenShot(QThread):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
     def run(self):
-        if not os.path.isdir("imgs"):
-            os.mkdir("imgs")
         if os.path.isfile(f"{dl.file}Rick Astley - Never Gonna Give You Up (Official Music Video)(1080p).mp4"):
             os.remove(f"{dl.file}Rick Astley - Never Gonna Give You Up (Official Music Video)(1080p).mp4")
         screenshot = mw.grab()

@@ -626,7 +626,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.3.0", None))
         self.actionSearch_For_Updates.setText(QCoreApplication.translate("MainWindow", u"Search for Updates", None))
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
-        self.actionShow_on_Github.setText(QCoreApplication.translate("MainWindow", u"Show on Github", None))
+        self.actionShow_on_Github.setText(QCoreApplication.translate("MainWindow", u"Show on GitHub", None))
         self.actionShow_Changelog.setText(QCoreApplication.translate("MainWindow", u"Show Changelog", None))
         self.actionSet_FFmpeg_Path.setText(QCoreApplication.translate("MainWindow", u"Set FFmpeg-Path", None))
         self.actionDownload_FFmpeg.setText(QCoreApplication.translate("MainWindow", u"Download FFmpeg", None))

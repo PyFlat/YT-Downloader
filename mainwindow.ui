@@ -1452,7 +1452,7 @@ QTableWidget QScrollBar{
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Show on Github</string>
+    <string>Show on GitHub</string>
    </property>
   </action>
   <action name="actionShow_Changelog">
