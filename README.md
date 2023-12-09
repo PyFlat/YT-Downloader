@@ -63,11 +63,11 @@ YOUTUBE DOWNLOADER
 
 All images were created with the _Show-Thumbnails_ setting: **Off**
 
-## Start
+## Start-Page
 
 [![](showcase/Startpage.png)](#usage)
 
-## Search
+## Search-Page
 
 [![](showcase/Search.png)](#search)
 
@@ -79,11 +79,11 @@ All images were created with the _Show-Thumbnails_ setting: **Off**
 
 [![](showcase/Select_Playlist_Range.png)](#playlist)
 
-## Download-Page for playlist
+## Download-Page for playlists
 
 [![](showcase/Download_Playlist.png)](#playlist)
 
-## Download control window
+## Download-Control-Page
 
 [![](showcase/Download_Overview.png)](#usage)
 
