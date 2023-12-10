@@ -19,25 +19,13 @@ from zipfile import ZipFile
 from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
+from src.Utils import Utils as Utils
+from src.Utils import noLogger as noLogger
 
 from urllib.request import urlopen
 from urllib.error import URLError
 
 VERSION = "1.3.0"
-
-class noLogger:
-    def error(msg):
-        pass
-    def warning(msg):
-        pass
-    def debug(msg):
-        pass
-
-class Utils():
-    def get_abs_path(relative_path):
-        base_path = getattr(sys,'_MEIPASS',os.path.dirname(os.path.abspath(__file__)))
-        path = os.path.join(base_path, relative_path).replace("\\", "/")
-        return path
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -61,6 +49,10 @@ class MainWindow(QMainWindow):
         self.bind_keys()
 
         self.search_shortcut = QShortcut(QKeySequence("Return"), self)
+
+        self.actiongroup_change_log_level = QActionGroup(self)
+        self.actiongroup_change_log_level.addAction(self.ui.actionLog_Level_Debug)
+        self.actiongroup_change_log_level.addAction(self.ui.actionLog_Level_Info)
 
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(5)
@@ -184,6 +176,13 @@ class Downloader():
         mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
         mw.ui.actionShow_on_Github.triggered.connect(lambda: self.show_on_github())
         mw.ui.actionDefault_Resolution.triggered.connect(lambda: self.change_default_resolution())
+        mw.ui.actionOpen_Log_Files_Folder.triggered.connect(lambda: self.open_log_files_folder())
+        mw.ui.actionLog_Level_Debug.triggered.connect(lambda: self.update_log_level("debug"))
+        mw.ui.actionLog_Level_Info.triggered.connect(lambda: self.update_log_level("info"))
+
+    def open_log_files_folder(self):
+        path = Utils.get_abs_path('logs').replace('/', '\\')
+        os.popen(f"explorer.exe \"{path}\"")
 
     def change_max_threads(self):
         dialog = QDialog(mw)
@@ -341,8 +340,10 @@ class Downloader():
         self.update_config("DEFAULT", "log-level", level)
         if level == "debug":
             logger_object.set_log_level(logging.DEBUG)
+            mw.ui.actionLog_Level_Debug.setChecked(True)
         else:
             logger_object.set_log_level(logging.INFO)
+            mw.ui.actionLog_Level_Info.setChecked(True)
 
     def update_config(self, section, key, new_val):
         logger.debug("Updating configuration file")
