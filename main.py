@@ -8,7 +8,7 @@ logger.info("Logging Started")
 
 def exception_hook(exc_type, exc_value, exc_traceback):
     logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
-sys.excepthook = exception_hook
+#sys.excepthook = exception_hook
 
 import threading, datetime, os, configparser, shutil, requests, re, copy
 
@@ -19,13 +19,27 @@ from zipfile import ZipFile
 from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
-from src.Utils import Utils as Utils
-from src.Utils import noLogger as noLogger
 
 from urllib.request import urlopen
 from urllib.error import URLError
 
 VERSION = "1.3.0"
+
+class Utils():
+    @staticmethod
+    def get_abs_path(relative_path):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        base_path = getattr(sys, '_MEIPASS', current_dir)
+        path = os.path.join(base_path, relative_path).replace("\\", "/")
+        return path
+
+class noLogger:
+    def error(msg):
+        pass
+    def warning(msg):
+        pass
+    def debug(msg):
+        pass
 
 class MainWindow(QMainWindow):
     def __init__(self):
