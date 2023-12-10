@@ -1398,10 +1398,18 @@ QTableWidget QScrollBar{
     <property name="title">
      <string>Edit</string>
     </property>
+    <widget class="QMenu" name="menuChange_Log_Level">
+     <property name="title">
+      <string>Change Log-Level</string>
+     </property>
+     <addaction name="actionLog_Level_Info"/>
+     <addaction name="actionLog_Level_Debug"/>
+    </widget>
     <addaction name="actionAutomatic_Update_Check"/>
     <addaction name="actionShow_Thumbnails"/>
     <addaction name="actionDefault_Resolution"/>
     <addaction name="actionMaximum_Threads"/>
+    <addaction name="menuChange_Log_Level"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1425,6 +1433,7 @@ QTableWidget QScrollBar{
     </property>
     <addaction name="actionChange_Download_Folder"/>
     <addaction name="actionReveal_in_File_Explorer"/>
+    <addaction name="actionOpen_Log_Files_Folder"/>
    </widget>
    <addaction name="menuFile_2"/>
    <addaction name="menuFile"/>
@@ -1539,6 +1548,39 @@ QTableWidget QScrollBar{
   <action name="actionMaximum_Threads">
    <property name="text">
     <string>Maximum Threads</string>
+   </property>
+  </action>
+  <action name="actionOpen_Log_Files_Folder">
+   <property name="text">
+    <string>Open Log-Files Folder</string>
+   </property>
+  </action>
+  <action name="actionLog_Level_Info">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <selectedoff>appdata/images/square.png</selectedoff>
+     <selectedon>appdata/images/check-square.png</selectedon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Log-Level: Info</string>
+   </property>
+  </action>
+  <action name="actionLog_Level_Debug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <selectedoff>appdata/images/square.png</selectedoff>
+     <selectedon>appdata/images/check-square.png</selectedon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Log-Level: Debug</string>
    </property>
   </action>
  </widget>

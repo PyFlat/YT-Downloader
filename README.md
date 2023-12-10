@@ -43,11 +43,13 @@ YOUTUBE DOWNLOADER
   - **File**
     - _Change Download Folder:_ Set the folder in which the downloaded files are saved
     - _Reveal in File Explorer:_ Opens the current download folder in explorer
+    - _Open Log-Files Folder:_ Opens the folder in which the saved log files are located
   - **Edit**
     - _Auto Update Check:_ Automatically searches for updates
     - _Show Thumbnails:_ If set to false no thumbnails will be loaded -> _faster_
     - _Default Resolution:_ Set the default resolution for downloading a video
     - _Maximum Threads:_ Set the maximum number of videos that can be downloaded at the same time (If you add more videos they will be added to the queue)
+    - _Change Log-Level:_ Set the amount of information the developer receives. With debug, personal data may be passed on
   - **Tools**
     - _Set FFmpeg-Path:_ Set the path to your local ffmpeg location
     - _Download FFmpeg:_ Automatically downloads and installs the latest FFmpeg version (**Warning:** Overwrites FFmpeg location)

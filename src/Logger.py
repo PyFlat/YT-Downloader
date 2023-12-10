@@ -1,12 +1,14 @@
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+from src.Utils import Utils as Utils
 
 class Logger():
     def __init__(self, log_level=logging.INFO):
-        logs_folder = 'logs'
+        logs_folder = Utils.get_abs_path("logs")
         if not os.path.exists(logs_folder):
             os.makedirs(logs_folder)
+        self.remove_old_log_files(logs_folder, 0)
 
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(log_level)
@@ -26,3 +28,12 @@ class Logger():
         for handler in self.logger.handlers:
             if isinstance(handler, logging.FileHandler):
                 handler.setLevel(log_level)
+
+    def remove_old_log_files(self, logs_folder, days_to_keep=14):
+        current_datetime = datetime.now()
+        for file_name in os.listdir(logs_folder):
+            file_path = os.path.join(logs_folder, file_name)
+            if os.path.isfile(file_path):
+                file_creation_time = datetime.fromtimestamp(os.path.getctime(file_path))
+                if current_datetime - file_creation_time > timedelta(days=days_to_keep):
+                    os.remove(file_path)
