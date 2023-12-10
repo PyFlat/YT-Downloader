@@ -5,17 +5,15 @@ Downloads/
 
 logs/
 
-setup.py
-
 mainwindow_ui.py
 
 ui_mainwindow.py
 
 build_exe.bat
 
-*.iss
-
 yt_dlp
 
 *.ini
 FFmpeg/
+
+env/
