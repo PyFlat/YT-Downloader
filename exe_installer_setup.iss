@@ -17,7 +17,7 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-LicenseFile=C:\Users\Johannes\Documents\GitHub\YT-Downloader\README.md
+LicenseFile=C:\Users\Johannes\Documents\GitHub\YT-Downloader\LICENSE
 AllowNoIcons=yes
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest

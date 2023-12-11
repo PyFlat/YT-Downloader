@@ -16,6 +16,12 @@ if get_qt_plugins_paths:
 base = "Win32GUI"
 
 build_exe_options = {
+    "includes": [
+        "optparse",
+        "html.parser",
+        "uuid",
+        "fileinput",
+    ],
     "excludes": [
         "tkinter",
         "yt_dlp"],

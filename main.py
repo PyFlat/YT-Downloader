@@ -9,9 +9,10 @@ class Utils():
         path = os.path.join(base_path, relative_path).replace("\\", "/")
         return path
 
-logger_object = Logger(logs_folder=Utils.get_abs_path("logs"))
-logger = logger_object.logger
-logger.info("Logging Started")
+if __name__ == "__main__":
+    logger_object = Logger(logs_folder=Utils.get_abs_path("logs"))
+    logger = logger_object.logger
+    logger.info("Logging Started")
 
 def exception_hook(exc_type, exc_value, exc_traceback):
     logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
