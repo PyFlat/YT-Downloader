@@ -1236,7 +1236,7 @@ class ImportYTDLP(QThread):
             logger.info("Imported yt-dlp succesfully")
             self.result.emit(True)
         except ModuleNotFoundError as e:
-            logger.error(f"An error occured, that yt-dlp doesn't exist. Probably it isn't downloaded!")
+            logger.error(f"An error occured, that yt-dlp doesn't exist. Probably it isn't downloaded! Error: {e}")
             self.result.emit(False)
         except Exception as e:
             logger.error(f"An unnokwn error occured when trying to import yt-dlp: {e}")
