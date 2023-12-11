@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 class Logger():
     def __init__(self, logs_folder, log_level=logging.INFO):
-        print(logs_folder)
         if not os.path.exists(logs_folder):
             os.makedirs(logs_folder)
         self.remove_old_log_files(logs_folder, 0)
