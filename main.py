@@ -1,14 +1,21 @@
-#TODO:
-# - Logging
 from src.Logger import Logger
-import sys, logging
-logger_object = Logger()
+import sys, logging, os
+
+class Utils():
+    @staticmethod
+    def get_abs_path(relative_path):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        base_path = getattr(sys, '_MEIPASS', current_dir)
+        path = os.path.join(base_path, relative_path).replace("\\", "/")
+        return path
+
+logger_object = Logger(logs_folder=Utils.get_abs_path("logs"))
 logger = logger_object.logger
 logger.info("Logging Started")
 
 def exception_hook(exc_type, exc_value, exc_traceback):
     logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
-#sys.excepthook = exception_hook
+sys.excepthook = exception_hook
 
 import threading, datetime, os, configparser, shutil, requests, re, copy
 
@@ -24,14 +31,6 @@ from urllib.request import urlopen
 from urllib.error import URLError
 
 VERSION = "1.3.0"
-
-class Utils():
-    @staticmethod
-    def get_abs_path(relative_path):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        base_path = getattr(sys, '_MEIPASS', current_dir)
-        path = os.path.join(base_path, relative_path).replace("\\", "/")
-        return path
 
 class noLogger:
     def error(msg):
@@ -327,7 +326,7 @@ class Downloader():
     def import_yt_dl(self):
         logger.info("Importing yt-dlp")
         self.import_yt_dl_thread = ImportYTDLP()
-        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.searching_button.setEnabled(True), self.user_info_no_ffmpeg() if self.ffmpeg == "None" else None])
+        self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.searching_button.setEnabled(True)])
         self.import_yt_dl_thread.result.connect(lambda e: self.user_info_no_yt_dlp() if not e else ())
         self.import_yt_dl_thread.start()
 
@@ -795,7 +794,6 @@ class DataHandler():
         self.playlist_data_await = False
 
     def create_data_objects(self, url, info, index):
-        if "ERROR: " in url: print("WARNING")
         x = DataHandler(url, info, skip=True)
         self.playlist_data_objects[index] = x
         if not None in self.playlist_data_objects:

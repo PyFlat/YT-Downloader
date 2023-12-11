@@ -16,7 +16,9 @@ if get_qt_plugins_paths:
 base = "Win32GUI"
 
 build_exe_options = {
-
+    "excludes": [
+        "tkinter",
+        "yt_dlp"],
     "include_files": include_files,
     "zip_include_packages": ["PySide6"],
 }
