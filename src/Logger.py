@@ -6,7 +6,7 @@ class Logger():
     def __init__(self, logs_folder, log_level=logging.INFO):
         if not os.path.exists(logs_folder):
             os.makedirs(logs_folder)
-        self.remove_old_log_files(logs_folder, 0)
+        self.remove_old_log_files(logs_folder)
 
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(log_level)
