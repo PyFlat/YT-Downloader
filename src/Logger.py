@@ -3,8 +3,8 @@ import logging
 from datetime import datetime, timedelta
 
 class Logger():
-    def __init__(self, log_level=logging.INFO):
-        logs_folder = self.get_abs_path("logs")
+    def __init__(self, logs_folder, log_level=logging.INFO):
+        print(logs_folder)
         if not os.path.exists(logs_folder):
             os.makedirs(logs_folder)
         self.remove_old_log_files(logs_folder, 0)
@@ -21,12 +21,6 @@ class Logger():
         file_handler.setFormatter(formatter)
 
         self.logger.addHandler(file_handler)
-    def get_abs_path(self, relative_path):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        base_path = getattr(sys, '_MEIPASS', parent_dir)
-        path = os.path.join(base_path, relative_path).replace("\\", "/")
-        return path
 
     def set_log_level(self, log_level):
         self.logger.setLevel(log_level)
