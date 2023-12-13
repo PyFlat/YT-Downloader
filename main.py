@@ -39,7 +39,6 @@ class noLogger:
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        print("HALLO")
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
