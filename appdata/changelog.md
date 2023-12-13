@@ -15,4 +15,5 @@
         <a href="https://github.com/PyFlat/YT-Downloader/issues/3" style="color: white; text-decoration: underline; font-weight: bold;">#3</a>
     </li>
     <li style="text-align: left;">Fixed a bug where the program crashed when a video was opened in the download overview.</li>
+    <li style="text-align: left;">Other small bug fixes.</li>
 </ul>
