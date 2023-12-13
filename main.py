@@ -1306,6 +1306,6 @@ if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
-    thread = ScreenShot(mw)
-    thread.start()
+    #thread = ScreenShot(mw)
+    #thread.start()
     sys.exit(app.exec())
