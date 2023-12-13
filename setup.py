@@ -8,6 +8,7 @@ try:
     from cx_Freeze.hooks import get_qt_plugins_paths
 except ImportError:
     get_qt_plugins_paths = None
+
 include_files = ["appdata"]
 
 if get_qt_plugins_paths:
