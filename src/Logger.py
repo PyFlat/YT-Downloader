@@ -18,8 +18,13 @@ class Logger():
 
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         file_handler.setFormatter(formatter)
-
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.addHandler(file_handler)
+
+        sys.stdout = self.StreamLogger(self.logger, logging.INFO)
+        sys.stderr = self.StreamLogger(self.logger, logging.ERROR)
+
+        sys.excepthook = self.exception_hook
 
     def set_log_level(self, log_level):
         self.logger.setLevel(log_level)
@@ -35,3 +40,19 @@ class Logger():
                 file_creation_time = datetime.fromtimestamp(os.path.getctime(file_path))
                 if current_datetime - file_creation_time > timedelta(days=days_to_keep):
                     os.remove(file_path)
+
+    def exception_hook(self, exc_type, exc_value, traceback):
+        self.logger.exception("Unhandled exception", exc_info=(exc_type, exc_value, traceback))
+
+    class StreamLogger:
+        def __init__(self, logger, level):
+            self.logger = logger
+            self.level = level
+            self.line_buffer = []
+
+        def write(self, buf):
+            for line in buf.rstrip().splitlines():
+                self.logger.log(self.level, line.rstrip())
+
+        def flush(self):
+            pass

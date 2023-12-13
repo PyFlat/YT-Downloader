@@ -14,10 +14,6 @@ if __name__ == "__main__":
     logger = logger_object.logger
     logger.info("Logging Started")
 
-def exception_hook(exc_type, exc_value, exc_traceback):
-    logger.error("Unbehandelter Fehler:", exc_info=(exc_type, exc_value, exc_traceback))
-sys.excepthook = exception_hook
-
 import threading, datetime, os, configparser, shutil, requests, re, copy
 
 from PySide6.QtWidgets import *
@@ -43,6 +39,7 @@ class noLogger:
 
 class MainWindow(QMainWindow):
     def __init__(self):
+        print("HALLO")
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -1069,7 +1066,7 @@ class GithubDownloader(QThread):
                     downloaded_size += len(data)
                     progress = downloaded_size / total_size * 100
                     self.progress.emit(progress)
-            logger.info(f"Downloaod of {self.url} finished")
+            logger.info(f"Download of {self.url} finished")
             self.finished.emit(True if progress == 100.0 else False)
 
         except requests.exceptions.ConnectionError:
@@ -1198,7 +1195,7 @@ class VideoDownloadThread(QThread):
                 except KeyError:
                     pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes_estimate"]),2)*100, 0))
                 eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else "Unknown"
-                self.progress.emit(f"{pr}%", self.row, f"{eta} Seconds")
+                self.progress.emit(f"{pr}%", self.row, "1 Second" if eta==1 else f"{eta} Seconds")
             elif d["status"] == "finished":
                 self.progress.emit("", self.row, "")
 
@@ -1290,13 +1287,25 @@ class ScreenShot(QThread):
         screenshot = mw.grab()
         screenshot.save("showcase/Download_Playlist.png", "png")
 
-
+def qt_message_handler(mode, context, message):
+    if mode == QtMsgType.QtInfoMsg:
+        mode = logging.INFO
+    elif mode == QtMsgType.QtWarningMsg:
+        mode = logging.WARNING
+    elif mode == QtMsgType.QtCriticalMsg:
+        mode = logging.CRITICAL
+    elif mode == QtMsgType.QtFatalMsg:
+        mode = logging.ERROR
+    else:
+        mode = logging.DEBUG
+    logger.log(mode, message)
 
 
 if __name__ == "__main__":
     app = QApplication([])
+    qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
-    # thread = ScreenShot(mw)
-    # thread.start()
+    thread = ScreenShot(mw)
+    thread.start()
     sys.exit(app.exec())

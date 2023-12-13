@@ -16,6 +16,7 @@ if get_qt_plugins_paths:
 base = "Win32GUI"
 
 build_exe_options = {
+    "optimize": 2,
     "includes": [
         "optparse",
         "html.parser",
