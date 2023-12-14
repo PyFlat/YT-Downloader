@@ -91,5 +91,5 @@ All images were created with the _Show-Thumbnails_ setting: **Off**
 
 # Credits:
 
-- <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Settings, Exit, Dropdown Arrow - Icons</a>
+- <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Exit, Dropdown Arrow - Icons</a>
 - <a href="https://github.com/twbs/icons">Checkbox Icon</a>
