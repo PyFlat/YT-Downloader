@@ -71,6 +71,8 @@ class MainWindow(QMainWindow):
 
         self.create_search_widges()
 
+        #self.ui.menuTools.popup()
+
         self.show()
 
     def on_focus_out(self, event):
@@ -368,6 +370,7 @@ class Downloader():
         text = open("appdata/changelog.md", "r").read()
 
         text_browser = QTextBrowser()
+        text_browser.setOpenExternalLinks(True)
         text_browser.setHtml(text)
 
         text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -581,7 +584,7 @@ class Downloader():
             return False
 
     def user_info_no_ffmpeg(self):
-        self.yes_no_messagebox("\"FFmpeg\" path is not defined.\nYou can't download Videos without it!\nDownload it or set the path to your installation in the menubar under tools.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+        self.yes_no_messagebox("Error: Missing FFmpeg Path.\nTo download videos, install FFmpeg or set the path in the Tools menu.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
 
     def handle_update_available(self, update_available, tag, auto):
         self.update_thread = None
