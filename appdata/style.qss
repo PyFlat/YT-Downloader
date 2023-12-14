@@ -6,7 +6,7 @@
 	background-color:  #323C5A;
 }
 
-QFrame#sidebar, QFrame#topbar, QFrame#topframe, QFrame#sb_top_frame{
+QFrame#sidebar, QMenuBar, QFrame#sb_top_frame{
 	background-color: #2A2D43;
 }
 
@@ -18,20 +18,18 @@ QPushButton {
 	text-align: center;
 	padding: 0px 10px 0px 10px;
 }
-QPushButton#search_btn, 
-QPushButton#settings_btn,
+QPushButton#search_btn,
 QPushButton#download_btn,
 QPushButton#file_btn,
-QPushButton#exit_btn, 
+QPushButton#exit_btn,
 QPushButton#toggle_sidebar_btn  {
 	border-radius: 0px;
 	border: 0;
 	text-align: left;
 	padding-left: 12.5px;
 }
-QPushButton#search_btn:checked, 
-QPushButton#settings_btn:checked, 
-QPushButton#download_btn:checked, 
+QPushButton#search_btn:checked,
+QPushButton#download_btn:checked,
 QPushButton#file_btn:checked {
 	border-right: 3px solid white;
 
@@ -48,17 +46,16 @@ QLabel{
 	qproperty-alignment: AlignCenter;
 }
 
-QLabel#search_labels, QLineEdit, QLabel#image_label, QLabel#top_label{
+QLabel#search_labels, QLineEdit, QLabel#image_label{
 	background: #2A2D43;
 	border: 3px solid white;
 	border-radius: 5px;
 }
+QLineEdit{
+    border-width: 2px;
+}
 QLabel#search_labels:disabled{
 	border-color: black;
-}
-
-QLabel#top_label{
-	padding: 0px 10px 0px 10px;
 }
 
 QPushButton:disabled, QLineEdit:disabled{
@@ -92,7 +89,7 @@ QComboBox::down-arrow:disabled {
 QListView {
 	background-color: #323C5A;
 	padding: 5px;
-	
+
 }
 
 QComboBox:drop-down {
@@ -159,7 +156,7 @@ QSlider::groove:horizontal {
 	background: #414361;
 	height: 20px;
 	border-radius: 10px;
-	
+
 }
 
 SliderLabel {
@@ -212,4 +209,52 @@ QTableView::item{
 
 QTableView::item:selected{
 	background-color: #515670;
+}
+
+QMenu {
+    icon-size: 25px;
+    border: 1px solid white;
+    border-radius: 2px;
+}
+
+QMenu::item {
+    background: transparent;
+}
+QMenu::item:selected {
+    background: #515670;
+}
+
+QMenuBar::item:selected{
+    background: #3f435a;
+}
+
+QScrollBar {
+    width: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
+    border: 0;
+    background: none;
+}
+
+QScrollBar::handle:vertical{
+    background: white;
+    border: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical{
+    background: #323C5A;
+}
+
+QTableWidget QScrollBar{
+    width: 12px;
+    margin-left: 5px;
+    border: 0;
+    padding: 0;
+}
+
+QTextBrowser {
+    border: none;
 }

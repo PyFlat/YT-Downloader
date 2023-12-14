@@ -3,11 +3,7 @@
 build/
 Downloads/
 
-ui_to_py.bat
-
-setup.py
-
-mainwindow.ui
+logs/
 
 mainwindow_ui.py
 
@@ -15,8 +11,9 @@ ui_mainwindow.py
 
 build_exe.bat
 
-*.iss
+yt_dlp
 
-update_ui.py
+*.ini
+FFmpeg/
 
-mainwindow.ui
+env/
