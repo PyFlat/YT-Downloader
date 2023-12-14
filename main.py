@@ -71,8 +71,6 @@ class MainWindow(QMainWindow):
 
         self.create_search_widges()
 
-        #self.ui.menuTools.popup()
-
         self.show()
 
     def on_focus_out(self, event):
@@ -326,8 +324,12 @@ class Downloader():
         logger.info("Importing yt-dlp")
         self.import_yt_dl_thread = ImportYTDLP()
         self.import_yt_dl_thread.finished.connect(lambda: [mw.ui.searching_button.setEnabled(True)])
-        self.import_yt_dl_thread.result.connect(lambda e: self.user_info_no_yt_dlp() if not e else ())
+        self.import_yt_dl_thread.result.connect(lambda e: self.user_info_no_yt_dlp() if not e else self.check_ffmpeg_installed())
         self.import_yt_dl_thread.start()
+
+    def check_ffmpeg_installed(self):
+        if not os.path.isfile(f"{self.ffmpeg}/ffmpeg.exe"):
+            self.user_info_no_ffmpeg()
 
     def update_config_version(self, config):
         self.update_check = config["DEFAULT"].getboolean("check-for-updates", fallback=True)
@@ -584,7 +586,28 @@ class Downloader():
             return False
 
     def user_info_no_ffmpeg(self):
-        self.yes_no_messagebox("Error: Missing FFmpeg Path.\nTo download videos, install FFmpeg or set the path in the Tools menu.", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+        msg_box = QMessageBox(mw)
+        msg_box.setText(f"""Error: Missing FFmpeg Path.<br>
+                            To download videos, install FFmpeg or set the path.""")
+        msg_box.setWindowTitle("Error")
+
+        msg_box.layout().setContentsMargins(10, 0, 0, 10)
+
+        install = QPushButton("Install FFmpeg")
+        msg_box.addButton(install, QMessageBox.ActionRole)
+        set = QPushButton("Set FFmpeg-Path")
+        msg_box.addButton(set, QMessageBox.ActionRole)
+        ignore = QPushButton("Ok")
+        msg_box.addButton(ignore, QMessageBox.ActionRole)
+
+        msg_box.setStyleSheet("QPushButton{margin-right: 8px;}")
+        msg_box.layout().setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        res = msg_box.exec()
+        if res == 0:
+            self.download_ffmpeg()
+        elif res == 1:
+            self.change_ffmpeg_location()
 
     def handle_update_available(self, update_available, tag, auto):
         self.update_thread = None
