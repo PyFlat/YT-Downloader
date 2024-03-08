@@ -2,19 +2,30 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 
+from src.CustomWidgets.CustomTableWidget import CustomTableWidget
+
 class VideoSelectDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, videos=None):
         super().__init__(parent)
+        self.setMinimumSize(1150, 550)
         self.setWindowTitle("Video Selector")
 
-        self.video_table = QTableWidget()
-        self.video_table.setColumnCount(3)  # Title, Uploader, Checkbox
-        self.video_table.setHorizontalHeaderLabels(["", "Uploader", "Title"])
+        # Search criteria checkboxes
+        self.search_title_checkbox = QCheckBox("Search Title")
+        self.search_title_checkbox.setChecked(True)
+        self.search_uploader_checkbox = QCheckBox("Search Uploader")
+        self.search_uploader_checkbox.setChecked(True)
+
+        self.video_table = CustomTableWidget()
+        self.video_table.setColumnCount(4)
+        self.video_table.setHorizontalHeaderLabels(["", "Title", "Uploader", "Playlist Index"])
         self.video_table.verticalHeader().setVisible(False)
+        self.video_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.video_table.setSelectionMode(QAbstractItemView.NoSelection)
         self.search_input = QLineEdit()
         self.search_input.textChanged.connect(self.filter_videos)
 
-        self.load_videos()
+        self.load_videos(videos)
 
         self.select_all_button = QPushButton("Select All")
         self.select_all_button.clicked.connect(self.select_all_videos)
@@ -26,67 +37,66 @@ class VideoSelectDialog(QDialog):
         button_layout.addWidget(self.select_all_button)
         button_layout.addWidget(self.deselect_all_button)
 
-        self.select_range_slider = QSlider(Qt.Horizontal)
-        self.select_range_slider.setMinimum(0)
-        self.select_range_slider.setMaximum(self.video_table.rowCount() - 1)
-        self.select_range_slider.setTickInterval(1)
-        self.select_range_slider.setTickPosition(QSlider.TicksBelow)
-
-        self.select_range_slider.sliderReleased.connect(self.select_range)
+        search_criteria_layout = QHBoxLayout()
+        search_criteria_layout.addWidget(self.search_title_checkbox)
+        search_criteria_layout.addWidget(self.search_uploader_checkbox)
 
         layout = QVBoxLayout()
         layout.addWidget(self.search_input)
+        layout.addLayout(search_criteria_layout)
         layout.addLayout(button_layout)
-        layout.addWidget(self.select_range_slider)
         layout.addWidget(self.video_table)
 
         self.setLayout(layout)
 
-        self.selected_rows = []
+        self.video_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.video_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.video_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.video_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
 
-    def load_videos(self):
-        videos = [
-            {"title": "Video 1", "uploader": "Uploader A"},
-            {"title": "Video 2", "uploader": "Uploader B"},
-            {"title": "Video 3", "uploader": "Uploader C"},
-            {"title": "Video 4", "uploader": "Uploader D"}
-        ]
+        # Connect checkbox signals
+        self.search_title_checkbox.stateChanged.connect(self.filter_videos)
+        self.search_uploader_checkbox.stateChanged.connect(self.filter_videos)
 
+        # Variables to store the selected search criteria
+        self.search_title = True
+        self.search_uploader = True
+
+    def load_videos(self, videos=None):
         self.video_table.setRowCount(len(videos))
         for row, video in enumerate(videos):
             title_item = QTableWidgetItem(video["title"])
             uploader_item = QTableWidgetItem(video["uploader"])
-            checkbox_item = QTableWidgetItem()
-            checkbox_item.setFlags(checkbox_item.flags() | Qt.ItemIsUserCheckable)
-            checkbox_item.setCheckState(Qt.Unchecked)
+            playlist_index_item = QTableWidgetItem(str(video["playlist_index"]+1))
+            checkbox_item = QCheckBox()
 
-            self.video_table.setItem(row, 0, checkbox_item)
+            self.video_table.setCellWidget(row, 0, checkbox_item)
             self.video_table.setItem(row, 1, title_item)
             self.video_table.setItem(row, 2, uploader_item)
+            self.video_table.setItem(row, 3, playlist_index_item)
 
-    def filter_videos(self, text):
+            for col in range(1, self.video_table.columnCount()):
+                self.video_table.item(row, col).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+    def filter_videos(self):
+        text = self.search_input.text().lower()
         for row in range(self.video_table.rowCount()):
             title_item = self.video_table.item(row, 1)
-            if title_item.text().lower().startswith(text.lower()):
+            uploader_item = self.video_table.item(row, 2)
+            title_contains_text = self.search_title_checkbox.isChecked() and text in title_item.text().lower()
+            uploader_contains_text = self.search_uploader_checkbox.isChecked() and text in uploader_item.text().lower()
+            if title_contains_text or uploader_contains_text:
                 self.video_table.setRowHidden(row, False)
             else:
                 self.video_table.setRowHidden(row, True)
 
     def select_all_videos(self):
         for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.item(row, 0)
-            checkbox_item.setCheckState(Qt.Checked)
+            checkbox_item = self.video_table.cellWidget(row, 0)
+            checkbox_item.setChecked(True)
 
     def deselect_all_videos(self):
         for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.item(row, 0)
-            checkbox_item.setCheckState(Qt.Unchecked)
+            checkbox_item = self.video_table.cellWidget(row, 0)
+            checkbox_item.setChecked(False)
 
-    def select_range(self):
-        slider_value = self.select_range_slider.value()
-        for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.item(row, 0)
-            if row <= slider_value:
-                checkbox_item.setCheckState(Qt.Checked)
-            else:
-                checkbox_item.setCheckState(Qt.Unchecked)

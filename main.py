@@ -23,6 +23,7 @@ from zipfile import ZipFile
 from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
+from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
 
 from urllib.request import urlopen
 from urllib.error import URLError
@@ -148,6 +149,7 @@ class Downloader():
         mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
         mw.ui.next_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(0))
         mw.ui.last_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(1))
+        mw.ui.select_videos_btn.clicked.connect(lambda: self.show_video_select())
         mw.ui.scrollArea.verticalScrollBar().valueChanged.connect(lambda: [self.fill_new_widgs()])
         mw.search_shortcut.activated.connect(self.enter_pressed)
         mw.ui.tableWidget.cellClicked.connect(self.handle_clicked)
@@ -168,6 +170,13 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def show_video_select(self):
+        videos = []
+        for index, playlist_object in enumerate(self.data.playlist_data_objects):
+            videos.append({"title": playlist_object.title, "uploader": playlist_object.author, "playlist_index": index})
+        dialog = VideoSelectDialog(mw, videos)
+        dialog.exec()
 
     def enter_pressed(self):
         if mw.ui.mainpages.currentIndex() == 0:
@@ -548,6 +557,7 @@ class Downloader():
             mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
             mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Select the Range you want to Download"))
             mw.ui.date_label.setText(f"Playlist Count: {self.data.playlist_count} Videos")
+            #print(self.data.playlist_data_objects)
             mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
             mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
 
@@ -821,6 +831,7 @@ class DataHandler():
         self.playlist_data_objects[index] = x
         if not None in self.playlist_data_objects:
             mw.ui.download_button.setEnabled(True)
+            mw.ui.select_videos_btn.setEnabled(True)
 
     def get_thumbnail_url(self):
         x = []
