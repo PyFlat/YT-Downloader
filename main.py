@@ -23,11 +23,12 @@ from zipfile import ZipFile
 from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
+from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
 
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 
 class noLogger:
     def error(msg):
@@ -51,8 +52,6 @@ class MainWindow(QMainWindow):
         self.ui.mainpages.setCurrentIndex(0)
         self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
-
-        self.ui.tableWidget.verticalScrollBar().setObjectName("test")
 
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
 
@@ -148,6 +147,8 @@ class Downloader():
         mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
         mw.ui.next_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(0))
         mw.ui.last_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(1))
+        mw.ui.select_videos_btn.clicked.connect(lambda: self.show_video_select())
+        mw.ui.playlist_range_slider.valueChanged.connect(lambda: self.change_download_range())
         mw.ui.scrollArea.verticalScrollBar().valueChanged.connect(lambda: [self.fill_new_widgs()])
         mw.search_shortcut.activated.connect(self.enter_pressed)
         mw.ui.tableWidget.cellClicked.connect(self.handle_clicked)
@@ -158,6 +159,7 @@ class Downloader():
         self.update_thread = None
         self.downloads = []
         self.cur_process = []
+        self.selected_ids = []
         self.loading = False
         self.delete_exe_files()
         self.connect_menu_actions()
@@ -168,6 +170,38 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def show_video_select(self):
+        videos = []
+        for index, playlist_object in enumerate(self.data.playlist_data_objects):
+            videos.append({"title": playlist_object.title,
+                "uploader": playlist_object.author,
+                "playlist_index": index,
+                "selected": True if index + 1 in self.selected_ids else False
+        })
+        self.video_select_dialog = VideoSelectDialog(mw, videos)
+        self.video_select_dialog.exec()
+        self.selected_ids = self.video_select_dialog.get_selected()
+        if self.selected_ids == [] or self.has_clear_range(self.selected_ids):
+            mw.ui.playlist_range_slider.setEnabled(True)
+        else:
+            mw.ui.playlist_range_slider.setEnabled(False)
+
+    def change_download_range(self):
+        start, stop = mw.ui.playlist_range_slider.value()
+        self.selected_ids = []
+        for num in range(start, stop + 1):
+            self.selected_ids.append(num)
+
+    def has_clear_range(self, numbers):
+        numbers.sort()
+
+        for i in range(len(numbers) - 1):
+            if numbers[i + 1] - numbers[i] != 1:
+                return False
+        mw.ui.playlist_range_slider.setValue((numbers[0], numbers[-1]))
+        return True
+
 
     def enter_pressed(self):
         if mw.ui.mainpages.currentIndex() == 0:
@@ -413,6 +447,8 @@ class Downloader():
 
     def use_info(self, info, cur_link):
         self.loading = False
+        if not info:
+            info = {}
         if info != {} and info["webpage_url_domain"] != None and info["webpage_url_domain"] == "youtube.com" and info["channel"] != None and info != False:
             self.cur_link = cur_link
             if "?list=" in cur_link and ("&list=" not in cur_link and "?v=" not in cur_link):
@@ -548,6 +584,7 @@ class Downloader():
             mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
             mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Select the Range you want to Download"))
             mw.ui.date_label.setText(f"Playlist Count: {self.data.playlist_count} Videos")
+            mw.ui.last_page_btn.setVisible(True)
             mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
             mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
 
@@ -821,6 +858,7 @@ class DataHandler():
         self.playlist_data_objects[index] = x
         if not None in self.playlist_data_objects:
             mw.ui.download_button.setEnabled(True)
+            mw.ui.select_videos_btn.setEnabled(True)
 
     def get_thumbnail_url(self):
         x = []
@@ -898,12 +936,16 @@ class DataHandler():
         self.download()
 
     def download_playlist(self):
-        start, stop = mw.ui.playlist_range_slider.value()
-        def download_next(i):
-            if i < stop:
-                self.playlist_data_objects[i].prepare_for_download()
-                QTimer.singleShot(1000, lambda: download_next(i + 1))
-        download_next(start - 1)
+        if dl.selected_ids  == []:
+            dl.yes_no_messagebox("No video chosen", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            return
+        def download_next(index):
+            if index < len(dl.selected_ids):
+                video_id = dl.selected_ids[index]-1
+                self.playlist_data_objects[video_id].prepare_for_download()
+                QTimer.singleShot(1000, lambda: download_next(index + 1))
+
+        download_next(0)
 
     def download(self, row=None):
         if row == None:
@@ -1307,7 +1349,15 @@ class ScreenShot(QThread):
         screenshot = mw.grab()
         screenshot.save("showcase/Select_Playlist_Range.png", "png")
 
+        mw.ui.select_videos_btn.click()
+        self.msleep(1000)
+
+        screenshot = dl.video_select_dialog.grab()
+        screenshot.save("showcase/Select_Playlist_Precise.png", "png")
+
         mw.ui.next_page_btn.click()
+
+        self.msleep(1000)
 
         screenshot = mw.grab()
         screenshot.save("showcase/Download_Playlist.png", "png")
@@ -1331,6 +1381,6 @@ if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
-    #thread = ScreenShot(mw)
-    #thread.start()
+    # thread = ScreenShot(mw)
+    # thread.start()
     sys.exit(app.exec())

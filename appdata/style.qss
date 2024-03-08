@@ -141,7 +141,9 @@ QSlider {
 	background-color: none;
 	min-height: 20px;
 }
-
+QSlider::handle:disabled{
+    background: #b2b2b2;
+}
 QSlider::handle {
 	background: white;
 	height: 20px;
@@ -253,6 +255,9 @@ QTableWidget QScrollBar{
     margin-left: 5px;
     border: 0;
     padding: 0;
+}
+QTableWidget{
+    border: 0;
 }
 
 QTextBrowser {
