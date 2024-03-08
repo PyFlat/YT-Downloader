@@ -179,9 +179,9 @@ class Downloader():
                 "playlist_index": index,
                 "selected": True if index + 1 in self.selected_ids else False
         })
-        dialog = VideoSelectDialog(mw, videos)
-        dialog.exec()
-        self.selected_ids = dialog.get_selected()
+        self.video_select_dialog = VideoSelectDialog(mw, videos)
+        self.video_select_dialog.exec()
+        self.selected_ids = self.video_select_dialog.get_selected()
         if self.selected_ids == [] or self.has_clear_range(self.selected_ids):
             mw.ui.playlist_range_slider.setEnabled(True)
         else:
@@ -584,6 +584,7 @@ class Downloader():
             mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
             mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Select the Range you want to Download"))
             mw.ui.date_label.setText(f"Playlist Count: {self.data.playlist_count} Videos")
+            mw.ui.last_page_btn.setVisible(True)
             mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
             mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
 
@@ -1348,7 +1349,18 @@ class ScreenShot(QThread):
         screenshot = mw.grab()
         screenshot.save("showcase/Select_Playlist_Range.png", "png")
 
+        mw.ui.select_videos_btn.click()
+        self.msleep(1000)
+
+        screenshot = dl.video_select_dialog.grab()
+        screenshot.save("showcase/Select_Playlist_Precise.png", "png")
+
+        #dl.video_select_dialog.close()
+
+
         mw.ui.next_page_btn.click()
+
+        self.msleep(1000)
 
         screenshot = mw.grab()
         screenshot.save("showcase/Download_Playlist.png", "png")
@@ -1372,6 +1384,6 @@ if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
-    #thread = ScreenShot(mw)
-    #thread.start()
+    thread = ScreenShot(mw)
+    thread.start()
     sys.exit(app.exec())
