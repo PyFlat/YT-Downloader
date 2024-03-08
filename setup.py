@@ -35,7 +35,7 @@ executables = [Executable("main.py", base=base)]
 
 setup(
     name="youtube_downloader",
-    version="1.3.0",
+    version="1.3.1",
     description="Youtube Downloader",
     options={"build_exe": build_exe_options},
     executables=executables,
