@@ -16,12 +16,15 @@ class VideoSelectDialog(QDialog):
         self.search_uploader_checkbox.setChecked(True)
 
         self.video_table = CustomTableWidget()
+        self.video_table.setSortingEnabled(True)
         self.video_table.setColumnCount(4)
         self.video_table.setHorizontalHeaderLabels(["", "Title", "Uploader", "Playlist Index"])
         self.video_table.verticalHeader().setVisible(False)
+        self.video_table.horizontalHeader().setSortIndicatorShown(False)
         self.video_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.video_table.setSelectionMode(QAbstractItemView.NoSelection)
         self.search_input = QLineEdit()
+        self.search_input.setAlignment(Qt.AlignCenter)
         self.search_input.textChanged.connect(self.delayed_filter_videos)
 
         self.load_videos(videos)
@@ -69,7 +72,7 @@ class VideoSelectDialog(QDialog):
         for row, video in enumerate(videos):
             title_item = QTableWidgetItem(video["title"])
             uploader_item = QTableWidgetItem(video["uploader"])
-            playlist_index_item = QTableWidgetItem(str(video["playlist_index"]+1))
+            playlist_index_item = PlaylistIndexTableWidgetItem(str(video["playlist_index"]+1))
             checkbox_item = QCheckBox()
 
             self.video_table.setCellWidget(row, 0, checkbox_item)
@@ -105,3 +108,8 @@ class VideoSelectDialog(QDialog):
             checkbox_item = self.video_table.cellWidget(row, 0)
             checkbox_item.setChecked(False)
 
+class PlaylistIndexTableWidgetItem(QTableWidgetItem):
+    def __lt__(self, other):
+        if (self.column() == 3 and other.column() == 3):  # Check if sorting the playlist index column
+            return int(self.text()) < int(other.text())
+        return super().__lt__(other)  # For other columns, use default sorting behavior

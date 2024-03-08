@@ -53,8 +53,6 @@ class MainWindow(QMainWindow):
         self.ui.search_stack_widg.setCurrentIndex(0)
         self.ui.download_2.setCurrentIndex(0)
 
-        self.ui.tableWidget.verticalScrollBar().setObjectName("test")
-
         self.ui.tableWidget.focusOutEvent = self.on_focus_out
 
         self.bind_keys()
