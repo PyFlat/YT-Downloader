@@ -10,7 +10,6 @@ class VideoSelectDialog(QDialog):
         self.setMinimumSize(1150, 550)
         self.setWindowTitle("Video Selector")
 
-        # Search criteria checkboxes
         self.search_title_checkbox = QCheckBox("Search Title")
         self.search_title_checkbox.setChecked(True)
         self.search_uploader_checkbox = QCheckBox("Search Uploader")
@@ -54,11 +53,9 @@ class VideoSelectDialog(QDialog):
         self.video_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.video_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
 
-        # Connect checkbox signals
         self.search_title_checkbox.stateChanged.connect(self.filter_videos)
         self.search_uploader_checkbox.stateChanged.connect(self.filter_videos)
 
-        # Variables to store the selected search criteria
         self.search_title = True
         self.search_uploader = True
 
