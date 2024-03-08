@@ -27,7 +27,7 @@ from src.CustomWidgets.SLabel import SLabel
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 
 class noLogger:
     def error(msg):
