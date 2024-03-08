@@ -10,58 +10,81 @@ class VideoSelectDialog(QDialog):
         self.setMinimumSize(1150, 550)
         self.setWindowTitle("Video Selector")
 
+        # Search Criteria
         self.search_title_checkbox = QCheckBox("Search Title")
         self.search_title_checkbox.setChecked(True)
         self.search_uploader_checkbox = QCheckBox("Search Uploader")
         self.search_uploader_checkbox.setChecked(True)
+        self.search_index_checkbox = QCheckBox("Search Index")
+        self.search_index_checkbox.setChecked(False)
 
+        # Video Table
         self.video_table = CustomTableWidget()
         self.video_table.setSortingEnabled(True)
         self.video_table.setColumnCount(4)
-        self.video_table.setHorizontalHeaderLabels(["", "Title", "Uploader", "Playlist Index"])
+        self.video_table.setHorizontalHeaderLabels(["Select", "Title", "Uploader", "Playlist Index"])
         self.video_table.verticalHeader().setVisible(False)
         self.video_table.horizontalHeader().setSortIndicatorShown(False)
         self.video_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.video_table.setSelectionMode(QAbstractItemView.NoSelection)
+
+        # Search Input
         self.search_input = QLineEdit()
         self.search_input.setAlignment(Qt.AlignCenter)
         self.search_input.textChanged.connect(self.delayed_filter_videos)
 
+        # Load Videos
         self.load_videos(videos)
 
+        # Select/Deselect Buttons
         self.select_all_button = QPushButton("Select All")
         self.select_all_button.clicked.connect(self.select_all_videos)
 
         self.deselect_all_button = QPushButton("Deselect All")
         self.deselect_all_button.clicked.connect(self.deselect_all_videos)
 
+        # Button Layout
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.select_all_button)
         button_layout.addWidget(self.deselect_all_button)
 
+        # Search Criteria Group
+        search_criteria_group = QGroupBox("Search Criteria")
         search_criteria_layout = QHBoxLayout()
+        search_criteria_layout.setSpacing(24)
+        search_criteria_layout.setAlignment(Qt.AlignLeft)
         search_criteria_layout.addWidget(self.search_title_checkbox)
         search_criteria_layout.addWidget(self.search_uploader_checkbox)
+        search_criteria_layout.addWidget(self.search_index_checkbox)
+        search_criteria_group.setLayout(search_criteria_layout)
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.search_input)
-        layout.addLayout(search_criteria_layout)
-        layout.addLayout(button_layout)
-        layout.addWidget(self.video_table)
+        # Search Layout
+        search_layout = QFormLayout()
+        search_layout.addRow("Search:", self.search_input)
 
-        self.setLayout(layout)
+        # Main Layout
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.addLayout(search_layout)
+        main_layout.addWidget(search_criteria_group)
+        main_layout.addLayout(button_layout)
+        main_layout.addWidget(self.video_table)
 
-        self.video_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        self.video_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.video_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.video_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.setLayout(main_layout)
 
+        # Set Section Resize Modes
+        for i in range(4):
+            self.video_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch if i > 0 else QHeaderView.ResizeToContents)
+
+        # Connect Checkbox Signals
         self.search_title_checkbox.stateChanged.connect(self.delayed_filter_videos)
         self.search_uploader_checkbox.stateChanged.connect(self.delayed_filter_videos)
 
+        # Set Default Values
         self.search_title = True
         self.search_uploader = True
 
+        # Timer for Delayed Filtering
         self.filter_timer = QTimer(self)
         self.filter_timer.setSingleShot(True)
         self.filter_timer.timeout.connect(self.filter_videos)
@@ -91,9 +114,11 @@ class VideoSelectDialog(QDialog):
         for row in range(self.video_table.rowCount()):
             title_item = self.video_table.item(row, 1)
             uploader_item = self.video_table.item(row, 2)
+            index_item  = self.video_table.item(row, 3)
             title_contains_text = self.search_title_checkbox.isChecked() and text in title_item.text().lower()
             uploader_contains_text = self.search_uploader_checkbox.isChecked() and text in uploader_item.text().lower()
-            if title_contains_text or uploader_contains_text:
+            index_contains_text = self.search_index_checkbox.isChecked() and text in index_item.text()
+            if title_contains_text or uploader_contains_text or index_contains_text:
                 self.video_table.setRowHidden(row, False)
             else:
                 self.video_table.setRowHidden(row, True)
