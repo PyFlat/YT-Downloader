@@ -1355,9 +1355,6 @@ class ScreenShot(QThread):
         screenshot = dl.video_select_dialog.grab()
         screenshot.save("showcase/Select_Playlist_Precise.png", "png")
 
-        #dl.video_select_dialog.close()
-
-
         mw.ui.next_page_btn.click()
 
         self.msleep(1000)
@@ -1384,6 +1381,6 @@ if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
-    thread = ScreenShot(mw)
-    thread.start()
+    # thread = ScreenShot(mw)
+    # thread.start()
     sys.exit(app.exec())
