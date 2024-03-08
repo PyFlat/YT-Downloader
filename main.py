@@ -447,6 +447,8 @@ class Downloader():
 
     def use_info(self, info, cur_link):
         self.loading = False
+        if not info:
+            info = {}
         if info != {} and info["webpage_url_domain"] != None and info["webpage_url_domain"] == "youtube.com" and info["channel"] != None and info != False:
             self.cur_link = cur_link
             if "?list=" in cur_link and ("&list=" not in cur_link and "?v=" not in cur_link):
