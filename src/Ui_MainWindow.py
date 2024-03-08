@@ -461,7 +461,7 @@ class Ui_MainWindow(object):
         self.download_bar_page3 = QWidget()
         self.download_bar_page3.setObjectName(u"download_bar_page3")
         self.verticalLayout_8 = QVBoxLayout(self.download_bar_page3)
-        self.verticalLayout_8.setSpacing(10)
+        self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.info_range_slider_label = QLabel(self.download_bar_page3)
@@ -481,11 +481,28 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.playlist_range_slider)
 
-        self.next_page_btn = QPushButton(self.download_bar_page3)
+        self.frame_4 = QFrame(self.download_bar_page3)
+        self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setFrameShape(QFrame.StyledPanel)
+        self.frame_4.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout = QHBoxLayout(self.frame_4)
+        self.horizontalLayout.setSpacing(25)
+        self.horizontalLayout.setContentsMargins(10, 10, 10, 10)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.select_videos_btn = QPushButton(self.frame_4)
+        self.select_videos_btn.setObjectName(u"select_videos_btn")
+        self.select_videos_btn.setEnabled(False)
+
+        self.horizontalLayout.addWidget(self.select_videos_btn)
+
+        self.next_page_btn = QPushButton(self.frame_4)
         self.next_page_btn.setObjectName(u"next_page_btn")
         self.next_page_btn.setMinimumSize(QSize(150, 0))
 
-        self.verticalLayout_8.addWidget(self.next_page_btn, 0, Qt.AlignHCenter)
+        self.horizontalLayout.addWidget(self.next_page_btn)
+
+
+        self.verticalLayout_8.addWidget(self.frame_4, 0, Qt.AlignHCenter)
 
         self.download_2.addWidget(self.download_bar_page3)
 
@@ -630,7 +647,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(0)
+        self.mainpages.setCurrentIndex(1)
         self.search_stack_widg.setCurrentIndex(1)
         self.download_2.setCurrentIndex(1)
 
@@ -639,7 +656,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.3.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.3.1", None))
         self.actionSearch_For_Updates.setText(QCoreApplication.translate("MainWindow", u"Search for Updates", None))
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.actionShow_on_Github.setText(QCoreApplication.translate("MainWindow", u"Show on GitHub", None))
@@ -673,6 +690,7 @@ class Ui_MainWindow(object):
         self.last_page_btn.setText(QCoreApplication.translate("MainWindow", u"Back", None))
         self.download_button.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.info_range_slider_label.setText("")
+        self.select_videos_btn.setText(QCoreApplication.translate("MainWindow", u"Select Videos", None))
         self.next_page_btn.setText(QCoreApplication.translate("MainWindow", u"Next", None))
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Channel", None));
