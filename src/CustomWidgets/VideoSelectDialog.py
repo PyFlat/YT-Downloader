@@ -22,7 +22,7 @@ class VideoSelectDialog(QDialog):
         self.video_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.video_table.setSelectionMode(QAbstractItemView.NoSelection)
         self.search_input = QLineEdit()
-        self.search_input.textChanged.connect(self.filter_videos)
+        self.search_input.textChanged.connect(self.delayed_filter_videos)
 
         self.load_videos(videos)
 
@@ -53,11 +53,16 @@ class VideoSelectDialog(QDialog):
         self.video_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.video_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
 
-        self.search_title_checkbox.stateChanged.connect(self.filter_videos)
-        self.search_uploader_checkbox.stateChanged.connect(self.filter_videos)
+        self.search_title_checkbox.stateChanged.connect(self.delayed_filter_videos)
+        self.search_uploader_checkbox.stateChanged.connect(self.delayed_filter_videos)
 
         self.search_title = True
         self.search_uploader = True
+
+        self.filter_timer = QTimer(self)
+        self.filter_timer.setSingleShot(True)
+        self.filter_timer.timeout.connect(self.filter_videos)
+        self.filter_delay = 300
 
     def load_videos(self, videos=None):
         self.video_table.setRowCount(len(videos))
@@ -74,6 +79,9 @@ class VideoSelectDialog(QDialog):
 
             for col in range(1, self.video_table.columnCount()):
                 self.video_table.item(row, col).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+    def delayed_filter_videos(self):
+        self.filter_timer.start(self.filter_delay)
 
     def filter_videos(self):
         text = self.search_input.text().lower()
