@@ -10,7 +10,6 @@ class VideoSelectDialog(QDialog):
         self.setMinimumSize(1150, 550)
         self.setWindowTitle("Video Selector")
 
-        # Search Criteria
         self.search_title_checkbox = QCheckBox("Search Title")
         self.search_title_checkbox.setChecked(True)
         self.search_uploader_checkbox = QCheckBox("Search Uploader")
@@ -18,7 +17,6 @@ class VideoSelectDialog(QDialog):
         self.search_index_checkbox = QCheckBox("Search Index")
         self.search_index_checkbox.setChecked(False)
 
-        # Video Table
         self.video_table = CustomTableWidget()
         self.video_table.setSortingEnabled(True)
         self.video_table.setColumnCount(4)
@@ -28,27 +26,22 @@ class VideoSelectDialog(QDialog):
         self.video_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.video_table.setSelectionMode(QAbstractItemView.NoSelection)
 
-        # Search Input
         self.search_input = QLineEdit()
         self.search_input.setAlignment(Qt.AlignCenter)
         self.search_input.textChanged.connect(self.delayed_filter_videos)
 
-        # Load Videos
         self.load_videos(videos)
 
-        # Select/Deselect Buttons
         self.select_all_button = QPushButton("Select All")
         self.select_all_button.clicked.connect(self.select_all_videos)
 
         self.deselect_all_button = QPushButton("Deselect All")
         self.deselect_all_button.clicked.connect(self.deselect_all_videos)
 
-        # Button Layout
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.select_all_button)
         button_layout.addWidget(self.deselect_all_button)
 
-        # Search Criteria Group
         search_criteria_group = QGroupBox("Search Criteria")
         search_criteria_layout = QHBoxLayout()
         search_criteria_layout.setSpacing(24)
@@ -58,11 +51,9 @@ class VideoSelectDialog(QDialog):
         search_criteria_layout.addWidget(self.search_index_checkbox)
         search_criteria_group.setLayout(search_criteria_layout)
 
-        # Search Layout
         search_layout = QFormLayout()
         search_layout.addRow("Search:", self.search_input)
 
-        # Main Layout
         main_layout = QVBoxLayout()
         main_layout.setSpacing(15)
         main_layout.addLayout(search_layout)
@@ -72,19 +63,15 @@ class VideoSelectDialog(QDialog):
 
         self.setLayout(main_layout)
 
-        # Set Section Resize Modes
         for i in range(4):
             self.video_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch if i > 0 else QHeaderView.ResizeToContents)
 
-        # Connect Checkbox Signals
         self.search_title_checkbox.stateChanged.connect(self.delayed_filter_videos)
         self.search_uploader_checkbox.stateChanged.connect(self.delayed_filter_videos)
 
-        # Set Default Values
         self.search_title = True
         self.search_uploader = True
 
-        # Timer for Delayed Filtering
         self.filter_timer = QTimer(self)
         self.filter_timer.setSingleShot(True)
         self.filter_timer.timeout.connect(self.filter_videos)
@@ -97,6 +84,7 @@ class VideoSelectDialog(QDialog):
             uploader_item = QTableWidgetItem(video["uploader"])
             playlist_index_item = PlaylistIndexTableWidgetItem(str(video["playlist_index"]+1))
             checkbox_item = QCheckBox()
+            checkbox_item.setChecked(video["selected"])
 
             self.video_table.setCellWidget(row, 0, checkbox_item)
             self.video_table.setItem(row, 1, title_item)
@@ -123,6 +111,16 @@ class VideoSelectDialog(QDialog):
             else:
                 self.video_table.setRowHidden(row, True)
 
+    def get_selected(self):
+        ids = []
+        for row in range(self.video_table.rowCount()):
+            checkbox_item = self.video_table.cellWidget(row, 0)
+            if checkbox_item.isChecked():
+                index_item = self.video_table.item(row, 3)
+                ids.append(int(index_item.text()))
+
+        return ids
+
     def select_all_videos(self):
         for row in range(self.video_table.rowCount()):
             checkbox_item = self.video_table.cellWidget(row, 0)
@@ -135,6 +133,6 @@ class VideoSelectDialog(QDialog):
 
 class PlaylistIndexTableWidgetItem(QTableWidgetItem):
     def __lt__(self, other):
-        if (self.column() == 3 and other.column() == 3):  # Check if sorting the playlist index column
+        if (self.column() == 3 and other.column() == 3):
             return int(self.text()) < int(other.text())
-        return super().__lt__(other)  # For other columns, use default sorting behavior
+        return super().__lt__(other)
