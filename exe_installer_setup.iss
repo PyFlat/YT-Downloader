@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 LicenseFile=C:\Users\Johannes\Documents\GitHub\YT-Downloader\LICENSE
-AllowNoIcons=yes
+AllowNoIcons=no
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=C:\Users\Johannes\Documents\GitHub\YT-Downloader\build
@@ -37,9 +37,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\api-ms-win-core-console-l1-2-0.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\api-ms-win-core-fibers-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\api-ms-win-eventing-provider-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\frozen_application_license.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\python3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\python311.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -50,7 +47,8 @@ Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIconFile}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; IconFilename: "{app}\{#MyAppIconFile}"
-;Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIconFile}"
+Name: "{autostartmenu}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIconFile}"
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIconFile}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\{#MyAppIconFile}"
 
 [Run]
