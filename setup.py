@@ -31,7 +31,7 @@ build_exe_options = {
     "zip_include_packages": ["PySide6"],
 }
 
-executables = [Executable("main.py", base=base)]
+executables = [Executable("main.py", base=base, icon="appdata/images/app-icon.ico")]
 
 setup(
     name="youtube_downloader",
