@@ -3,6 +3,7 @@ def parse_keystring(s):
     for line in s.split("\n"):
         key=""
         content=""
+        space_buffer = ""
         mode="search_key"
         skip_special_key = False
         for c in line:
@@ -20,6 +21,12 @@ def parse_keystring(s):
             if mode=="load_key":
                 if c == "=":
                     mode="search_data"
+                    continue
+                if c != " ":
+                    key += space_buffer
+                    space_buffer = ""
+                if c == " ":
+                    space_buffer += c
                     continue
                 key += c
             if mode=="read_data":
