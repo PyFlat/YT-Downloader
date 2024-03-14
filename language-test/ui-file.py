@@ -19,8 +19,7 @@ class MainWindow(QWidget):
     def change_language(self):
         for key, value in self.strings_en.items():
             method_name, attribute_name = key.split('.')
-            method = getattr(self.ui, method_name)
-            method = getattr(method, attribute_name)
+            method = getattr(getattr(self.ui, method_name), attribute_name)
             method(value)
 
 if __name__ == "__main__":
