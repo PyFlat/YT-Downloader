@@ -5,12 +5,14 @@ class TranslationManager():
         self.directory = directory
         languages = []
         for dir in os.listdir(self.directory):
-            languages.append(self.parse_keystring(open(f"{self.directory}/{dir}", "r", encoding="utf-8").read()))
+            language, name = self.parse_keystring(open(f"{self.directory}/{dir}", "r", encoding="utf-8").read(),return_name=True)
+            languages.append(language)
         print(languages)
 
 
-    def parse_keystring(self, strings):
+    def parse_keystring(self, strings, return_name = False):
         keymap = {}
+        name = ""
         for line in strings.split("\n"):
             key=""
             content=""
@@ -49,5 +51,10 @@ class TranslationManager():
                         continue
                     content += c
                     skip_special_key = False
-            keymap[key] = content
+            if key == "NAME" and return_name:
+                name = content
+            else:
+                keymap[key] = content
+        if return_name:
+            return keymap, name
         return keymap

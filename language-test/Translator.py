@@ -1,9 +1,10 @@
-def parse_keystring(s):
+def parse_keystring(s, return_name=False):
     keymap = {}
     for line in s.split("\n"):
         key=""
         content=""
         space_buffer = ""
+        name = ""
         mode="search_key"
         skip_special_key = False
         for c in line:
@@ -38,5 +39,7 @@ def parse_keystring(s):
                     continue
                 content += c
                 skip_special_key = False
+        if key == "NAME":
+            name = c
         keymap[key] = content
     return keymap
