@@ -39,6 +39,8 @@ def parse_keystring(s, return_name=False):
                     continue
                 content += c
                 skip_special_key = False
+        if key == "" and content == "":
+            continue
         if key == "NAME":
             name = c
         keymap[key] = content
