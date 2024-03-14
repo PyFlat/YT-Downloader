@@ -1,14 +1,13 @@
 import os
 
 class TranslationManager():
-    def __init__(self, directory:str=None):
+    def __init__(self, directory:str=None, mainwindow=None):
         self.directory = directory
-        languages = []
-        for dir in os.listdir(self.directory):
-            language, name = self.parse_keystring(open(f"{self.directory}/{dir}", "r", encoding="utf-8").read(),return_name=True)
-            languages.append(language)
-        print(languages)
-
+        self.mainwindow = mainwindow
+        self.languages = {}
+        for filename in os.listdir(self.directory):
+            language_code, language_name = self.parse_keystring(open(f"{self.directory}/{filename}", "r", encoding="utf-8").read(), return_name=True)
+            self.languages[language_name] = language_code
 
     def parse_keystring(self, strings, return_name = False):
         keymap = {}
@@ -58,3 +57,14 @@ class TranslationManager():
         if return_name:
             return keymap, name
         return keymap
+
+    def change_language(self, language:str=None):
+        if language in self.languages:
+            for key, value in self.languages[language].items():
+                if '.' in key:
+                    method_name, attribute_name = key.split('.')
+                    method = getattr(getattr(self.mainwindow.ui, method_name), attribute_name)
+                    method(value)
+                else:
+                    method = getattr(self, key)
+                    method(value)

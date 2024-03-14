@@ -767,8 +767,8 @@ QTableWidget QScrollBar{
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>1026</width>
-                          <height>20</height>
+                          <width>100</width>
+                          <height>30</height>
                          </rect>
                         </property>
                         <property name="sizePolicy">
@@ -1443,11 +1443,18 @@ QTableWidget QScrollBar{
      <addaction name="actionLog_Level_Info"/>
      <addaction name="actionLog_Level_Debug"/>
     </widget>
+    <widget class="QMenu" name="menuChange_Language">
+     <property name="title">
+      <string>Change Language</string>
+     </property>
+     <addaction name="actionDefault"/>
+    </widget>
     <addaction name="actionAutomatic_Update_Check"/>
     <addaction name="actionShow_Thumbnails"/>
     <addaction name="actionDefault_Resolution"/>
     <addaction name="actionMaximum_Threads"/>
     <addaction name="menuChange_Log_Level"/>
+    <addaction name="menuChange_Language"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1619,6 +1626,11 @@ QTableWidget QScrollBar{
    </property>
    <property name="text">
     <string>Log-Level: Debug</string>
+   </property>
+  </action>
+  <action name="actionDefault">
+   <property name="text">
+    <string>Default</string>
    </property>
   </action>
  </widget>

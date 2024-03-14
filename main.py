@@ -164,7 +164,8 @@ class Downloader():
         self.loading = False
         self.delete_exe_files()
         self.connect_menu_actions()
-        self.tm = TranslationManager(Utils.get_abs_path("languages/"))
+        self.tm = TranslationManager(Utils.get_abs_path("languages/"), mw)
+        self.update_language_action()
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
@@ -172,6 +173,15 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def update_language_action(self):
+        keys = self.tm.languages.keys()
+        mw.ui.actionDefault.deleteLater()
+        for key in keys:
+            action = QAction(mw)
+            action.setText(key)
+            action.triggered.connect(lambda checked=False, k=key: self.tm.change_language(k))
+            mw.ui.menuChange_Language.addAction(action)
 
     def show_video_select(self):
         videos = []
