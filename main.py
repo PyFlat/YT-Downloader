@@ -177,10 +177,18 @@ class Downloader():
     def update_language_action(self):
         keys = self.tm.languages.keys()
         mw.ui.actionDefault.deleteLater()
+        icon = mw.ui.actionLog_Level_Debug.icon()
+
+        mw.ui.menuChange_Language.clear()
+
+        action_group = QActionGroup(mw)
+
         for key in keys:
-            action = QAction(mw)
-            action.setText(key)
+            action = QAction(key, mw, checkable=True)
+            action.setIcon(icon)
+            action_group.addAction(action)
             action.triggered.connect(lambda checked=False, k=key: self.tm.change_language(k))
+
             mw.ui.menuChange_Language.addAction(action)
 
     def show_video_select(self):
