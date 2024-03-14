@@ -18,9 +18,13 @@ class MainWindow(QWidget):
 
     def change_language(self):
         for key, value in self.strings_en.items():
-            method_name, attribute_name = key.split('.')
-            method = getattr(getattr(self.ui, method_name), attribute_name)
-            method(value)
+            if '.' in key:
+                method_name, attribute_name = key.split('.')
+                method = getattr(getattr(self.ui, method_name), attribute_name)
+                method(value)
+            else:
+                method = getattr(self, key)
+                method(value)
 
 if __name__ == "__main__":
     app = QApplication([])
