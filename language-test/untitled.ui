@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>untitled</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -39,7 +39,7 @@
    <item alignment="Qt::AlignHCenter">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>TThis is a nice text</string>
+      <string>This is a nice text</string>
      </property>
     </widget>
    </item>

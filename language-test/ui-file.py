@@ -12,7 +12,7 @@ class MainWindow(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         os.chdir("language-test")
-        self.strings_en = Translator.parse_keystring(open("languages/language_en.properties", "r").read())
+        self.strings_en = Translator.parse_keystring(open("languages/language_en.properties", "r", encoding="utf-8").read())
         self.ui.pushButton.clicked.connect(self.change_language)
         self.show()
 
