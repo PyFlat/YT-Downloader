@@ -50,6 +50,8 @@ class TranslationManager():
                         continue
                     content += c
                     skip_special_key = False
+            if key == "" and content == "":
+                continue
             if key == "NAME" and return_name:
                 name = content
             else:
