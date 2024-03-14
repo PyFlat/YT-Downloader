@@ -24,6 +24,7 @@ from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
 from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
+from src.TranslationManager import TranslationManager
 
 from urllib.request import urlopen
 from urllib.error import URLError
@@ -163,6 +164,7 @@ class Downloader():
         self.loading = False
         self.delete_exe_files()
         self.connect_menu_actions()
+        self.tm = TranslationManager(Utils.get_abs_path("languages/"))
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
