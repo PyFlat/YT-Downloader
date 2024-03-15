@@ -13,7 +13,7 @@ class TranslationManager():
         sections = {"default":{}}
         active_section="default"
         keymap = {}
-        name = ""
+        _name = ""
         for line in strings.split("\n"):
             if len(line) > 0:
                 if line[0] == "#":
@@ -64,7 +64,7 @@ class TranslationManager():
             if key == "" and content == "":
                 continue
             if key == "NAME" and return_name:
-                name = content
+                _name = content
             else:
                 keymap[key] = content
         sections[active_section] = keymap
@@ -80,7 +80,7 @@ class TranslationManager():
                     raise NameError(f"Return section {name} was not found!")
                 returns[name] = sections[name]
         if return_name:
-            return returns, name
+            return returns, _name
         return returns
 
     def change_language(self, language: str = None):
