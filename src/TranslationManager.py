@@ -60,13 +60,22 @@ class TranslationManager():
             return keymap, name
         return keymap
 
-    def change_language(self, language:str=None):
+    def change_language(self, language: str = None):
         if language in self.languages:
             for key, value in self.languages[language].items():
-                if '.' in key:
-                    method_name, attribute_name = key.split('.')
-                    method = getattr(getattr(self.mainwindow.ui, method_name), attribute_name)
-                    method(value)
-                else:
-                    method = getattr(self, key)
-                    method(value)
+                try:
+                    if key.startswith("__"):
+                        method_name, attribute_name = key.split('.')
+                        index = int(method_name[-1]) if not method_name.endswith("m") else 0
+                        obj = self.mainwindow.ui.tableWidget.horizontalHeaderItem(index)
+                        method = getattr(obj, attribute_name)
+                        method(value)
+                    elif '.' in key:
+                        method_name, attribute_name = key.split('.')
+                        method = getattr(getattr(self.mainwindow.ui, method_name), attribute_name)
+                        method(value)
+                    else:
+                        method = getattr(self.mainwindow, key)
+                        method(value)
+                except Exception as e:
+                    print(e, key)
