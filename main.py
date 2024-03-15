@@ -186,10 +186,15 @@ class Downloader():
         for key in keys:
             action = QAction(key, mw, checkable=True)
             action.setIcon(icon)
+            action.setObjectName(key)
             action_group.addAction(action)
-            action.triggered.connect(lambda checked=False, k=key: self.tm.change_language(k))
+            action.triggered.connect(lambda checked=False, k=key: [self.tm.change_language(k), self.change_language(k)])
 
             mw.ui.menuChange_Language.addAction(action)
+
+    def change_language(self, language:str):
+        self.default_language = language
+        self.update_config("DEFAULT", "default-language", str(self.default_language))
 
     def show_video_select(self):
         videos = []
@@ -345,7 +350,8 @@ class Downloader():
                             "max-download-threads": "1",
                             "thumbnail-streaming": "True",
                             "log-level": "info",
-                            "default-resolution": "None"}
+                            "default-resolution": "None",
+                            "default-language": "English"}
         with open(Utils.get_abs_path("appdata/config.ini"), "w+") as file:
             config.write(file)
 
@@ -403,6 +409,13 @@ class Downloader():
 
         self.default_resolution = config["DEFAULT"].get("default-resolution", fallback=None)
         self.update_config("DEFAULT", "default-resolution", str(self.default_resolution))
+
+        self.default_language = config["DEFAULT"].get("default-language", fallback="English")
+        self.update_config("DEFAULT", "default-language", str(self.default_language))
+        self.tm.change_language(self.default_language)
+        self.change_language(self.default_language)
+        child = mw.findChild(QAction, self.default_language)
+        child.setChecked(True)
 
     def update_log_level(self, level):
         self.update_config("DEFAULT", "log-level", level)
