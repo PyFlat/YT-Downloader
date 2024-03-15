@@ -176,6 +176,7 @@ class Downloader():
 
     def update_language_action(self):
         keys = self.tm.languages.keys()
+        print(keys)
         mw.ui.actionDefault.deleteLater()
         icon = mw.ui.actionLog_Level_Debug.icon()
 
