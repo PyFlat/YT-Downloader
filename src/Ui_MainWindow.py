@@ -665,7 +665,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Youtube Downloader v1.3.1", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"YouTube Downloader v1.3.1", None))
         self.actionSearch_For_Updates.setText(QCoreApplication.translate("MainWindow", u"Search for Updates", None))
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.actionShow_on_Github.setText(QCoreApplication.translate("MainWindow", u"Show on GitHub", None))
