@@ -5,8 +5,10 @@ class TranslationManager():
         self.directory = directory
         self.mainwindow = mainwindow
         self.languages = {}
+        self.language = None
         for filename in os.listdir(self.directory):
-            language_code, language_name = self.parse_keystring(open(f"{self.directory}/{filename}", "r", encoding="utf-8").read(), return_name=True)
+            file = open(f"{self.directory}/{filename}", "r", encoding="utf-8").read()
+            language_code, language_name = self.parse_keystring(file, return_name=True, return_sections=["default", "inline"])
             self.languages[language_name] = language_code
 
     def parse_keystring(self, strings, return_name = False, return_sections=["default"]):
@@ -85,7 +87,8 @@ class TranslationManager():
 
     def change_language(self, language: str = None):
         if language in self.languages:
-            for key, value in self.languages[language].items():
+            self.language = language
+            for key, value in self.languages[language]["default"].items():
                 try:
                     if key.startswith("__"):
                         method_name, attribute_name = key.split('.')
@@ -102,3 +105,14 @@ class TranslationManager():
                         method(value)
                 except Exception as e:
                     print(e, key)
+
+    def get_inline_string(self, originalKey: str = None) -> str:
+        if self.language in self.languages:
+            key = self.languages[self.language]["inline"].get(originalKey, None)
+            if key is None:
+                key = self.languages["English"]["inline"].get(originalKey)
+
+            return key
+
+        else:
+            return f"Language '{self.language}' is not supported."

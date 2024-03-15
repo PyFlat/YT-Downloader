@@ -176,7 +176,6 @@ class Downloader():
 
     def update_language_action(self):
         keys = self.tm.languages.keys()
-        print(keys)
         mw.ui.actionDefault.deleteLater()
         icon = mw.ui.actionLog_Level_Debug.icon()
 
@@ -261,8 +260,7 @@ class Downloader():
 
         layout.setContentsMargins(20, 10, 20, 10)
         layout.setSpacing(25)
-
-        label = QLabel(f'Maximum Download Threads: {self.max_download_threads}')
+        label = QLabel(self.tm.get_inline_string("max-dl-threads").format(self.max_download_threads))
         layout.addWidget(label)
 
         slider = QSlider()
@@ -270,7 +268,7 @@ class Downloader():
         slider.setMinimum(1)
         slider.setMaximum(10)
         slider.setValue(self.max_download_threads)
-        slider.valueChanged.connect(lambda value: label.setText(f'Maximum Download Threads: {value}'))
+        slider.valueChanged.connect(lambda value: label.setText(self.tm.get_inline_string("max-dl-threads").format(value)))
         layout.addWidget(slider)
 
         apply_button = QPushButton('Apply')
