@@ -9,10 +9,21 @@ class TranslationManager():
             language_code, language_name = self.parse_keystring(open(f"{self.directory}/{filename}", "r", encoding="utf-8").read(), return_name=True)
             self.languages[language_name] = language_code
 
-    def parse_keystring(self, strings, return_name = False):
+    def parse_keystring(self, strings, return_name = False, return_sections=["default"]):
+        sections = {"default":{}}
+        active_section="default"
         keymap = {}
         name = ""
         for line in strings.split("\n"):
+            if len(line) > 0:
+                if line[0] == "#":
+                    section_name = line[1:]
+                    sections[active_section] = keymap
+                    active_section = section_name
+                    if not section_name in sections:
+                        sections[section_name] = {}
+                    keymap = sections[section_name]
+                    continue
             key=""
             content=""
             space_buffer = ""
@@ -56,9 +67,21 @@ class TranslationManager():
                 name = content
             else:
                 keymap[key] = content
+        sections[active_section] = keymap
+        returns = {}
+        if len(return_sections) == 1:
+            if return_sections[0] in sections:
+                returns = sections[return_sections[0]]
+            else:
+                raise NameError(f"Return section {return_sections[0]} was not found!")
+        else:
+            for name in return_sections:
+                if not name in sections:
+                    raise NameError(f"Return section {name} was not found!")
+                returns[name] = sections[name]
         if return_name:
-            return keymap, name
-        return keymap
+            return returns, name
+        return returns
 
     def change_language(self, language: str = None):
         if language in self.languages:
