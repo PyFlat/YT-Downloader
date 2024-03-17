@@ -271,7 +271,7 @@ class Downloader():
         slider.valueChanged.connect(lambda value: label.setText(self.tm.get_inline_string("max-dl-threads").format(value)))
         layout.addWidget(slider)
 
-        apply_button = QPushButton('Apply')
+        apply_button = QPushButton(self.tm.get_inline_string("apply"))
         apply_button.clicked.connect(lambda: save_maximum_download_threads())
 
         def save_maximum_download_threads():
@@ -284,7 +284,7 @@ class Downloader():
 
         dialog.setLayout(layout)
 
-        dialog.setWindowTitle('Set Maximum Download Threads')
+        dialog.setWindowTitle(self.tm.get_inline_string("max-dl-threads-title"))
         dialog.setFixedSize(375, 175)
 
         dialog.exec()
@@ -305,7 +305,7 @@ class Downloader():
 
         layout.addWidget(combobox)
 
-        apply_button = QPushButton('Apply')
+        apply_button = QPushButton(self.tm.get_inline_string("apply"))
         apply_button.clicked.connect(lambda: save_default_resolution())
 
         def save_default_resolution():
@@ -317,7 +317,7 @@ class Downloader():
 
         dialog.setLayout(layout)
 
-        dialog.setWindowTitle('Set Default Resolution')
+        dialog.setWindowTitle(self.tm.get_inline_string("default-res-title"))
         dialog.setFixedSize(300, 125)
 
         dialog.exec()
