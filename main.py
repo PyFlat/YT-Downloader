@@ -29,7 +29,7 @@ from src.TranslationManager import TranslationManager
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 
 class noLogger:
     def error(msg):
