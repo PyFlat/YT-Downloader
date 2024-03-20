@@ -908,7 +908,7 @@ class DataHandler():
                 if stre not in resolution:
                     resolution.append(stre)
         resolution = sorted(resolution, key=lambda s: int(re.compile(r'\d+').search(s).group()), reverse=True)
-        resolution.insert(0, "Best Quality")
+        resolution.insert(0, dl.tm.get_inline_string("best-quality"))
         return resolution
 
     def prepare_for_download(self, row = None):
@@ -920,8 +920,8 @@ class DataHandler():
         if self.playlist: self.download_playlist();return
 
         temp_vid_res = self.vid_res.split("p")[0]
-        if ((temp_vid_res != "Best Quality") and (self.vid_ext != "mp3")) and not self.playlist:
-            self.download_format = "bv[height<="+str(temp_vid_res)+"]+ba[ext=m4a]/b"
+        if ((temp_vid_res != dl.tm.get_inline_string("best-quality")) and (self.vid_ext != "mp3")) and not self.playlist:
+            self.download_format = f"bv[height<={temp_vid_res}]+ba[ext=m4a]/b"
         else:
             self.download_format = "bv*+ba[ext=m4a]/b"
         if self.vid_ext  == "mp4":

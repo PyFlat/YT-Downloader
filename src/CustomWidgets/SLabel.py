@@ -13,6 +13,7 @@ class SLabel(QLabel):
         self.setObjectName("search_labels")
         self.setScaledContents(True)
         self.setMouseTracking(True)
+        self.geo2 = None
     def enterEvent(self, event):
         self.geo = self.geometry()
         self.geo2 = self.geo.adjusted(-10,-10,10,10)
