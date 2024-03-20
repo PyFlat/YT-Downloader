@@ -195,6 +195,7 @@ class Downloader():
     def change_language(self, language:str):
         self.default_language = language
         self.update_config("DEFAULT", "default-language", str(self.default_language))
+        self.resolutions[0] = self.tm.get_inline_string("best-quality")
 
     def show_video_select(self):
         videos = []
@@ -373,7 +374,7 @@ class Downloader():
             self.import_yt_dl()
 
     def user_info_no_yt_dlp(self):
-        if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
+        if self.yes_no_messagebox(self.tm.get_inline_string("yt-dlp-not-exists"), QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
             self.download_yt_dlp()
         else:
             mw.close()
@@ -445,12 +446,12 @@ class Downloader():
         text_browser.setMinimumSize(600, 300)
 
         msg_box = QMessageBox(mw)
-        msg_box.setWindowTitle(f"Changelog - {VERSION}")
+        msg_box.setWindowTitle(self.tm.get_inline_string("changelog-dialog-title").format(VERSION))
         msg_box.setTextFormat(Qt.RichText)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)
         msg_box.setEscapeButton(QMessageBox.Ok)
-        msg_box.setText(f"Changelog for version {VERSION}")
+        msg_box.setText(self.tm.get_inline_string("changelog-dialog-text").format(VERSION))
         msg_box.layout().addWidget(text_browser, 1, 0, 1, msg_box.layout().columnCount())
         msg_box.exec()
 
@@ -492,9 +493,9 @@ class Downloader():
         else:
             if info == {} or info["webpage_url_domain"] == None:
                 self.search_thread.start()
-                text = "Searching..."
+                text = self.tm.get_inline_string("searching-text")
             else:
-                text = f"No valid video or playlist url!"
+                text = self.tm.get_inline_string("no-video-found")
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, text))
             mw.invokeFunc(mw.ui.download_btn, "setEnabled", Qt.QueuedConnection, Q_ARG(bool, False))
         self.info_thread = None
@@ -502,7 +503,7 @@ class Downloader():
     def load_url(self, cur_link = None):
         if not cur_link:
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
+        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("searching-text")))
         if cur_link==None: cur_link = mw.ui.url_entry.text()
         if cur_link == "":
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
@@ -530,7 +531,7 @@ class Downloader():
         mw.invokeFunc(mw.ui.scrollArea.verticalScrollBar(), "setValue", Qt.QueuedConnection, Q_ARG(int, 0))
         if data == []:
             mw.ui.searching_button.setEnabled(True)
-            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "No video found"))
+            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("no-video-found2")))
             return
         self.fill_widget_thread = FillWidgetThread(data)
         self.fill_widget_thread.finished.connect(lambda: mw.ui.searching_button.setEnabled(True))
@@ -598,8 +599,8 @@ class Downloader():
             mw.ui.image_label.setPixmap(pixmap)
         else:
             mw.ui.image_label.setText("")
-        mw.ui.name_label.setText(f"Title: {self.data.title}")
-        mw.ui.artist_label.setText(f"Uploader: {self.data.uploader}")
+        mw.ui.name_label.setText(self.tm.get_inline_string("title").format(self.data.title))
+        mw.ui.artist_label.setText(self.tm.get_inline_string("uploader").format(self.data.uploader))
         mw.ui.format_selection.clear()
         mw.ui.resolution_selection.clear()
         mw.ui.format_selection.addItems(self.file_formats)
@@ -608,20 +609,20 @@ class Downloader():
             if self.default_resolution in self.data.resolutions:
                 mw.ui.resolution_selection.setCurrentIndex(self.data.resolutions.index(self.default_resolution))
         if not self.playlist:
-            mw.ui.date_label.setText(f"Upload Date: {self.data.upload_date}")
-            mw.ui.duration_label.setText(f"Video Length: {self.data.duration}")
+            mw.ui.date_label.setText(self.tm.get_inline_string("upload-date").format(self.data.upload_date))
+            mw.ui.duration_label.setText(self.tm.get_inline_string("video-length").format(self.data.duration))
             mw.invokeFunc(mw.ui.last_page_btn, "setVisible", Qt.QueuedConnection, Q_ARG(bool, False))
         else:
             mw.ui.duration_label.clear()
             mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
-            mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Select the Range you want to Download"))
-            mw.ui.date_label.setText(f"Playlist Count: {self.data.playlist_count} Videos")
+            mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("select-range-info")))
+            mw.ui.date_label.setText(self.tm.get_inline_string("playlist-count").format(self.data.playlist_count))
             mw.ui.last_page_btn.setVisible(True)
             mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
             mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
 
     def change_location(self):
-        new_dir = QFileDialog.getExistingDirectory(None, "Select a folder", os.path.expanduser(self.file))
+        new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-folder"), os.path.expanduser(self.file))
         if new_dir == "":
             return
         self.file = f"{new_dir}/"
