@@ -629,11 +629,11 @@ class Downloader():
         self.update_config("DEFAULT", "download_path", self.file)
 
     def change_ffmpeg_location(self):
-        new_dir = QFileDialog.getExistingDirectory(None, "Select the '/bin' Folder of your FFmpeg installation", os.path.expanduser(self.ffmpeg))
+        new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-ffmpeg-bin"), os.path.expanduser(self.ffmpeg))
         if new_dir == "":
             return
         if not os.path.isfile(f"{new_dir}/ffmpeg.exe"):
-            self.yes_no_messagebox("This is not a valid path", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("no-valid-path"), QMessageBox.Warning, "Warning", QMessageBox.Ok)
             self.change_ffmpeg_location()
             return
         self.ffmpeg = f"{new_dir}/"
@@ -657,17 +657,16 @@ class Downloader():
 
     def user_info_no_ffmpeg(self):
         msg_box = QMessageBox(mw)
-        msg_box.setText(f"""Error: Missing FFmpeg Path.<br>
-                            To download videos, install FFmpeg or set the path.""")
-        msg_box.setWindowTitle("Error")
+        msg_box.setText(self.tm.get_inline_string("missing-ffmpeg-path"))
+        msg_box.setWindowTitle(self.tm.get_inline_string("error"))
 
         msg_box.layout().setContentsMargins(10, 0, 0, 10)
 
-        install = QPushButton("Install FFmpeg")
+        install = QPushButton(self.tm.get_inline_string("install-ffmpeg"))
         msg_box.addButton(install, QMessageBox.ActionRole)
-        set = QPushButton("Set FFmpeg-Path")
+        set = QPushButton(self.tm.get_inline_string("set-ffmpeg-path"))
         msg_box.addButton(set, QMessageBox.ActionRole)
-        ignore = QPushButton("Ok")
+        ignore = QPushButton(self.tm.get_inline_string("ok"))
         msg_box.addButton(ignore, QMessageBox.ActionRole)
 
         msg_box.setStyleSheet("QPushButton{margin-right: 8px;}")
@@ -689,17 +688,17 @@ class Downloader():
                                 Not working with portable version""")
             msg_box.setWindowTitle("Update found")
             msg_box.setIcon(QMessageBox.Information)
-            download_and_install = QPushButton("Install Update")
+            download_and_install = QPushButton(self.tm.get_inline_string("install-update"))
             msg_box.addButton(download_and_install, QMessageBox.ActionRole)
 
-            skip = QPushButton("Skip Update")
+            skip = QPushButton(self.tm.get_inline_string("skip-update"))
             msg_box.addButton(skip, QMessageBox.ActionRole)
             res = msg_box.exec()
             if res == 0: self.update_self(tag)
         elif not update_available and tag == "no_connection":
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         elif not update_available and not auto:
-            self.yes_no_messagebox("No update available.", QMessageBox.Information, "No update found", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("no-update-found"), QMessageBox.Information, self.tm.get_inline_string("no-update-found"), QMessageBox.Ok)
 
     def search_for_updates(self, auto = True):
         if self.update_thread != None:
@@ -718,7 +717,7 @@ class Downloader():
         self.self_download_thread.progress.connect(self.update_progress_self)
         self.self_download_thread.finished.connect(lambda success: self.download_finished_self(success, tag))
 
-        self.self_download_progress_dialog = ProgressDialog("update", mw)
+        self.self_download_progress_dialog = ProgressDialog(self.tm.get_inline_string("update"), mw)
         self.self_download_progress_dialog.show()
 
         self.self_download_thread.start()
@@ -727,7 +726,7 @@ class Downloader():
         if progress < 0:
             self.self_download_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.self_download_progress_dialog:
             self.self_download_progress_dialog.update_progress(progress)
 
@@ -736,9 +735,9 @@ class Downloader():
         self.self_download_progress_dialog = None
         if not success:
             logger.warning("Update download failed")
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
-        if self.yes_no_messagebox("Download Finished\nStart installation?", QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
+        if self.yes_no_messagebox(self.tm.get_inline_string("download-finished"), QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
             logger.info("Update download finished, updating now")
             os.popen(f"start appdata/win_installer_v{tag}.exe")
             mw.close()
@@ -759,7 +758,7 @@ class Downloader():
         if progress < 0:
             self.yt_dlp_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.yt_dlp_progress_dialog:
             self.yt_dlp_progress_dialog.update_progress(progress)
 
@@ -768,12 +767,12 @@ class Downloader():
         self.yt_dlp_progress_dialog = None
         if not success:
             logger.warning("yt-dlp download failed")
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
         logger.info("yt-dlp download and installation finished")
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
-        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("yt-dlp-installation-finished"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.import_yt_dl()
 
     def download_ffmpeg(self):
@@ -793,7 +792,7 @@ class Downloader():
         if progress < 0:
             self.ffmpeg_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.ffmpeg_progress_dialog:
             self.ffmpeg_progress_dialog.update_progress(progress)
 
@@ -802,7 +801,7 @@ class Downloader():
             logger.warning("FFmpeg download failed")
             self.ffmpeg_progress_dialog.close()
             self.ffmpeg_progress_dialog = None
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
         logger.info("FFmpeg download finished, starting installation")
         zp = ZipFile("appdata/ffmpeg.zip")
@@ -814,7 +813,7 @@ class Downloader():
         os.remove("appdata/ffmpeg.zip")
         self.ffmpeg_progress_dialog.close()
         self.ffmpeg_progress_dialog = None
-        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("ffmpeg-installation-finished"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.ffmpeg = Utils.get_abs_path("appdata/FFmpeg/bin")
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
         logger.info("FFmpeg installation finished")
@@ -916,7 +915,7 @@ class DataHandler():
         mw.set_enabled(False, False, False)
         self.vid_ext = mw.ui.format_selection.currentText().lower()
         self.vid_res = mw.ui.resolution_selection.currentText()
-        self.vid_res = "Best Quality" if self.vid_res == "" else self.vid_res
+        self.vid_res = dl.tm.get_inline_string("best-quality") if self.vid_res == "" else self.vid_res
 
         if self.playlist: self.download_playlist();return
 
