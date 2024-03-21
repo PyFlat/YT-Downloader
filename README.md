@@ -100,6 +100,8 @@ PyFlat YouTube Downloader is a user-friendly tool designed to download videos an
 - **Show on GitHub:** Open the repository on GitHub
 - **Show Changelog:** View the changelog for the current version
 
+---
+
 ## Languages
 
 You can contribute to the expansion of language options in the application. Below are the steps to contribute a new language:
