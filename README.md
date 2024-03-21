@@ -1,99 +1,158 @@
 <div align="center">
-YOUTUBE DOWNLOADER
+    <h1>YouTube Downloader</h1>
 </div>
 
-- [INSTALLATION](#installation)
-- [USAGE](#usage)
-- [SHOWCASE](#showcase)
+---
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+  - [Portable Installation](#portable-installation)
+  - [Installer Installation](#installer-installation)
+- [Usage](#usage)
+  - [Downloading Videos](#downloading-videos)
+  - [Downloading Playlists](#downloading-playlists)
+  - [Searching](#searching)
+  - [Menu Bar Functions](#menu-bar-functions)
+- [Languages](#languages)
+- [Showcase](#showcase)
 - [Credits](#credits)
 
-# Installation:
+---
 
-- Download the [latest version](https://github.com/PyFlat/YT-Downloader/releases/latest)
-- Portable:
-  - Unzip the .zip folder
-  - Execute the .exe file
-- Installer:
-  - Execute the .exe installer
-  - Follow the installation steps
-  - Start the downloader
+## Introduction
 
-# Usage:
+PyFlat YouTube Downloader is a user-friendly tool designed to download videos and playlists from YouTube. It offers convenient features such as format selection, resolution options, and playlist downloading.
 
-- Let the downloader install [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) on first use
-- Add a video or playlist URL or a search term to the entry
-- Wait until the downloader has loaded the information
+---
 
-- ### Video:
-  - Select the output format (mp3, mp4)
-  - Choose the resolution if you want to download mp4
-  - Press Download and wait until you see the button again, then you can download more videos or another format
-- ### Playlist:
-  - Choose which range of the playlist should be downloaded
-  - Click on next
-  - Select the output format (mp3, mp4)
-  - Select the output folder, this is by default the /Download folder
-  - Press Download and wait until you see the button again, then you can download more videos or another format
-- ### Search:
-  - Wait until the results are displayed (Can take a bit with slow Wifi)
-  - With left click you can open a video in the download page
-  - With right click you can see the uploader and title of the video
-- ### Menubar:
+## Installation
 
-  - **File**
-    - _Change Download Folder:_ Set the folder in which the downloaded files are saved
-    - _Reveal in File Explorer:_ Opens the current download folder in explorer
-    - _Open Log-Files Folder:_ Opens the folder in which the saved log files are located
-  - **Edit**
-    - _Auto Update Check:_ Automatically searches for updates
-    - _Show Thumbnails:_ If set to false no thumbnails will be loaded -> _faster_
-    - _Default Resolution:_ Set the default resolution for downloading a video
-    - _Maximum Threads:_ Set the maximum number of videos that can be downloaded at the same time (If you add more videos they will be added to the queue)
-    - _Change Log-Level:_ Set the amount of information the developer receives. With debug, personal data may be passed on
-  - **Tools**
-    - _Set FFmpeg-Path:_ Set the path to your local ffmpeg location
-    - _Download FFmpeg:_ Automatically downloads and installs the latest FFmpeg version (**Warning:** Overwrites FFmpeg location)
-    - _Update Yt-dlp:_ Automatically downloads and installs the latest yt-dlp version
-  - **Help**
-    - _Search for Updates:_ Searches for a new version of _PyFlat Youtube Downloader_
-    - _Show on GitHub:_ Opens the repository on GitHub
-    - _Show Changelog:_ Shows the changelog for the current version
+### Portable Installation
 
-- **The download speed depends on the internet connection and the length and resolution of the video!**
+1. Download the [latest version](https://github.com/PyFlat/YT-Downloader/releases/latest)
+2. Unzip the downloaded .zip folder
+3. Execute the .exe file
 
-# Showcase:
+### Installer Installation
 
-All images were created with the _Show-Thumbnails_ setting: **Off**
+1. Download the [latest version](https://github.com/PyFlat/YT-Downloader/releases/latest)
+2. Run the .exe installer
+3. Follow the installation steps
+4. Launch the downloader after installation
 
-## Start-Page
+---
 
-[![](showcase/Startpage.png)](#usage)
+## Usage
 
-## Search-Page
+### Downloading Videos
 
-[![](showcase/Search.png)](#search)
+1. Add the video URL to the input field
+2. Choose the output format (mp3 or mp4)
+3. Select the desired resolution (for mp4)
+4. Click Download and wait for completion
 
-## Download-Page for videos
+### Downloading Playlists
 
-[![](showcase/Download_Video.png)](#video)
+1. Add the playlist URL to the input field
+2. Specify the videos you want to download:
+   - **Range Selection:** Choose a range of videos to download.
+   - **Precise Selection:** Manually select individual videos to download.
+3. Proceed to the next step
+4. Choose the output format (mp3 or mp4)
+5. Select the output folder (default is /Download)
+6. Click Download and wait for completion
 
-## Range-Selection-Page for playlists
+### Searching
 
-[![](showcase/Select_Playlist_Range.png)](#playlist)
+1. Enter a search term in the input field
+2. Wait for the results to load
+3. Left-click to open a video on the download page
+4. Right-click to view video details
 
-## Precise-Selection-Dialog for playlists
+### Menu Bar Functions
 
-[![](showcase/Select_Playlist_Precise.png)](#playlist)
+#### File
 
-## Download-Page for playlists
+- **Change Download Folder:** Set the download directory
+- **Reveal in File Explorer:** Open the download folder in explorer
+- **Open Log-Files Folder:** Open the folder containing log files
 
-[![](showcase/Download_Playlist.png)](#playlist)
+#### Edit
 
-## Download-Control-Page
+- **Auto Update Check:** Automatically check for updates
+- **Show Thumbnails:** Toggle thumbnail loading for faster performance
+- **Default Resolution:** Set the default resolution for video downloads
+- **Maximum Threads:** Adjust the maximum simultaneous downloads
+- **Change Log-Level:** Control the level of developer information
+- **Change Language:** Switch the language of the application
 
-[![](showcase/Download_Overview.png)](#usage)
+#### Tools
 
-# Credits:
+- **Set FFmpeg Path:** Set the path to local ffmpeg installation
+- **Download FFmpeg:** Automatically download and install the latest FFmpeg version (warning: overwrites existing ffmpeg)
+- **Update Yt-dlp:** Automatically download and install the latest yt-dlp version
 
-- <a href="https://github.com/Make-Lemonade/iconicicons">Menu, Search, Download, Folder, Exit, Dropdown Arrow - Icons</a>
-- <a href="https://github.com/twbs/icons">Checkbox Icon</a>
+#### Help
+
+- **Search for Updates:** Search for new versions of the downloader
+- **Show on GitHub:** Open the repository on GitHub
+- **Show Changelog:** View the changelog for the current version
+
+## Languages
+
+You can contribute to the expansion of language options in the application. Below are the steps to contribute a new language:
+
+1. Fork the repository [here](https://github.com/PyFlat/YT-Downloader).
+2. Navigate to the `languages` directory.
+3. Duplicate the `language_en.properties` file and rename it with the appropriate language code (e.g., `language_fr.properties` for French).
+4. Translate the strings in the file to the desired language.
+5. Submit a pull request with your changes.
+
+### Available Languages
+
+- **English (en)**
+- **German (de)**
+
+#### If you're fluent in a language not listed here, we welcome your contribution to add it to our supported languages!
+
+---
+
+## Showcase
+
+### Start Page
+
+![Start Page](showcase/Startpage.png)
+
+### Search Page
+
+![Search Page](showcase/Search.png)
+
+### Download Page for Videos
+
+![Download Page for Videos](showcase/Download_Video.png)
+
+### Range Selection Page for Playlists
+
+![Range Selection Page for Playlists](showcase/Select_Playlist_Range.png)
+
+### Precise Selection Dialog for Playlists
+
+![Precise Selection Dialog for Playlists](showcase/Select_Playlist_Precise.png)
+
+### Download Page for Playlists
+
+![Download Page for Playlists](showcase/Download_Playlist.png)
+
+### Download Control Page
+
+![Download Control Page](showcase/Download_Overview.png)
+
+---
+
+## Credits
+
+- [Icons for Menu, Search, Download, Folder, Exit, Dropdown Arrow](https://github.com/Make-Lemonade/iconicicons)
+- [Checkbox Icon](https://github.com/twbs/icons)
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp): A youtube-dl fork for downloading YouTube videos.
