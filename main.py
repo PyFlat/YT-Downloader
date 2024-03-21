@@ -25,7 +25,7 @@ from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
 from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
 from src.TranslationManager import TranslationManager
-from src.changelogs.changelogFiles import CHANGELOG_FILES
+from appdata.changelogs.changelogFiles import CHANGELOG_FILES
 
 from urllib.request import urlopen
 from urllib.error import URLError
@@ -460,7 +460,7 @@ class Downloader():
     def show_changelog(self):
         self.update_config("DEFAULT", "first-use-since-update", "False")
         changelog_file = CHANGELOG_FILES.get(self.default_language, "changelog_en.md")
-        text = open(f"src/changelogs/{changelog_file}", "r", encoding="utf-8").read()
+        text = open(f"appdata/changelogs/{changelog_file}", "r", encoding="utf-8").read()
 
         text_browser = QTextBrowser()
         text_browser.setOpenExternalLinks(True)
