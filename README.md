@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>YouTube Downloader</h1>
+    <h1>PyFlat YouTube Downloader</h1>
 </div>
 
 ---
