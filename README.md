@@ -104,7 +104,7 @@ PyFlat YouTube Downloader is a user-friendly tool designed to download videos an
 
 You can contribute to the expansion of language options in the application. Below are the steps to contribute a new language:
 
-1. Fork the repository [here](https://github.com/PyFlat/YT-Downloader).
+1. Fork the repository [here](https://github.com/PyFlat/YT-Downloader/fork).
 2. Navigate to the `languages` directory.
 3. Duplicate the `language_en.properties` file and rename it with the appropriate language code (e.g., `language_fr.properties` for French).
 4. Translate the strings in the file to the desired language.
