@@ -3,16 +3,17 @@ from PySide6.QtGui import Qt
 from PySide6.QtCore import QSize, QTimer
 
 class SLabel(QLabel):
-    def __init__(self, entry, *args, **kwargs):
+    def __init__(self, entry, dl, *args, **kwargs):
         QLabel.__init__(self, *args, **kwargs)
         self.searching_btn = entry
-        self.setText("Loading...")
+        self.setText(dl.tm.get_inline_string("searching-text"))
         self.setMinimumSize(QSize(325, 183))
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         self.setObjectName("search_labels")
         self.setScaledContents(True)
         self.setMouseTracking(True)
+        self.geo2 = None
     def enterEvent(self, event):
         self.geo = self.geometry()
         self.geo2 = self.geo.adjusted(-10,-10,10,10)

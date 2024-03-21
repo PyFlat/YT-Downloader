@@ -9,7 +9,7 @@ try:
 except ImportError:
     get_qt_plugins_paths = None
 
-include_files = ["appdata"]
+include_files = ["appdata", "languages"]
 
 if get_qt_plugins_paths:
     include_files += get_qt_plugins_paths("PySide6", "platform")
@@ -35,7 +35,7 @@ executables = [Executable("main.py", base=base, icon="appdata/images/app-icon.ic
 
 setup(
     name="youtube_downloader",
-    version="1.3.1",
+    version="1.3.2",
     description="Youtube Downloader",
     options={"build_exe": build_exe_options},
     executables=executables,

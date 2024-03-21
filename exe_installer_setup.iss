@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PyFlat Youtube Downloader"
-#define MyAppVersion "1.3.1"
+#define MyAppVersion "1.3.2"
 #define MyAppPublisher "PyFlat Studios"
 #define MyAppExeName "main.exe"
 #define MyAppIconFile "appdata/images/app-icon.ico"
@@ -41,6 +41,7 @@ Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\python3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\python311.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\appdata\*"; DestDir: "{app}\appdata"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\languages\*"; DestDir: "{app}\languages"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.11\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

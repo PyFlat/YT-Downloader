@@ -24,11 +24,13 @@ from src.CustomWidgets.ProgressDialog import ProgressDialog
 from src.Ui_MainWindow import Ui_MainWindow
 from src.CustomWidgets.SLabel import SLabel
 from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
+from src.TranslationManager import TranslationManager
+from src.changelogs.changelogFiles import CHANGELOG_FILES
 
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 
 class noLogger:
     def error(msg):
@@ -67,8 +69,6 @@ class MainWindow(QMainWindow):
         self.threadpool.setMaxThreadCount(5)
 
         self.ui.search_btn.setChecked(True)
-
-        self.create_search_widges()
 
         self.show()
 
@@ -126,11 +126,19 @@ class MainWindow(QMainWindow):
             if not self.ui.scrollArea.verticalScrollBar().value() == self.ui.scrollArea.verticalScrollBar().maximum(): return
         for _ in range(0,10):
             for i in range(0,3):
-                label = SLabel(self.ui.searching_button, self.ui.scrollAreaWidgetContents)
+                label = SLabel(self.ui.searching_button, dl, self.ui.scrollAreaWidgetContents)
                 self.search_labels.append(label)
                 self.ui.gridLayout_2.addWidget(label, self.column, i)
                 self.ui.gridLayout_2.setAlignment(label, Qt.AlignTop | Qt.AlignCenter)
             self.column += 1
+
+    def restartApplication(self):
+        if getattr(sys, 'frozen', False):
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        else:
+            python = sys.executable
+            print(sys.argv)
+            os.execl(python, python, *sys.argv)
 
     def closeEvent(self, event: QCloseEvent):
         logger.info("Closing the application")
@@ -163,6 +171,8 @@ class Downloader():
         self.loading = False
         self.delete_exe_files()
         self.connect_menu_actions()
+        self.tm = TranslationManager(Utils.get_abs_path("languages/"), mw)
+        self.update_language_action()
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
             y.start()
@@ -170,6 +180,47 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def update_language_action(self):
+        keys = self.tm.languages.keys()
+        mw.ui.actionDefault.deleteLater()
+        icon = mw.ui.actionLog_Level_Debug.icon()
+
+        mw.ui.menuChange_Language.clear()
+
+        action_group = QActionGroup(mw)
+
+        for key in keys:
+            action = QAction(key, mw, checkable=True)
+            action.setIcon(icon)
+            action.setObjectName(key)
+            action_group.addAction(action)
+            action.triggered.connect(lambda checked=False, k=key: self.change_language(k))
+
+            mw.ui.menuChange_Language.addAction(action)
+
+    def change_language(self, language:str, force=False):
+        if language == self.default_language:
+            force = True
+        if not force:
+            result = self.yes_no_messagebox(self.tm.get_inline_string("change-language-dialog"), QMessageBox.Warning, self.tm.get_inline_string("warning"), QMessageBox.No | QMessageBox.Yes)
+            if not result:
+                child = mw.findChild(QAction, self.default_language)
+                child.setChecked(True)
+                return
+
+        self.tm.change_language(language)
+
+        self.default_language = language
+        self.update_config("DEFAULT", "default-language", str(self.default_language))
+        self.resolutions[0] = self.tm.get_inline_string("best-quality")
+
+        if not force:
+            if getattr(sys, 'frozen', False):
+                os.execv(sys.executable, [sys.executable] + sys.argv)
+            else:
+                python = sys.executable
+                os.execl(python, python, *sys.argv)
 
     def show_video_select(self):
         videos = []
@@ -179,7 +230,7 @@ class Downloader():
                 "playlist_index": index,
                 "selected": True if index + 1 in self.selected_ids else False
         })
-        self.video_select_dialog = VideoSelectDialog(mw, videos)
+        self.video_select_dialog = VideoSelectDialog(mw, dl, videos)
         self.video_select_dialog.exec()
         self.selected_ids = self.video_select_dialog.get_selected()
         if self.selected_ids == [] or self.has_clear_range(self.selected_ids):
@@ -201,7 +252,6 @@ class Downloader():
                 return False
         mw.ui.playlist_range_slider.setValue((numbers[0], numbers[-1]))
         return True
-
 
     def enter_pressed(self):
         if mw.ui.mainpages.currentIndex() == 0:
@@ -235,8 +285,7 @@ class Downloader():
 
         layout.setContentsMargins(20, 10, 20, 10)
         layout.setSpacing(25)
-
-        label = QLabel(f'Maximum Download Threads: {self.max_download_threads}')
+        label = QLabel(self.tm.get_inline_string("max-dl-threads").format(self.max_download_threads))
         layout.addWidget(label)
 
         slider = QSlider()
@@ -244,10 +293,10 @@ class Downloader():
         slider.setMinimum(1)
         slider.setMaximum(10)
         slider.setValue(self.max_download_threads)
-        slider.valueChanged.connect(lambda value: label.setText(f'Maximum Download Threads: {value}'))
+        slider.valueChanged.connect(lambda value: label.setText(self.tm.get_inline_string("max-dl-threads").format(value)))
         layout.addWidget(slider)
 
-        apply_button = QPushButton('Apply')
+        apply_button = QPushButton(self.tm.get_inline_string("apply"))
         apply_button.clicked.connect(lambda: save_maximum_download_threads())
 
         def save_maximum_download_threads():
@@ -260,7 +309,7 @@ class Downloader():
 
         dialog.setLayout(layout)
 
-        dialog.setWindowTitle('Set Maximum Download Threads')
+        dialog.setWindowTitle(self.tm.get_inline_string("max-dl-threads-title"))
         dialog.setFixedSize(375, 175)
 
         dialog.exec()
@@ -281,7 +330,7 @@ class Downloader():
 
         layout.addWidget(combobox)
 
-        apply_button = QPushButton('Apply')
+        apply_button = QPushButton(self.tm.get_inline_string("apply"))
         apply_button.clicked.connect(lambda: save_default_resolution())
 
         def save_default_resolution():
@@ -293,7 +342,7 @@ class Downloader():
 
         dialog.setLayout(layout)
 
-        dialog.setWindowTitle('Set Default Resolution')
+        dialog.setWindowTitle(self.tm.get_inline_string("default-res-title"))
         dialog.setFixedSize(300, 125)
 
         dialog.exec()
@@ -325,7 +374,8 @@ class Downloader():
                             "max-download-threads": "1",
                             "thumbnail-streaming": "True",
                             "log-level": "info",
-                            "default-resolution": "None"}
+                            "default-resolution": "None",
+                            "default-language": "English"}
         with open(Utils.get_abs_path("appdata/config.ini"), "w+") as file:
             config.write(file)
 
@@ -348,7 +398,7 @@ class Downloader():
             self.import_yt_dl()
 
     def user_info_no_yt_dlp(self):
-        if self.yes_no_messagebox("\"yt-dlp\" isn't downloaded! \nDownload it?", QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
+        if self.yes_no_messagebox(self.tm.get_inline_string("yt-dlp-not-exists"), QMessageBox.Warning, "Warning", QMessageBox.Yes |QMessageBox.No):
             self.download_yt_dlp()
         else:
             mw.close()
@@ -384,6 +434,12 @@ class Downloader():
         self.default_resolution = config["DEFAULT"].get("default-resolution", fallback=None)
         self.update_config("DEFAULT", "default-resolution", str(self.default_resolution))
 
+        self.default_language = config["DEFAULT"].get("default-language", fallback="English")
+        self.update_config("DEFAULT", "default-language", str(self.default_language))
+        self.change_language(self.default_language, force=True)
+        child = mw.findChild(QAction, self.default_language)
+        child.setChecked(True)
+
     def update_log_level(self, level):
         self.update_config("DEFAULT", "log-level", level)
         if level == "debug":
@@ -403,7 +459,8 @@ class Downloader():
 
     def show_changelog(self):
         self.update_config("DEFAULT", "first-use-since-update", "False")
-        text = open("appdata/changelog.md", "r").read()
+        changelog_file = CHANGELOG_FILES.get(self.default_language, "changelog_en.md")
+        text = open(f"src/changelogs/{changelog_file}", "r", encoding="utf-8").read()
 
         text_browser = QTextBrowser()
         text_browser.setOpenExternalLinks(True)
@@ -413,12 +470,12 @@ class Downloader():
         text_browser.setMinimumSize(600, 300)
 
         msg_box = QMessageBox(mw)
-        msg_box.setWindowTitle(f"Changelog - {VERSION}")
+        msg_box.setWindowTitle(self.tm.get_inline_string("changelog-dialog-title").format(VERSION))
         msg_box.setTextFormat(Qt.RichText)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)
         msg_box.setEscapeButton(QMessageBox.Ok)
-        msg_box.setText(f"Changelog for version {VERSION}")
+        msg_box.setText(self.tm.get_inline_string("changelog-dialog-text").format(VERSION))
         msg_box.layout().addWidget(text_browser, 1, 0, 1, msg_box.layout().columnCount())
         msg_box.exec()
 
@@ -460,9 +517,9 @@ class Downloader():
         else:
             if info == {} or info["webpage_url_domain"] == None:
                 self.search_thread.start()
-                text = "Searching..."
+                text = self.tm.get_inline_string("searching-text")
             else:
-                text = f"No valid video or playlist url!"
+                text = self.tm.get_inline_string("no-video-found")
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, text))
             mw.invokeFunc(mw.ui.download_btn, "setEnabled", Qt.QueuedConnection, Q_ARG(bool, False))
         self.info_thread = None
@@ -470,7 +527,7 @@ class Downloader():
     def load_url(self, cur_link = None):
         if not cur_link:
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Searching..."))
+        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("searching-text")))
         if cur_link==None: cur_link = mw.ui.url_entry.text()
         if cur_link == "":
             mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
@@ -498,7 +555,7 @@ class Downloader():
         mw.invokeFunc(mw.ui.scrollArea.verticalScrollBar(), "setValue", Qt.QueuedConnection, Q_ARG(int, 0))
         if data == []:
             mw.ui.searching_button.setEnabled(True)
-            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, "No video found"))
+            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("no-video-found2")))
             return
         self.fill_widget_thread = FillWidgetThread(data)
         self.fill_widget_thread.finished.connect(lambda: mw.ui.searching_button.setEnabled(True))
@@ -509,8 +566,8 @@ class Downloader():
         if event.button() == Qt.LeftButton:
             self.load_url(url)
         elif event.button() == Qt.RightButton:
-            self.yes_no_messagebox(f"""<p style="font-weight: bold;">Uploader:</p> {channel}
-                                    <p style="font-weight: bold;">Title:</p> {title}
+            self.yes_no_messagebox(f"""<p style="font-weight: bold;">{self.tm.get_inline_string("uploader2")}:</p> {channel}
+                                    <p style="font-weight: bold;">{self.tm.get_inline_string("title2")}:</p> {title}
                                     <p style="font-weight: bold;">URL:</p>
                                     <a style="color: white; font-weight: bold;" href='{url}'>{url}</a>""", QMessageBox.Information, "Video", QMessageBox.Ok)
 
@@ -542,6 +599,8 @@ class Downloader():
             if "urlopen error" in e.msg:
                 logger.error("Internet connection error")
                 info = False
+            elif "ytsearch" in e.msg:
+                pass
             else:
                 logger.error(f"An unknown error occurred: {e}")
         except Exception as e:
@@ -566,8 +625,8 @@ class Downloader():
             mw.ui.image_label.setPixmap(pixmap)
         else:
             mw.ui.image_label.setText("")
-        mw.ui.name_label.setText(f"Title: {self.data.title}")
-        mw.ui.artist_label.setText(f"Uploader: {self.data.uploader}")
+        mw.ui.name_label.setText(self.tm.get_inline_string("title").format(self.data.title))
+        mw.ui.artist_label.setText(self.tm.get_inline_string("uploader").format(self.data.uploader))
         mw.ui.format_selection.clear()
         mw.ui.resolution_selection.clear()
         mw.ui.format_selection.addItems(self.file_formats)
@@ -576,31 +635,31 @@ class Downloader():
             if self.default_resolution in self.data.resolutions:
                 mw.ui.resolution_selection.setCurrentIndex(self.data.resolutions.index(self.default_resolution))
         if not self.playlist:
-            mw.ui.date_label.setText(f"Upload Date: {self.data.upload_date}")
-            mw.ui.duration_label.setText(f"Video Length: {self.data.duration}")
+            mw.ui.date_label.setText(self.tm.get_inline_string("upload-date").format(self.data.upload_date))
+            mw.ui.duration_label.setText(self.tm.get_inline_string("video-length").format(self.data.duration))
             mw.invokeFunc(mw.ui.last_page_btn, "setVisible", Qt.QueuedConnection, Q_ARG(bool, False))
         else:
             mw.ui.duration_label.clear()
             mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
-            mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, "Select the Range you want to Download"))
-            mw.ui.date_label.setText(f"Playlist Count: {self.data.playlist_count} Videos")
+            mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("select-range-info")))
+            mw.ui.date_label.setText(self.tm.get_inline_string("playlist-count").format(self.data.playlist_count))
             mw.ui.last_page_btn.setVisible(True)
             mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
             mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
 
     def change_location(self):
-        new_dir = QFileDialog.getExistingDirectory(None, "Select a folder", os.path.expanduser(self.file))
+        new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-folder"), os.path.expanduser(self.file))
         if new_dir == "":
             return
         self.file = f"{new_dir}/"
         self.update_config("DEFAULT", "download_path", self.file)
 
     def change_ffmpeg_location(self):
-        new_dir = QFileDialog.getExistingDirectory(None, "Select the '/bin' Folder of your FFmpeg installation", os.path.expanduser(self.ffmpeg))
+        new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-ffmpeg-bin"), os.path.expanduser(self.ffmpeg))
         if new_dir == "":
             return
         if not os.path.isfile(f"{new_dir}/ffmpeg.exe"):
-            self.yes_no_messagebox("This is not a valid path", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("no-valid-path"), QMessageBox.Warning, "Warning", QMessageBox.Ok)
             self.change_ffmpeg_location()
             return
         self.ffmpeg = f"{new_dir}/"
@@ -616,25 +675,25 @@ class Downloader():
         qms.setModal(True)
         if hide:
             qms.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint)
-        reply = qms.exec()
-        if reply == QMessageBox.Yes:
-            return True
-        else:
-            return False
+        for option in options:
+            btn = qms.button(option)
+            btn.setText(self.tm.get_inline_string(str(option)))
+
+        return qms.exec() == QMessageBox.Yes
+
 
     def user_info_no_ffmpeg(self):
         msg_box = QMessageBox(mw)
-        msg_box.setText(f"""Error: Missing FFmpeg Path.<br>
-                            To download videos, install FFmpeg or set the path.""")
-        msg_box.setWindowTitle("Error")
+        msg_box.setText(self.tm.get_inline_string("missing-ffmpeg-path"))
+        msg_box.setWindowTitle(self.tm.get_inline_string("error"))
 
         msg_box.layout().setContentsMargins(10, 0, 0, 10)
 
-        install = QPushButton("Install FFmpeg")
+        install = QPushButton(self.tm.get_inline_string("install-ffmpeg"))
         msg_box.addButton(install, QMessageBox.ActionRole)
-        set = QPushButton("Set FFmpeg-Path")
+        set = QPushButton(self.tm.get_inline_string("set-ffmpeg-path"))
         msg_box.addButton(set, QMessageBox.ActionRole)
-        ignore = QPushButton("Ok")
+        ignore = QPushButton(self.tm.get_inline_string("ok"))
         msg_box.addButton(ignore, QMessageBox.ActionRole)
 
         msg_box.setStyleSheet("QPushButton{margin-right: 8px;}")
@@ -650,23 +709,20 @@ class Downloader():
         self.update_thread = None
         if update_available:
             msg_box = QMessageBox(mw)
-            msg_box.setText(f"""Current version: {VERSION} <br>
-                                New version: {tag} <br>
-                                Download and install? <br>
-                                Not working with portable version""")
+            msg_box.setText(self.tm.get_inline_string("update-available").format(VERSION, tag))
             msg_box.setWindowTitle("Update found")
             msg_box.setIcon(QMessageBox.Information)
-            download_and_install = QPushButton("Install Update")
+            download_and_install = QPushButton(self.tm.get_inline_string("install-update"))
             msg_box.addButton(download_and_install, QMessageBox.ActionRole)
 
-            skip = QPushButton("Skip Update")
+            skip = QPushButton(self.tm.get_inline_string("skip-update"))
             msg_box.addButton(skip, QMessageBox.ActionRole)
             res = msg_box.exec()
             if res == 0: self.update_self(tag)
         elif not update_available and tag == "no_connection":
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         elif not update_available and not auto:
-            self.yes_no_messagebox("No update available.", QMessageBox.Information, "No update found", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("no-update-found"), QMessageBox.Information, self.tm.get_inline_string("no-update-found"), QMessageBox.Ok)
 
     def search_for_updates(self, auto = True):
         if self.update_thread != None:
@@ -685,7 +741,7 @@ class Downloader():
         self.self_download_thread.progress.connect(self.update_progress_self)
         self.self_download_thread.finished.connect(lambda success: self.download_finished_self(success, tag))
 
-        self.self_download_progress_dialog = ProgressDialog("update", mw)
+        self.self_download_progress_dialog = ProgressDialog(self.tm.get_inline_string("update"), mw, dl)
         self.self_download_progress_dialog.show()
 
         self.self_download_thread.start()
@@ -694,7 +750,7 @@ class Downloader():
         if progress < 0:
             self.self_download_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.self_download_progress_dialog:
             self.self_download_progress_dialog.update_progress(progress)
 
@@ -703,9 +759,9 @@ class Downloader():
         self.self_download_progress_dialog = None
         if not success:
             logger.warning("Update download failed")
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
-        if self.yes_no_messagebox("Download Finished\nStart installation?", QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
+        if self.yes_no_messagebox(self.tm.get_inline_string("download-finished"), QMessageBox.Question, " ", QMessageBox.Yes | QMessageBox.No):
             logger.info("Update download finished, updating now")
             os.popen(f"start appdata/win_installer_v{tag}.exe")
             mw.close()
@@ -717,7 +773,7 @@ class Downloader():
         self.yt_dlp_download_thread.progress.connect(self.update_progress_yt_dlp)
         self.yt_dlp_download_thread.finished.connect(self.download_finished_yt_dlp)
 
-        self.yt_dlp_progress_dialog = ProgressDialog("yt-dlp", mw)
+        self.yt_dlp_progress_dialog = ProgressDialog("yt-dlp", mw, dl)
         self.yt_dlp_progress_dialog.show()
 
         self.yt_dlp_download_thread.start()
@@ -726,7 +782,7 @@ class Downloader():
         if progress < 0:
             self.yt_dlp_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.yt_dlp_progress_dialog:
             self.yt_dlp_progress_dialog.update_progress(progress)
 
@@ -735,12 +791,12 @@ class Downloader():
         self.yt_dlp_progress_dialog = None
         if not success:
             logger.warning("yt-dlp download failed")
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
         logger.info("yt-dlp download and installation finished")
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
-        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("installation-finished").format("yt-dlp"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.import_yt_dl()
 
     def download_ffmpeg(self):
@@ -751,7 +807,7 @@ class Downloader():
         self.ffmpeg_download_thread.progress.connect(self.update_progress_ffmpeg)
         self.ffmpeg_download_thread.finished.connect(self.download_finished_ffmpeg)
 
-        self.ffmpeg_progress_dialog = ProgressDialog("ffmpeg", mw)
+        self.ffmpeg_progress_dialog = ProgressDialog("ffmpeg", mw, dl)
         self.ffmpeg_progress_dialog.show()
 
         self.ffmpeg_download_thread.start()
@@ -760,7 +816,7 @@ class Downloader():
         if progress < 0:
             self.ffmpeg_progress_dialog.close()
             logger.error("Internet connection error")
-            self.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, self.tm.get_inline_string("no-internet"), QMessageBox.Ok)
         if self.ffmpeg_progress_dialog:
             self.ffmpeg_progress_dialog.update_progress(progress)
 
@@ -769,7 +825,7 @@ class Downloader():
             logger.warning("FFmpeg download failed")
             self.ffmpeg_progress_dialog.close()
             self.ffmpeg_progress_dialog = None
-            self.yes_no_messagebox("Download Failed", QMessageBox.Warning, "Download Fail", QMessageBox.Ok)
+            self.yes_no_messagebox(self.tm.get_inline_string("download-failed"), QMessageBox.Warning, self.tm.get_inline_string("download-failed"), QMessageBox.Ok)
             return
         logger.info("FFmpeg download finished, starting installation")
         zp = ZipFile("appdata/ffmpeg.zip")
@@ -781,7 +837,7 @@ class Downloader():
         os.remove("appdata/ffmpeg.zip")
         self.ffmpeg_progress_dialog.close()
         self.ffmpeg_progress_dialog = None
-        self.yes_no_messagebox("Installation Finished", QMessageBox.Information, "Info", QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("installation-finished").format("ffmpeg"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.ffmpeg = Utils.get_abs_path("appdata/FFmpeg/bin")
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
         logger.info("FFmpeg installation finished")
@@ -805,14 +861,14 @@ class Downloader():
         except AttributeError:
             pass
         status = mw.ui.tableWidget.item(row, 4).text()
-        if not os.path.isfile(self.downloads[row].filename) and status == "Finished":
-            item = QTableWidgetItem("Deleted")
+        if not os.path.isfile(self.downloads[row].filename) and status == self.tm.get_inline_string("finished"):
+            item = QTableWidgetItem(self.tm.get_inline_string("deleted"))
             mw.ui.tableWidget.setItem(row, 4, item)
-            status = "Deleted"
+            status = self.tm.get_inline_string("deleted")
 
-        if status == "Finished":
+        if status == self.tm.get_inline_string("finished"):
             mw.set_enabled(True, True, True)
-        elif status == "Deleted" or status == "Download Failed":
+        elif status == self.tm.get_inline_string("deleted") or status == self.tm.get_inline_string("download-failed"):
             mw.set_enabled(False, False, True)
         self.delete_btn_connection = mw.ui.download_delete_btn.clicked.connect(lambda ev: self.downloads[row].delete(row))
         self.play_file_btn_connection = mw.ui.download_open_btn.clicked.connect(lambda ev: self.downloads[row].play())
@@ -876,20 +932,20 @@ class DataHandler():
                 if stre not in resolution:
                     resolution.append(stre)
         resolution = sorted(resolution, key=lambda s: int(re.compile(r'\d+').search(s).group()), reverse=True)
-        resolution.insert(0, "Best Quality")
+        resolution.insert(0, dl.tm.get_inline_string("best-quality"))
         return resolution
 
     def prepare_for_download(self, row = None):
         mw.set_enabled(False, False, False)
         self.vid_ext = mw.ui.format_selection.currentText().lower()
         self.vid_res = mw.ui.resolution_selection.currentText()
-        self.vid_res = "Best Quality" if self.vid_res == "" else self.vid_res
+        self.vid_res = dl.tm.get_inline_string("best-quality") if self.vid_res == "" else self.vid_res
 
         if self.playlist: self.download_playlist();return
 
         temp_vid_res = self.vid_res.split("p")[0]
-        if ((temp_vid_res != "Best Quality") and (self.vid_ext != "mp3")) and not self.playlist:
-            self.download_format = "bv[height<="+str(temp_vid_res)+"]+ba[ext=m4a]/b"
+        if ((temp_vid_res != dl.tm.get_inline_string("best-quality")) and (self.vid_ext != "mp3")) and not self.playlist:
+            self.download_format = f"bv[height<={temp_vid_res}]+ba[ext=m4a]/b"
         else:
             self.download_format = "bv*+ba[ext=m4a]/b"
         if self.vid_ext  == "mp4":
@@ -901,7 +957,7 @@ class DataHandler():
             return
         currently_processing = [self.vid_ext, temp_vid_res, self.url]
         if currently_processing in dl.cur_process:
-            dl.yes_no_messagebox("You cant download the same file at the same time", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            dl.yes_no_messagebox(dl.tm.get_inline_string("no-same-files"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Ok)
             return
 
         self.process = currently_processing
@@ -917,11 +973,11 @@ class DataHandler():
     def check_if_exists(self, filename):
         if filename == "Connection Error":
             logger.error("Internet connection error")
-            dl.yes_no_messagebox("ERROR: No internet connection", QMessageBox.Warning, "No internet", QMessageBox.Ok)
+            dl.yes_no_messagebox(dl.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, dl.tm.get_inline_string("no-internet"), QMessageBox.Ok)
             dl.cur_process.remove(self.process)
             return
         if os.path.isfile(filename):
-            if not dl.yes_no_messagebox("This file already exists.\nDo you want to overwrite it?", QMessageBox.Warning, "Warning", QMessageBox.Yes | QMessageBox.No):
+            if not dl.yes_no_messagebox(dl.tm.get_inline_string("file-already-exists"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Yes | QMessageBox.No):
                 dl.cur_process.remove(self.process)
                 return
         if filename[-3:] == "mp4":
@@ -937,7 +993,7 @@ class DataHandler():
 
     def download_playlist(self):
         if dl.selected_ids  == []:
-            dl.yes_no_messagebox("No video chosen", QMessageBox.Warning, "Warning", QMessageBox.Ok)
+            dl.yes_no_messagebox(dl.tm.get_inline_string("no-video-chosen"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Ok)
             return
         def download_next(index):
             if index < len(dl.selected_ids):
@@ -949,11 +1005,11 @@ class DataHandler():
 
     def download(self, row=None):
         if row == None:
-            data = [self.author, self.title, self.vid_ext.upper(), self.vid_res, "Started", ""]
+            data = [self.author, self.title, self.vid_ext.upper(), self.vid_res, dl.tm.get_inline_string("started"), ""]
             row_count = mw.ui.tableWidget.rowCount()
             dl.add_row(row_count, data)
         else:
-            item  = QTableWidgetItem("Started")
+            item  = QTableWidgetItem(dl.tm.get_inline_string("started"))
             mw.ui.tableWidget.setItem(row, 4, item)
             row_count = row
 
@@ -970,25 +1026,25 @@ class DataHandler():
         dl.cur_process.remove(dl.downloads[row].process)
 
         if success:
-            item  = QTableWidgetItem("Finished")
+            item  = QTableWidgetItem(dl.tm.get_inline_string("finished"))
             mw.ui.tableWidget.setItem(row, 4, item)
             logger.info("Video download finished successfully")
         else:
-            item  = QTableWidgetItem("Download Failed")
+            item  = QTableWidgetItem(dl.tm.get_inline_string("download-failed"))
             mw.ui.tableWidget.setItem(row, 4, item)
             logger.warning("Video download failed")
 
     def update_progress(self, progress, row, eta):
         item  = QTableWidgetItem(progress)
         mw.ui.tableWidget.setItem(row, 4, item)
-        if eta == "Unknown Seconds": return
+        if dl.tm.get_inline_string("unknown") in eta: return
         item2 = QTableWidgetItem(eta)
         mw.ui.tableWidget.setItem(row, 5, item2)
 
     def delete(self, row):
         mw.set_enabled(False, False, False)
-        if not dl.yes_no_messagebox("Do you really want to delete this file?", QMessageBox.Question, "Question", QMessageBox.Yes | QMessageBox.No):return
-        item  = QTableWidgetItem("Deleted")
+        if not dl.yes_no_messagebox(dl.tm.get_inline_string("delete-file"), QMessageBox.Question, dl.tm.get_inline_string("question"), QMessageBox.Yes | QMessageBox.No):return
+        item  = QTableWidgetItem(dl.tm.get_inline_string("deleted"))
         mw.ui.tableWidget.setItem(row, 4, item)
         if os.path.isfile(self.filename):
             logger.info("Deleting file")
@@ -1050,7 +1106,7 @@ class FillWidgetThread(QThread):
     def run(self):
         if self.data == "Connection Error":
             mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-            mw.ui.info_start_label.setText("No Internet Connection")
+            mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
             mw.ui.searching_button.setEnabled(True)
             return
 
@@ -1064,7 +1120,7 @@ class FillWidgetThread(QThread):
             if self.data == "Connection Error":
                 mw.search_labels = mw.search_labels[:dl.search]
                 mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-                mw.ui.info_start_label.setText("No Internet Connection")
+                mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
                 mw.ui.searching_button.setEnabled(True)
                 dl.new_widget_thread_running = False
                 return
@@ -1092,7 +1148,7 @@ class FillWidgetThread(QThread):
                     image_byt = urlopen(thumbnail_url, timeout=15).read()
                 except Exception:
                     mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-                    mw.ui.info_start_label.setText("No Internet Connection")
+                    mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
                     mw.ui.searching_button.setEnabled(True)
                     return
 
@@ -1261,16 +1317,16 @@ class VideoDownloadThread(QThread):
                     pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes"]),2)*100, 0))
                 except KeyError:
                     pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes_estimate"]),2)*100, 0))
-                eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else "Unknown"
-                self.progress.emit(f"{pr}%", self.row, "1 Second" if eta==1 else f"{eta} Seconds")
+                eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else dl.tm.get_inline_string("unknown")
+                self.progress.emit(f"{pr}%", self.row, dl.tm.get_inline_string("1-second") if eta==1 else dl.tm.get_inline_string("seconds").format(eta))
             elif d["status"] == "finished":
                 self.progress.emit("", self.row, "")
 
     def _hook_postprocess(self, d):
         if d["status"] == "started":
-            self.progress.emit("Postprocessing Started", self.row, "")
+            self.progress.emit(dl.tm.get_inline_string("postp-started"), self.row, "")
         else:
-            self.progress.emit("Postprocessing Finished", self.row, "")
+            self.progress.emit(dl.tm.get_inline_string("postp-finished"), self.row, "")
 
 class YoutubeSearch(QThread):
     result = Signal(object)
@@ -1381,6 +1437,7 @@ if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     mw = MainWindow()
     dl = Downloader()
+    mw.create_search_widges()
     # thread = ScreenShot(mw)
     # thread.start()
     sys.exit(app.exec())
