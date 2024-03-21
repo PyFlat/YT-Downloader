@@ -2,7 +2,7 @@
 
 <ul>
 <li style="text-align: left;">Die App hat jetzt ein Icon</li>
-<li style="text-align: left;">Sie können jetzt die Sprache der App konfigurieren</li>
+<li style="text-align: left;">Sie können nun die Sprache des Programms auswählen</li>
 </ul>
 <br>
 <strong>Fehlerbehebungen:</strong>
