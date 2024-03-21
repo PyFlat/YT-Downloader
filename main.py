@@ -597,6 +597,8 @@ class Downloader():
             if "urlopen error" in e.msg:
                 logger.error("Internet connection error")
                 info = False
+            elif "ytsearch" in e.msg:
+                pass
             else:
                 logger.error(f"An unknown error occurred: {e}")
         except Exception as e:
@@ -792,7 +794,7 @@ class Downloader():
         logger.info("yt-dlp download and installation finished")
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
-        self.yes_no_messagebox(self.tm.get_inline_string("yt-dlp-installation-finished"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("installation-finished").format("yt-dlp"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.import_yt_dl()
 
     def download_ffmpeg(self):
@@ -833,7 +835,7 @@ class Downloader():
         os.remove("appdata/ffmpeg.zip")
         self.ffmpeg_progress_dialog.close()
         self.ffmpeg_progress_dialog = None
-        self.yes_no_messagebox(self.tm.get_inline_string("ffmpeg-installation-finished"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
+        self.yes_no_messagebox(self.tm.get_inline_string("installation-finished").format("ffmpeg"), QMessageBox.Information, self.tm.get_inline_string("info"), QMessageBox.Ok)
         self.ffmpeg = Utils.get_abs_path("appdata/FFmpeg/bin")
         self.update_config("DEFAULT", "ffmpeg_path", self.ffmpeg)
         logger.info("FFmpeg installation finished")
@@ -1033,7 +1035,7 @@ class DataHandler():
     def update_progress(self, progress, row, eta):
         item  = QTableWidgetItem(progress)
         mw.ui.tableWidget.setItem(row, 4, item)
-        if eta.split()[0] == dl.tm.get_inline_string("unknown"): return
+        if dl.tm.get_inline_string("unknown") in eta: return
         item2 = QTableWidgetItem(eta)
         mw.ui.tableWidget.setItem(row, 5, item2)
 
@@ -1314,7 +1316,7 @@ class VideoDownloadThread(QThread):
                 except KeyError:
                     pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes_estimate"]),2)*100, 0))
                 eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else dl.tm.get_inline_string("unknown")
-                self.progress.emit(f"{pr}%", self.row, dl.tm.get_inline_string("1-second") if eta==1 else dl.tm.get_inline_string("sekunden").format(eta))
+                self.progress.emit(f"{pr}%", self.row, dl.tm.get_inline_string("1-second") if eta==1 else dl.tm.get_inline_string("seconds").format(eta))
             elif d["status"] == "finished":
                 self.progress.emit("", self.row, "")
 

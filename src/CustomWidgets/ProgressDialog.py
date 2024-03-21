@@ -8,7 +8,7 @@ class ProgressDialog(QProgressDialog):
         self.setModal(True)
         self.setCancelButton(None)
         self.setFixedWidth(250)
-        self.setLabelText(dl.tm.get_inline_string("searching-text").format(name))
+        self.setLabelText(dl.tm.get_inline_string("downloading-name").format(name))
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint)
         self.setMinimum(0)
         self.setMaximum(101)
