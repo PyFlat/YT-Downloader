@@ -1,6 +1,7 @@
 <strong>New Features:</strong>
 
 <ul>
+<li style="text-align: left;">The app now finally has an icon</li>
 <li style="text-align: left;">You can now select the language of the program</li>
 </ul>
 <br>
