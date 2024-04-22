@@ -1,6 +1,4 @@
-
 from __future__ import annotations
-
 
 from cx_Freeze import Executable, setup
 from src.version import VERSION
@@ -24,6 +22,9 @@ build_exe_options = {
         "html.parser",
         "uuid",
         "fileinput",
+        "xml.etree.ElementTree",
+        "ctypes.wintypes",
+        "asyncio"
     ],
     "excludes": [
         "tkinter",
