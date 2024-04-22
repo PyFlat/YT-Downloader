@@ -30,7 +30,7 @@ from appdata.changelogs.changelogFiles import CHANGELOG_FILES
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.2"
+VERSION = "1.3.3"
 
 class noLogger:
     def error(msg):
@@ -145,6 +145,7 @@ class MainWindow(QMainWindow):
             os.execl(python, python, *sys.argv)
 
     def closeEvent(self, event: QCloseEvent):
+        dl.cleanup()
         logger.info("Closing the application")
         return super().closeEvent(event)
 
@@ -156,7 +157,7 @@ class Downloader():
     def __init__(self):
         mw.ui.searching_button.clicked.connect(lambda:[self.load_url(), mw.ui.searching_button.setEnabled(False)])
         mw.ui.format_selection.currentIndexChanged.connect(lambda:self.update_file_box())
-        mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
+        mw.ui.download_button.clicked.connect(self.prepare_for_download)
         mw.ui.next_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(0))
         mw.ui.last_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(1))
         mw.ui.select_videos_btn.clicked.connect(lambda: self.show_video_select())
@@ -184,6 +185,17 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def cleanup(self):
+        path = os.path.dirname(self.file)
+        for file in os.listdir(path):
+            if file.endswith('.part') or file.endswith('.ytdl'):
+                os.remove(os.path.join(path, file))
+
+    def prepare_for_download(self):
+        ext = mw.ui.format_selection.currentText().lower()
+        res = mw.ui.resolution_selection.currentText()
+        copy.copy(self.data).prepare_for_download(ext, res)
 
     def update_language_action(self):
         keys = self.tm.languages.keys()
@@ -879,10 +891,13 @@ class Downloader():
             mw.set_enabled(False, False, True, False)
         else:
             mw.set_enabled(False, False, False, True)
+
         self.delete_btn_connection = mw.ui.download_delete_btn.clicked.connect(lambda ev: self.downloads[row].delete(row))
         self.play_file_btn_connection = mw.ui.download_open_btn.clicked.connect(lambda ev: self.downloads[row].play())
         self.cancel_btn_connection = mw.ui.download_cancel_btn.clicked.connect(lambda ev: self.downloads[row].cancel())
-        self.re_download_file_btn_connection = mw.ui.download_download_btn.clicked.connect(lambda ev: self.downloads[row].prepare_for_download(row))
+        ext = mw.ui.tableWidget.item(row, 2).text().lower()
+        res = mw.ui.tableWidget.item(row, 3).text()
+        self.re_download_file_btn_connection = mw.ui.download_download_btn.clicked.connect(lambda ev: self.downloads[row].prepare_for_download(ext, res, row))
 
 class DataHandler():
     def __init__(self, url, info, playlist = False, skip=False):
@@ -945,10 +960,11 @@ class DataHandler():
         resolution.insert(0, dl.tm.get_inline_string("best-quality"))
         return resolution
 
-    def prepare_for_download(self, row = None):
+    def prepare_for_download(self, vid_ext, vid_res, row = None):
+        print(self)
         mw.set_enabled(False, False, False)
-        self.vid_ext = mw.ui.format_selection.currentText().lower()
-        self.vid_res = mw.ui.resolution_selection.currentText()
+        self.vid_ext = vid_ext
+        self.vid_res = vid_res
         self.vid_res = dl.tm.get_inline_string("best-quality") if self.vid_res == "" else self.vid_res
 
         if self.playlist: self.download_playlist();return
@@ -965,6 +981,7 @@ class DataHandler():
         if not os.path.isfile(dl.ffmpeg + "/ffmpeg.exe"):
             dl.user_info_no_ffmpeg()
             return
+
         currently_processing = [self.vid_ext, temp_vid_res, self.url]
         if currently_processing in dl.cur_process:
             dl.yes_no_messagebox(dl.tm.get_inline_string("no-same-files"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Ok)
@@ -976,11 +993,12 @@ class DataHandler():
             self.download(row)
             return
         file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext, dl.file)
-        file_name_thread.ret_filename.connect(self.check_if_exists)
+        file_name_thread.ret_filename.connect(lambda x: self.check_if_exists(x))
         file_name_thread.start()
         self.file_name_threads.append(file_name_thread)
 
     def check_if_exists(self, filename):
+        print("HI")
         if filename == "Connection Error":
             logger.error("Internet connection error")
             dl.yes_no_messagebox(dl.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, dl.tm.get_inline_string("no-internet"), QMessageBox.Ok)
@@ -1030,7 +1048,7 @@ class DataHandler():
         self.x = dl_thread
         thread_worker = ThreadWorker(dl_thread)
         mw.threadpool.start(thread_worker)
-        if row == None: dl.downloads.append(copy.copy(self))
+        if row == None: dl.downloads.append(self)
 
     def handle_download_finished(self, success, row):
         if mw.ui.tableWidget.item(row, 0).isSelected():
@@ -1322,7 +1340,6 @@ class VideoDownloadThread(QThread):
                 self.finished.emit(False, self.row)
             elif "Cancelled by user" in e.msg:
                 logger.info("Download cancelled by user")
-                self.cleanup_files()
                 self.finished.emit(False, self.row)
             else:
                 logger.error(f"An unnokwn download error occured: {e.msg}")
@@ -1352,13 +1369,6 @@ class VideoDownloadThread(QThread):
             self.progress.emit(dl.tm.get_inline_string("postp-started"), self.row, "")
         else:
             self.progress.emit(dl.tm.get_inline_string("postp-finished"), self.row, "")
-
-    def cleanup_files(self):
-        path = os.path.dirname(self.file_template)
-        for file in os.listdir(path):
-            if file.endswith('.part') or file.endswith('.ytdl'):
-                os.remove(os.path.join(path, file))
-
 
     def cancel(self):
         self.is_cancelled = True
