@@ -141,7 +141,6 @@ class MainWindow(QMainWindow):
             os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             python = sys.executable
-            print(sys.argv)
             os.execl(python, python, *sys.argv)
 
     def closeEvent(self, event: QCloseEvent):
@@ -961,7 +960,6 @@ class DataHandler():
         return resolution
 
     def prepare_for_download(self, vid_ext, vid_res, row = None):
-        print(self)
         mw.set_enabled(False, False, False)
         self.vid_ext = vid_ext
         self.vid_res = vid_res
@@ -998,7 +996,6 @@ class DataHandler():
         self.file_name_threads.append(file_name_thread)
 
     def check_if_exists(self, filename):
-        print("HI")
         if filename == "Connection Error":
             logger.error("Internet connection error")
             dl.yes_no_messagebox(dl.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, dl.tm.get_inline_string("no-internet"), QMessageBox.Ok)
