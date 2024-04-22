@@ -86,10 +86,21 @@ class VideoSelectDialog(QDialog):
             title_item = QTableWidgetItem(video["title"])
             uploader_item = QTableWidgetItem(video["uploader"])
             playlist_index_item = PlaylistIndexTableWidgetItem(str(video["playlist_index"]+1))
-            checkbox_item = QCheckBox()
-            checkbox_item.setChecked(video["selected"])
+            checkBoxWidget = QWidget()
+            checkBoxWidget.setObjectName("widget")
+            checkBox = QCheckBox()
+            checkBox.setObjectName("checkbox")
+            checkBox.setChecked(video["selected"])
 
-            self.video_table.setCellWidget(row, 0, checkbox_item)
+            layoutCheckBox = QHBoxLayout(checkBoxWidget)
+
+            layoutCheckBox.addWidget(checkBox)
+
+            checkBoxWidget.setStyleSheet("QWidget#widget{border-left: 2px solid white;}QCheckBox{padding: 2px}")
+
+            layoutCheckBox.setContentsMargins(7,0,0,0)
+
+            self.video_table.setCellWidget(row, 0, checkBoxWidget)
             self.video_table.setItem(row, 1, title_item)
             self.video_table.setItem(row, 2, uploader_item)
             self.video_table.setItem(row, 3, playlist_index_item)
@@ -117,7 +128,8 @@ class VideoSelectDialog(QDialog):
     def get_selected(self):
         ids = []
         for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.cellWidget(row, 0)
+            checkbox_widget = self.video_table.cellWidget(row, 0)
+            checkbox_item = checkbox_widget.findChild(QCheckBox, "checkbox")
             if checkbox_item.isChecked():
                 index_item = self.video_table.item(row, 3)
                 ids.append(int(index_item.text()))
@@ -126,12 +138,14 @@ class VideoSelectDialog(QDialog):
 
     def select_all_videos(self):
         for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.cellWidget(row, 0)
+            checkbox_widget = self.video_table.cellWidget(row, 0)
+            checkbox_item = checkbox_widget.findChild(QCheckBox, "checkbox")
             checkbox_item.setChecked(True)
 
     def deselect_all_videos(self):
         for row in range(self.video_table.rowCount()):
-            checkbox_item = self.video_table.cellWidget(row, 0)
+            checkbox_widget = self.video_table.cellWidget(row, 0)
+            checkbox_item = checkbox_widget.findChild(QCheckBox, "checkbox")
             checkbox_item.setChecked(False)
 
 class PlaylistIndexTableWidgetItem(QTableWidgetItem):
