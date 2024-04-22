@@ -206,7 +206,6 @@ QHeaderView::section:hover{
 QTableView::item{
 	border-right: 1px solid white;
 	border-bottom: 1px solid white;
-	padding-left: 7.5px;
 }
 
 QTableView::item:selected{
