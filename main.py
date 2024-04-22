@@ -789,7 +789,7 @@ class Downloader():
         self.yt_dlp_download_thread.progress.connect(self.update_progress_yt_dlp)
         self.yt_dlp_download_thread.finished.connect(self.download_finished_yt_dlp)
 
-        self.yt_dlp_progress_dialog = ProgressDialog("yt-dlp", mw, dl)
+        self.yt_dlp_progress_dialog = ProgressDialog("yt-dlp", mw, self)
         self.yt_dlp_progress_dialog.show()
 
         self.yt_dlp_download_thread.start()
