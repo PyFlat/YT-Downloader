@@ -3,6 +3,7 @@ from __future__ import annotations
 
 
 from cx_Freeze import Executable, setup
+from src.version import VERSION
 
 try:
     from cx_Freeze.hooks import get_qt_plugins_paths
@@ -35,7 +36,7 @@ executables = [Executable("main.py", base=base, icon="appdata/images/app-icon.ic
 
 setup(
     name="youtube_downloader",
-    version="1.3.3",
+    version=VERSION,
     description="Youtube Downloader",
     options={"build_exe": build_exe_options},
     executables=executables,

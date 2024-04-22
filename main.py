@@ -30,7 +30,7 @@ from appdata.changelogs.changelogFiles import CHANGELOG_FILES
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.3"
+from src.version import VERSION
 
 class noLogger:
     def error(msg):
@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle(f"YouTube Downloader v{VERSION}")
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.download_btn.setEnabled(False)
         self.ui.tableWidget.horizontalHeader().setVisible(True)
