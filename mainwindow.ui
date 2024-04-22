@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>YouTube Downloader v1.3.1</string>
+   <string>YouTube Downloader v1.3.3</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -618,7 +618,7 @@ QTableWidget QScrollBar{
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="mpage1">
              <property name="sizePolicy">
@@ -1405,6 +1405,16 @@ QTableWidget QScrollBar{
                    </property>
                    <property name="text">
                     <string>Redownload File</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="download_cancel_btn">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Cancel Download</string>
                    </property>
                   </widget>
                  </item>

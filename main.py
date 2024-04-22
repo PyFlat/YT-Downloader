@@ -30,7 +30,7 @@ from appdata.changelogs.changelogFiles import CHANGELOG_FILES
 from urllib.request import urlopen
 from urllib.error import URLError
 
-VERSION = "1.3.2"
+from src.version import VERSION
 
 class noLogger:
     def error(msg):
@@ -45,9 +45,13 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle(f"YouTube Downloader v{VERSION}")
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.download_btn.setEnabled(False)
         self.ui.tableWidget.horizontalHeader().setVisible(True)
+        self.ui.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.tableWidget.horizontalHeader().setSectionResizeMode( QHeaderView.Stretch)
+        self.ui.tableWidget.setWordWrap(True)
 
         self.setStyleSheet(open(Utils.get_abs_path("appdata/style.qss"), "r").read())
 
@@ -79,10 +83,11 @@ class MainWindow(QMainWindow):
         timer = QTimer()
         timer.singleShot(250, lambda: self.set_enabled(False, False, False))
 
-    def set_enabled(self, enabled1:bool, enabled2:bool, enabled3:bool):
+    def set_enabled(self, enabled1:bool, enabled2:bool, enabled3:bool, enabled4:bool=False):
         self.ui.download_delete_btn.setEnabled(enabled1)
         self.ui.download_open_btn.setEnabled(enabled2)
         self.ui.download_download_btn.setEnabled(enabled3)
+        self.ui.download_cancel_btn.setEnabled(enabled4)
 
     def bind_keys(self):
         self.ui.search_btn.clicked.connect(lambda: [self.ui.mainpages.setCurrentIndex(0)])
@@ -137,10 +142,10 @@ class MainWindow(QMainWindow):
             os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             python = sys.executable
-            print(sys.argv)
             os.execl(python, python, *sys.argv)
 
     def closeEvent(self, event: QCloseEvent):
+        dl.cleanup()
         logger.info("Closing the application")
         return super().closeEvent(event)
 
@@ -152,7 +157,7 @@ class Downloader():
     def __init__(self):
         mw.ui.searching_button.clicked.connect(lambda:[self.load_url(), mw.ui.searching_button.setEnabled(False)])
         mw.ui.format_selection.currentIndexChanged.connect(lambda:self.update_file_box())
-        mw.ui.download_button.clicked.connect(lambda: self.data.prepare_for_download())
+        mw.ui.download_button.clicked.connect(self.prepare_for_download)
         mw.ui.next_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(0))
         mw.ui.last_page_btn.clicked.connect(lambda: mw.ui.download_2.setCurrentIndex(1))
         mw.ui.select_videos_btn.clicked.connect(lambda: self.show_video_select())
@@ -180,6 +185,17 @@ class Downloader():
         self.load_config()
         if getattr(sys, 'frozen', False) and self.update_check:
             self.search_for_updates()
+
+    def cleanup(self):
+        path = os.path.dirname(self.file)
+        for file in os.listdir(path):
+            if file.endswith('.part') or file.endswith('.ytdl'):
+                os.remove(os.path.join(path, file))
+
+    def prepare_for_download(self):
+        ext = mw.ui.format_selection.currentText().lower()
+        res = mw.ui.resolution_selection.currentText()
+        copy.copy(self.data).prepare_for_download(ext, res)
 
     def update_language_action(self):
         keys = self.tm.languages.keys()
@@ -846,33 +862,42 @@ class Downloader():
         mw.ui.tableWidget.insertRow(row_count)
         for column, string in enumerate(data):
             item = QTableWidgetItem(str(string))
+            item.setTextAlignment(Qt.AlignCenter)
             mw.ui.tableWidget.setItem(row_count, column, item)
 
     def handle_clicked(self, row, column):
         selection_model = mw.ui.tableWidget.selectionModel()
         selection_model.clearSelection()
-        mw.set_enabled(False, False, False)
+        mw.set_enabled(False, False, False, False)
         index = mw.ui.tableWidget.model().index(row, 0)
         selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
         try:
             mw.ui.download_delete_btn.disconnect(self.delete_btn_connection)
             mw.ui.download_open_btn.disconnect(self.play_file_btn_connection)
+            mw.ui.download_cancel_btn.disconnect(self.cancel_btn_connection)
             mw.ui.download_download_btn.disconnect(self.re_download_file_btn_connection)
         except AttributeError:
             pass
         status = mw.ui.tableWidget.item(row, 4).text()
         if not os.path.isfile(self.downloads[row].filename) and status == self.tm.get_inline_string("finished"):
             item = QTableWidgetItem(self.tm.get_inline_string("deleted"))
+            item.setTextAlignment(Qt.AlignCenter)
             mw.ui.tableWidget.setItem(row, 4, item)
             status = self.tm.get_inline_string("deleted")
 
         if status == self.tm.get_inline_string("finished"):
-            mw.set_enabled(True, True, True)
+            mw.set_enabled(True, True, True, False)
         elif status == self.tm.get_inline_string("deleted") or status == self.tm.get_inline_string("download-failed"):
-            mw.set_enabled(False, False, True)
+            mw.set_enabled(False, False, True, False)
+        else:
+            mw.set_enabled(False, False, False, True)
+
         self.delete_btn_connection = mw.ui.download_delete_btn.clicked.connect(lambda ev: self.downloads[row].delete(row))
         self.play_file_btn_connection = mw.ui.download_open_btn.clicked.connect(lambda ev: self.downloads[row].play())
-        self.re_download_file_btn_connection = mw.ui.download_download_btn.clicked.connect(lambda ev: self.downloads[row].prepare_for_download(row))
+        self.cancel_btn_connection = mw.ui.download_cancel_btn.clicked.connect(lambda ev: self.downloads[row].cancel())
+        ext = mw.ui.tableWidget.item(row, 2).text().lower()
+        res = mw.ui.tableWidget.item(row, 3).text()
+        self.re_download_file_btn_connection = mw.ui.download_download_btn.clicked.connect(lambda ev: self.downloads[row].prepare_for_download(ext, res, row))
 
 class DataHandler():
     def __init__(self, url, info, playlist = False, skip=False):
@@ -935,10 +960,10 @@ class DataHandler():
         resolution.insert(0, dl.tm.get_inline_string("best-quality"))
         return resolution
 
-    def prepare_for_download(self, row = None):
+    def prepare_for_download(self, vid_ext, vid_res, row = None):
         mw.set_enabled(False, False, False)
-        self.vid_ext = mw.ui.format_selection.currentText().lower()
-        self.vid_res = mw.ui.resolution_selection.currentText()
+        self.vid_ext = vid_ext
+        self.vid_res = vid_res
         self.vid_res = dl.tm.get_inline_string("best-quality") if self.vid_res == "" else self.vid_res
 
         if self.playlist: self.download_playlist();return
@@ -955,6 +980,7 @@ class DataHandler():
         if not os.path.isfile(dl.ffmpeg + "/ffmpeg.exe"):
             dl.user_info_no_ffmpeg()
             return
+
         currently_processing = [self.vid_ext, temp_vid_res, self.url]
         if currently_processing in dl.cur_process:
             dl.yes_no_messagebox(dl.tm.get_inline_string("no-same-files"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Ok)
@@ -966,7 +992,7 @@ class DataHandler():
             self.download(row)
             return
         file_name_thread = FileNameThread(self.outtmpl, self.download_format, self.url, self.vid_ext, dl.file)
-        file_name_thread.ret_filename.connect(self.check_if_exists)
+        file_name_thread.ret_filename.connect(lambda x: self.check_if_exists(x))
         file_name_thread.start()
         self.file_name_threads.append(file_name_thread)
 
@@ -1010,15 +1036,17 @@ class DataHandler():
             dl.add_row(row_count, data)
         else:
             item  = QTableWidgetItem(dl.tm.get_inline_string("started"))
+            item.setTextAlignment(Qt.AlignCenter)
             mw.ui.tableWidget.setItem(row, 4, item)
             row_count = row
 
         dl_thread = VideoDownloadThread(self.url, self.download_format, self.vid_ext, dl.ffmpeg, self.filename, row_count)
         dl_thread.finished.connect(self.handle_download_finished)
         dl_thread.progress.connect(self.update_progress)
+        self.x = dl_thread
         thread_worker = ThreadWorker(dl_thread)
         mw.threadpool.start(thread_worker)
-        if row == None: dl.downloads.append(copy.copy(self))
+        if row == None: dl.downloads.append(self)
 
     def handle_download_finished(self, success, row):
         if mw.ui.tableWidget.item(row, 0).isSelected():
@@ -1027,30 +1055,38 @@ class DataHandler():
 
         if success:
             item  = QTableWidgetItem(dl.tm.get_inline_string("finished"))
+            item.setTextAlignment(Qt.AlignCenter)
             mw.ui.tableWidget.setItem(row, 4, item)
             logger.info("Video download finished successfully")
         else:
             item  = QTableWidgetItem(dl.tm.get_inline_string("download-failed"))
+            item.setTextAlignment(Qt.AlignCenter)
             mw.ui.tableWidget.setItem(row, 4, item)
             logger.warning("Video download failed")
 
     def update_progress(self, progress, row, eta):
         item  = QTableWidgetItem(progress)
+        item.setTextAlignment(Qt.AlignCenter)
         mw.ui.tableWidget.setItem(row, 4, item)
         if dl.tm.get_inline_string("unknown") in eta: return
         item2 = QTableWidgetItem(eta)
+        item2.setTextAlignment(Qt.AlignCenter)
         mw.ui.tableWidget.setItem(row, 5, item2)
 
     def delete(self, row):
         mw.set_enabled(False, False, False)
         if not dl.yes_no_messagebox(dl.tm.get_inline_string("delete-file"), QMessageBox.Question, dl.tm.get_inline_string("question"), QMessageBox.Yes | QMessageBox.No):return
         item  = QTableWidgetItem(dl.tm.get_inline_string("deleted"))
+        item.setTextAlignment(Qt.AlignCenter)
         mw.ui.tableWidget.setItem(row, 4, item)
         if os.path.isfile(self.filename):
             logger.info("Deleting file")
             logger.debug(f"Filename: \"{self.filename}\"")
 
             os.remove(self.filename)
+
+    def cancel(self):
+        self.x.cancel()
 
     def play(self):
         mw.set_enabled(False, False, False)
@@ -1256,7 +1292,7 @@ class VideoDownloadThread(QThread):
         self.ffmpeg = ffmpeg
         self.file_template = file_template
         self.update_eta = 0
-        self.is_paused = False
+        self.is_cancelled = False
         self.row = row
 
     def run(self):
@@ -1300,6 +1336,9 @@ class VideoDownloadThread(QThread):
             if "urlopen error" in e.msg or "The read operation timed out" in e.msg:
                 logger.error(f"A network error occured: {e.msg}")
                 self.finished.emit(False, self.row)
+            elif "Cancelled by user" in e.msg:
+                logger.info("Download cancelled by user")
+                self.finished.emit(False, self.row)
             else:
                 logger.error(f"An unnokwn download error occured: {e.msg}")
 
@@ -1308,25 +1347,29 @@ class VideoDownloadThread(QThread):
             self.finished.emit(True, self.row)
 
     def _hook(self, d):
-        if not self.is_paused:
-            self.update_eta += 1
-            if not (self.update_eta % 20 == 0):
-                return
-            if d['status'] == 'downloading':
-                try:
-                    pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes"]),2)*100, 0))
-                except KeyError:
-                    pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes_estimate"]),2)*100, 0))
-                eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else dl.tm.get_inline_string("unknown")
-                self.progress.emit(f"{pr}%", self.row, dl.tm.get_inline_string("1-second") if eta==1 else dl.tm.get_inline_string("seconds").format(eta))
-            elif d["status"] == "finished":
-                self.progress.emit("", self.row, "")
+        if self.is_cancelled:
+            raise DownloadError("Cancelled by user")
+        self.update_eta += 1
+        if not (self.update_eta % 20 == 0):
+            return
+        if d['status'] == 'downloading':
+            try:
+                pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes"]),2)*100, 0))
+            except KeyError:
+                pr = int(round(round(float(d['downloaded_bytes'])/float(d["total_bytes_estimate"]),2)*100, 0))
+            eta = int(round(float(d['eta']),ndigits=0)) if d["eta"] else dl.tm.get_inline_string("unknown")
+            self.progress.emit(f"{pr}%", self.row, dl.tm.get_inline_string("1-second") if eta==1 else dl.tm.get_inline_string("seconds").format(eta))
+        elif d["status"] == "finished":
+            self.progress.emit("", self.row, "")
 
     def _hook_postprocess(self, d):
         if d["status"] == "started":
             self.progress.emit(dl.tm.get_inline_string("postp-started"), self.row, "")
         else:
             self.progress.emit(dl.tm.get_inline_string("postp-finished"), self.row, "")
+
+    def cancel(self):
+        self.is_cancelled = True
 
 class YoutubeSearch(QThread):
     result = Signal(object)

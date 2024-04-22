@@ -1,11 +1,10 @@
 <strong>New Features:</strong>
 
 <ul>
-<li style="text-align: left;">The app now finally has an icon</li>
-<li style="text-align: left;">You can now select the language of the program</li>
+<li style="text-align: left;">Ongoing downloads can now be canceled</li>
 </ul>
 <br>
 <strong>Bug Fixes:</strong>
 <ul>
-    <li style="text-align: left;">Fixed a bug where the program crashed when a video from the search-view was clicked using a touchscreen</li>
+    <li style="text-align: left;">Fixed a bug that caused problems when a video in different formats was downloaded too quickly in a row.</li>
 </ul>

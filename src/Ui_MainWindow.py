@@ -593,6 +593,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_8.addWidget(self.download_download_btn)
 
+        self.download_cancel_btn = QPushButton(self.frame_2)
+        self.download_cancel_btn.setObjectName(u"download_cancel_btn")
+        self.download_cancel_btn.setEnabled(False)
+
+        self.horizontalLayout_8.addWidget(self.download_cancel_btn)
+
 
         self.verticalLayout_13.addWidget(self.frame_2)
 
@@ -656,7 +662,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.mainpages.setCurrentIndex(0)
+        self.mainpages.setCurrentIndex(2)
         self.search_stack_widg.setCurrentIndex(0)
         self.download_2.setCurrentIndex(1)
 
@@ -665,7 +671,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"YouTube Downloader v1.3.1", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"YouTube Downloader v1.3.3", None))
         self.actionSearch_For_Updates.setText(QCoreApplication.translate("MainWindow", u"Search for Updates", None))
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.actionShow_on_Github.setText(QCoreApplication.translate("MainWindow", u"Show on GitHub", None))
@@ -717,6 +723,7 @@ class Ui_MainWindow(object):
         self.download_delete_btn.setText(QCoreApplication.translate("MainWindow", u"Delete File", None))
         self.download_open_btn.setText(QCoreApplication.translate("MainWindow", u"Open File", None))
         self.download_download_btn.setText(QCoreApplication.translate("MainWindow", u"Redownload File", None))
+        self.download_cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"Edit", None))
         self.menuChange_Log_Level.setTitle(QCoreApplication.translate("MainWindow", u"Change Log-Level", None))
         self.menuChange_Language.setTitle(QCoreApplication.translate("MainWindow", u"Change Language", None))
