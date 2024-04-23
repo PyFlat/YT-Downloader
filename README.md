@@ -2,6 +2,24 @@
     <h1>PyFlat YouTube Downloader</h1>
 </div>
 
+<p align="center">
+  <a href="https://github.com/PyFlat/YT-Downloader/releases/latest" target="_blank">
+    <img src="https://img.shields.io/github/v/release/pyflat/yt-downloader" alt="GitHub Version">
+  </a>
+
+  <a style="text-decoration:none">
+    <img src="https://img.shields.io/github/downloads/pyflat/yt-downloader/total" alt="GitHub Downloads"/>
+  </a>
+
+  <a style="text-decoration:none">
+    <img src="https://img.shields.io/github/license/pyflat/yt-downloader" alt="GitHub License"/>
+  </a>
+
+  <a style="text-decoration:none">
+    <img src="https://img.shields.io/github/stars/pyflat/yt-downloader" alt="GitHub Stars"/>
+  </a>
+</p>
+
 ---
 
 ## Table of Contents
