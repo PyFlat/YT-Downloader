@@ -123,8 +123,9 @@ class MainWindow(QMainWindow):
             self.column += 1
 
     def restartApplication(self):
+        self.closeEvent(QCloseEvent())
         if getattr(sys, 'frozen', False):
-            os.execv(sys.executable, [sys.executable] + sys.argv)
+                os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             python = sys.executable
             os.execl(python, python, *sys.argv)
@@ -132,11 +133,10 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event: QCloseEvent):
         try:
             dl.cleanup()
-            logger.info("Closing the application")
         except NameError:
             pass
-        finally:
-            return super().closeEvent(event)
+        logger.info("Closing the application")
+        return super().closeEvent(event)
 
     def paintEvent(self, event: QPaintEvent):
         self.ui.scrollArea.setMinimumHeight(self.geometry().height()-150)
@@ -176,10 +176,16 @@ class Downloader():
             self.search_for_updates()
 
     def cleanup(self):
+        for download in self.downloads:
+            download.cancel(1)
+
         path = os.path.dirname(self.file)
         for file in os.listdir(path):
             if file.endswith('.part') or file.endswith('.ytdl'):
-                os.remove(os.path.join(path, file))
+                try:
+                    os.remove(os.path.join(path, file))
+                except PermissionError:
+                    pass
 
     def prepare_for_download(self):
         ext = mw.ui.format_selection.currentText().lower()
@@ -221,11 +227,7 @@ class Downloader():
         self.resolutions[0] = self.tm.get_inline_string("best-quality")
 
         if not force:
-            if getattr(sys, 'frozen', False):
-                os.execv(sys.executable, [sys.executable] + sys.argv)
-            else:
-                python = sys.executable
-                os.execl(python, python, *sys.argv)
+            mw.restartApplication()
 
     def show_video_select(self):
         videos = []
@@ -1075,8 +1077,8 @@ class DataHandler():
 
             os.remove(self.filename)
 
-    def cancel(self):
-        self.x.cancel()
+    def cancel(self, errorCode:int=0):
+        self.x.cancel(errorCode)
 
     def play(self):
         mw.set_enabled(False, False, False)
@@ -1283,6 +1285,7 @@ class VideoDownloadThread(QThread):
         self.file_template = file_template
         self.update_eta = 0
         self.is_cancelled = False
+        self.errorCode = 0
         self.row = row
 
     def run(self):
@@ -1327,7 +1330,8 @@ class VideoDownloadThread(QThread):
                 logger.error(f"A network error occured: {e.msg}")
                 self.finished.emit(False, self.row)
             elif "Cancelled by user" in e.msg:
-                logger.info("Download cancelled by user")
+                if self.errorCode == 0:
+                    logger.info("Download cancelled by user")
                 self.finished.emit(False, self.row)
             else:
                 logger.error(f"An unnokwn download error occured: {e.msg}")
@@ -1358,7 +1362,8 @@ class VideoDownloadThread(QThread):
         else:
             self.progress.emit(dl.tm.get_inline_string("postp-finished"), self.row, "")
 
-    def cancel(self):
+    def cancel(self, errorCode:int=0):
+        self.errorCode = errorCode
         self.is_cancelled = True
 
 class YoutubeSearch(QThread):
