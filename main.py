@@ -1481,6 +1481,6 @@ if __name__ == "__main__":
     mw = MainWindow()
     dl = Downloader()
     mw.create_search_widges()
-    thread = ScreenShot(mw)
-    thread.start()
+    # thread = ScreenShot(mw)
+    # thread.start()
     sys.exit(app.exec())
