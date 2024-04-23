@@ -130,9 +130,13 @@ class MainWindow(QMainWindow):
             os.execl(python, python, *sys.argv)
 
     def closeEvent(self, event: QCloseEvent):
-        dl.cleanup()
-        logger.info("Closing the application")
-        return super().closeEvent(event)
+        try:
+            dl.cleanup()
+            logger.info("Closing the application")
+        except NameError:
+            pass
+        finally:
+            return super().closeEvent(event)
 
     def paintEvent(self, event: QPaintEvent):
         self.ui.scrollArea.setMinimumHeight(self.geometry().height()-150)
