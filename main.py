@@ -188,6 +188,7 @@ class Downloader():
                     pass
 
     def prepare_for_download(self):
+        mw.ui.download_button.setEnabled(False)
         ext = mw.ui.format_selection.currentText().lower()
         res = mw.ui.resolution_selection.currentText()
         copy.copy(self.data).prepare_for_download(ext, res)
@@ -989,6 +990,7 @@ class DataHandler():
         self.file_name_threads.append(file_name_thread)
 
     def check_if_exists(self, filename):
+        mw.ui.download_button.setEnabled(True)
         if filename == "Connection Error":
             logger.error("Internet connection error")
             dl.yes_no_messagebox(dl.tm.get_inline_string("error-no-internet"), QMessageBox.Warning, dl.tm.get_inline_string("no-internet"), QMessageBox.Ok)
