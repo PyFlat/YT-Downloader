@@ -107,21 +107,6 @@ class MainWindow(QMainWindow):
         self.animation.setEndValue(widthExtended)
         self.animation.start()
 
-    @Slot(int, int)
-    def setWidg2Range(self, min: int, max:int):
-        self.ui.playlist_range_slider.setRange(min, max)
-
-    @Slot(int, int)
-    def setWidg2Value(self, min: int, max:int):
-        self.ui.playlist_range_slider.setValue((min, max))
-
-
-    def invokeFunc(self, widget, func, connection, arg):
-        QMetaObject.invokeMethod(widget, func, connection, arg)
-
-    def invokeFunc2(self, widget, func, connection, arg, arg2):
-        QMetaObject.invokeMethod(widget, func, connection, arg, arg2)
-
     def create_search_widges(self, more = False):
         if not more:
             self.search_labels = []
@@ -536,18 +521,18 @@ class Downloader():
                 text = self.tm.get_inline_string("searching-text")
             else:
                 text = self.tm.get_inline_string("no-video-found")
-            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, text))
-            mw.invokeFunc(mw.ui.download_btn, "setEnabled", Qt.QueuedConnection, Q_ARG(bool, False))
+            mw.ui.info_start_label.setText(text)
+            mw.ui.download_btn.setEnabled(False)
         self.info_thread = None
 
     def load_url(self, cur_link = None):
         if not cur_link:
-            mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
-        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("searching-text")))
+            mw.ui.search_stack_widg.setCurrentIndex(0)
+        mw.ui.info_start_label.setText(self.tm.get_inline_string("searching-text"))
         if cur_link==None: cur_link = mw.ui.url_entry.text()
         if cur_link == "":
-            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
-            mw.invokeFunc(mw.ui.searching_button, "setDisabled", Qt.QueuedConnection, Q_ARG(bool, False))
+            mw.ui.info_start_label.setText("")
+            mw.ui.searching_button.setDisabled(False)
             return
 
         self.search_thread = YoutubeSearch(cur_link,"0:30", 30, self)
@@ -568,15 +553,15 @@ class Downloader():
         while len(mw.search_labels) > 0:
             mw.search_labels.pop().deleteLater()
         mw.create_search_widges()
-        mw.invokeFunc(mw.ui.scrollArea.verticalScrollBar(), "setValue", Qt.QueuedConnection, Q_ARG(int, 0))
+        mw.ui.scrollArea.verticalScrollBar().setValue(0)
         if data == []:
             mw.ui.searching_button.setEnabled(True)
-            mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("no-video-found2")))
+            mw.ui.info_start_label.setText(self.tm.get_inline_string("no-video-found2"))
             return
         self.fill_widget_thread = FillWidgetThread(data)
         self.fill_widget_thread.finished.connect(lambda: mw.ui.searching_button.setEnabled(True))
         self.fill_widget_thread.start()
-        mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
+        mw.ui.search_stack_widg.setCurrentIndex(1)
 
     def custom_event(self, event, url, channel, title):
         if event.button() == Qt.LeftButton:
@@ -632,7 +617,7 @@ class Downloader():
         mw.ui.download_btn.setEnabled(True)
         mw.ui.download_btn.click()
         mw.ui.searching_button.setEnabled(True)
-        mw.invokeFunc(mw.ui.info_start_label, "setText", Qt.QueuedConnection, Q_ARG(str, ""))
+        mw.ui.info_start_label.setText("")
         mw.ui.image_label.clear()
         if self.stream_thumbnails:
             img = QImage()
@@ -651,17 +636,18 @@ class Downloader():
             if self.default_resolution in self.data.resolutions:
                 mw.ui.resolution_selection.setCurrentIndex(self.data.resolutions.index(self.default_resolution))
         if not self.playlist:
+            mw.ui.download_2.setCurrentIndex(0)
             mw.ui.date_label.setText(self.tm.get_inline_string("upload-date").format(self.data.upload_date))
             mw.ui.duration_label.setText(self.tm.get_inline_string("video-length").format(self.data.duration))
-            mw.invokeFunc(mw.ui.last_page_btn, "setVisible", Qt.QueuedConnection, Q_ARG(bool, False))
+            mw.ui.last_page_btn.setVisible(False)
         else:
             mw.ui.duration_label.clear()
-            mw.invokeFunc(mw.ui.download_2, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 1))
-            mw.invokeFunc(mw.ui.info_range_slider_label, "setText", Qt.QueuedConnection, Q_ARG(str, self.tm.get_inline_string("select-range-info")))
+            mw.ui.download_2.setCurrentIndex(1)
+            mw.ui.info_range_slider_label.setText(self.tm.get_inline_string("select-range-info"))
             mw.ui.date_label.setText(self.tm.get_inline_string("playlist-count").format(self.data.playlist_count))
             mw.ui.last_page_btn.setVisible(True)
-            mw.invokeFunc2(mw, "setWidg2Range", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
-            mw.invokeFunc2(mw, "setWidg2Value", Qt.QueuedConnection, Q_ARG(int, 1), Q_ARG(int, self.data.playlist_count))
+            mw.ui.playlist_range_slider.setRange(0, self.data.playlist_count)
+            mw.ui.playlist_range_slider.setValue((0, self.data.playlist_count))
 
     def change_location(self):
         new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-folder"), os.path.expanduser(self.file))
@@ -1141,7 +1127,7 @@ class FillWidgetThread(QThread):
 
     def run(self):
         if self.data == "Connection Error":
-            mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
+            mw.ui.search_stack_widg.setCurrentIndex(0)
             mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
             mw.ui.searching_button.setEnabled(True)
             return
@@ -1155,7 +1141,7 @@ class FillWidgetThread(QThread):
 
             if self.data == "Connection Error":
                 mw.search_labels = mw.search_labels[:dl.search]
-                mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
+                mw.ui.search_stack_widg.setCurrentIndex(0)
                 mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
                 mw.ui.searching_button.setEnabled(True)
                 dl.new_widget_thread_running = False
@@ -1183,7 +1169,7 @@ class FillWidgetThread(QThread):
                 try:
                     image_byt = urlopen(thumbnail_url, timeout=15).read()
                 except Exception:
-                    mw.invokeFunc(mw.ui.search_stack_widg, "setCurrentIndex", Qt.QueuedConnection, Q_ARG(int, 0))
+                    mw.ui.search_stack_widg.setCurrentIndex(0)
                     mw.ui.info_start_label.setText(dl.tm.get_inline_string("error-no-internet"))
                     mw.ui.searching_button.setEnabled(True)
                     return
