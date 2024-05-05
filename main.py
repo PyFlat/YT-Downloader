@@ -812,7 +812,7 @@ class Downloader():
         logger.info("Download FFmpeg started")
         if os.path.isdir("appdata/FFmpeg"):
             shutil.rmtree("appdata/FFmpeg")
-        self.ffmpeg_download_thread = GithubDownloader("https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip")
+        self.ffmpeg_download_thread = GithubDownloader("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip")
         self.ffmpeg_download_thread.progress.connect(self.update_progress_ffmpeg)
         self.ffmpeg_download_thread.finished.connect(self.download_finished_ffmpeg)
 
