@@ -653,8 +653,8 @@ class Downloader():
             mw.ui.info_range_slider_label.setText(self.tm.get_inline_string("select-range-info"))
             mw.ui.date_label.setText(self.tm.get_inline_string("playlist-count").format(self.data.playlist_count))
             mw.ui.last_page_btn.setVisible(True)
-            mw.ui.playlist_range_slider.setRange(0, self.data.playlist_count)
-            mw.ui.playlist_range_slider.setValue((0, self.data.playlist_count))
+            mw.ui.playlist_range_slider.setRange(1, self.data.playlist_count)
+            mw.ui.playlist_range_slider.setValue((1, self.data.playlist_count))
 
     def change_location(self):
         new_dir = QFileDialog.getExistingDirectory(None, self.tm.get_inline_string("select-folder"), os.path.expanduser(self.file))
@@ -1015,10 +1015,12 @@ class DataHandler():
         if dl.selected_ids  == []:
             dl.yes_no_messagebox(dl.tm.get_inline_string("no-video-chosen"), QMessageBox.Warning, dl.tm.get_inline_string("warning"), QMessageBox.Ok)
             return
+        ext = mw.ui.format_selection.currentText().lower()
+        res = mw.ui.resolution_selection.currentText()
         def download_next(index):
             if index < len(dl.selected_ids):
                 video_id = dl.selected_ids[index]-1
-                self.playlist_data_objects[video_id].prepare_for_download()
+                self.playlist_data_objects[video_id].prepare_for_download(ext, res)
                 QTimer.singleShot(1000, lambda: download_next(index + 1))
 
         download_next(0)
