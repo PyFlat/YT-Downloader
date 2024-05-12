@@ -1,0 +1,11 @@
+{
+    "Preferences": {
+        "EnableMinimizeAsTray": false,
+        "EnableShowOnStartup": false,
+        "EnableStartWithWindows": false
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ff009faa",
+        "ThemeMode": "Dark"
+    }
+}
