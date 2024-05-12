@@ -1,4 +1,8 @@
-from PySide6.QtCore import QThread, Signal, QRunnable
+from PySide6.QtCore import QRunnable
+try:
+    from src.DownloaderCore.Threads.Signal import Signal
+except ModuleNotFoundError:
+    from Threads.Signal import Signal
 
 class InformationLoadThread(QRunnable):
     def __init__(self, url: str, all_playlist: bool, finished_callback: object) -> None:
@@ -7,10 +11,9 @@ class InformationLoadThread(QRunnable):
         self.__url = url
         self.__all_playlist = all_playlist
         self.__on_finish.connect(finished_callback)
-        print("HI")
     def run(self):
-        options = {"quiet": False,
-                        "noprogress": False,
+        options = {"quiet": True,
+                        "noprogress": True,
                         "extract_flat": "in_playlist"
                     }
         if not self.__all_playlist:

@@ -2,82 +2,47 @@ try:
     from src.DownloaderCore.Threads.VideoDownloadThread import VideoDownloadThread
     from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
     from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
+    from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+    from src.DownloaderCore.Threads.Container import Container
+    from src.DownloaderCore.Threads.Signal import Signal
 except:
     from Threads.VideoDownloadThread import VideoDownloadThread
     from Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
     from Threads.InformationLoadThread import InformationLoadThread
-Threads = {}
+    from Threads.ThreadManager import ThreadManager
+    from Threads.Container import Container
+TM = ThreadManager(10)
+
+class Downloader():
+    def __init__(self, thread_manager: ThreadManager) -> None:
+        self.thread_manager = thread_manager
+    def get_playlist_info(self, url: str, callback: callable) -> None:
+        self.thread_manager.runTask(InformationLoadThread(url, True, callback), force=True)
+    def get_video_info(self, url: str, callback: callable) -> None:
+        self.thread_manager.runTask(InformationLoadThread(url, False, callback), force=True)
+    def download_video(self, url: str, outfile_path: str, ffmpeg_path: str, resolution: int):
+        self.thread_manager.runTask(YoutubeVideoDownloadThread(url,f"bv[height<={resolution}]+ba[ext=m4a]/b",ffmpeg_path,f"{outfile_path}/%(title)s(%(height)sp).%(ext)s","mp4"))
+    def download_playlist(self, url: str, outfile_path: str, ffmpeg_path: str, resolution: int, playlist_range: tuple[int, int] | None = None):
+        def on_info_recieve(data, url):
+            if data == {}:
+                return
+            import os
+            if not os.path.isdir(f"{outfile_path}{data['title']}"):
+                os.mkdir(f"{outfile_path}{data['title']}")
+            for i, entry in enumerate(data["entries"]):
+                if playlist_range != None:
+                    lower, upper = playlist_range
+                    if i < lower or i > upper:
+                        continue
+                self.download_video(entry["url"],f"{outfile_path}{data['title']}/",ffmpeg_path, resolution)
+        self.get_playlist_info(url, on_info_recieve)
 if __name__ == "__main__":
     import sys
     from PySide6.QtCore import QCoreApplication, QTimer, QThread
-    class infothread(QThread):
-        def __init__(self) -> None:
-            super().__init__()
-        def run(self):
-            while True:
-                import sys
-                def strpln(i):
-                    r = ""
-                    rr = 0
-                    for c in i:
-                        if c != " ":
-                            rr = 1
-                        if rr:
-                            r += c
-                    return r
-                def spltln(i):
-                    r = []
-                    a = ""
-                    s = 0
-                    for c in i:
-                        if c == "\"":
-                            s ^= 1
-                            continue
-                        if c == " " and not s:
-                            r.append(a)
-                            a = ""
-                        else:
-                            a += c
-                    if a:
-                        r.append(a)
-                    return r
-                command = strpln(input("YTDL>"))
-                print(command)
-                argv = spltln(command)
-                argc = len(argv)
-                match (argv[0]):
-                    case "exit":
-                        print("Bye")
-                        sys.exit(0)
-                    case "download":
-                        def progress(a, b):
-                            print(a, b)
-                        def finish(a):
-                            print("EXIT", a)
-                        if argc < 6:
-                            print("Usage: download <url> <extension> <ffempeg> <format> <output_template>")
-                        else:
-                        #download https://www.youtube.com/watch?v=HBEsr0MfdmQ mp4 C:/Users/jonas/AppData/Local/Programs/PyFlat Youtube Downloader(2)/appdata/FFmpeg/bin bv[height<=720]+ba[ext=m4a]/b (%(height)sp).%(ext)s
-                            thd = YoutubeVideoDownloadThread(argv[1],argv[4],argv[3],argv[5],argv[2],finish, progress)
-                            thd.start()
-                    case "get-info":
-                        if argc < 2:
-                            print("Usage: get-info <url>")
-                        else:
-                            def callback(data, url):
-                                print(url, data)
-                            def report(data):
-                                print(data)
-                            thd = InformationLoadThread(argv[1], False, callback)
-                            print(thd)
-                            thd.start()
-                            Threads[argv[1]] = thd
-                    case other:
-                        print("No matching command found :(")
+    #download https://www.youtube.com/watch?v=HBEsr0MfdmQ mp4 C:/Users/jonas/AppData/Local/Programs/PyFlat Youtube Downloader(2)/appdata/FFmpeg/bin bv[height<=720]+ba[ext=m4a]/b (%(height)sp).%(ext)s
     def cb(*args):
         print(*args)
     __app__ = QCoreApplication()
-    thd = InformationLoadThread("https://www.youtube.com/watch?v=HBEsr0MfdmQ", False, cb)
-    thd.start()
-    
+    DL = Downloader(TM)
+    DL.download_playlist("https://www.youtube.com/playlist?list=PLE1nXFFhjpTFyTf6Gp7M7M17MeIz8QYr4","./","C:/Users/jonas/AppData/Local/Programs/PyFlat Youtube Downloader(2)/appdata/FFmpeg/bin",720)
     sys.exit(__app__.exec())
