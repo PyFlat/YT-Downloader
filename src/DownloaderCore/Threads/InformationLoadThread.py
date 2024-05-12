@@ -9,9 +9,8 @@ class InformationLoadThread(QThread):
         self.__on_finish.connect(finished_callback)
         print("HI")
     def run(self):
-        self.__on_finish.emit({},"HI")
-        options = {"quiet": True,
-                        "noprogress": True,
+        options = {"quiet": False,
+                        "noprogress": False,
                         "extract_flat": "in_playlist"
                     }
         if not self.__all_playlist:
