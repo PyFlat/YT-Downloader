@@ -7,6 +7,8 @@ logs/
 
 mainwindow_ui.py
 
+convert_svgs.py
+
 ui_mainwindow.py
 
 build_exe.bat
