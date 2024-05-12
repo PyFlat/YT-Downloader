@@ -21,12 +21,13 @@ try:
         if "Form.setStyleSheet" in line:
             continue
         res.append(line)
-    for line, i in enumerate(res):
+    for i, line in enumerate(res):
+        class_name = sys.argv[2].split('.')[0]
         if line[0:5] == "class":
-            res[i] = f"class {sys.argv[2].split('.')[0]}(QWidget):"
-            res[i+1] = "    def init(self, parent):"
-            res[i+2] = "        super().init(parent=parent)"
-            res[i+3] = '        self.setObjectName("MainInterface")'
+            res[i] = f"class {class_name}(QWidget):"
+            res[i+1] = "    def __init__(self, parent):"
+            res[i+2] = "        super().__init__(parent=parent)"
+            res[i+3] = f'        self.setObjectName("{class_name}")'
             res = res[:i+4] + ["        Form = self"] + res[i+4:]
             break
     open(sys.argv[2], "w").write("\n".join(res))
