@@ -1,10 +1,12 @@
 try:
     from src.DownloaderCore.Threads.VideoDownloadThread import VideoDownloadThread
     from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
+    from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
 except:
     from Threads.VideoDownloadThread import VideoDownloadThread
     from Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
-
+    from Threads.InformationLoadThread import InformationLoadThread
+Threads = {}
 if __name__ == "__main__":
     from PySide6.QtCore import QCoreApplication, QTimer
     import sys
@@ -53,6 +55,18 @@ if __name__ == "__main__":
                 #download https://www.youtube.com/watch?v=HBEsr0MfdmQ mp4 C:/Users/jonas/AppData/Local/Programs/PyFlat Youtube Downloader(2)/appdata/FFmpeg/bin bv[height<=720]+ba[ext=m4a]/b (%(height)sp).%(ext)s
                     thd = YoutubeVideoDownloadThread(argv[1],argv[4],argv[3],argv[5],argv[2],finish, progress)
                     thd.start()
+            case "get-info":
+                if argc < 2:
+                    print("Usage: get-info <url>")
+                else:
+                    def callback(data, url):
+                        print(url, data)
+                    def report(data):
+                        print(data)
+                    thd = InformationLoadThread(argv[1], False, callback)
+                    print(thd)
+                    thd.start()
+                    Threads[argv[1]] = thd
             case other:
                 print("No matching command found :(")
         QTimer.singleShot(0, await_input)
