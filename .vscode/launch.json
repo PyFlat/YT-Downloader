@@ -5,7 +5,7 @@
       "name": "Python Debugger: Main",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/src/DownloaderCore/Downloader.py",
+      "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal"
     }
   ]
