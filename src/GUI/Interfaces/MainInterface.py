@@ -19,8 +19,9 @@ class MainInterface(QWidget):
         self.widget = QWidget(Form)
         self.widget.setObjectName(u"widget")
         self.horizontalLayout = QHBoxLayout(self.widget)
-        self.horizontalLayout.setSpacing(14)
+        self.horizontalLayout.setSpacing(10)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.LineEdit = LineEdit(self.widget)
         self.LineEdit.setObjectName(u"LineEdit")
         self.horizontalLayout.addWidget(self.LineEdit)
@@ -38,6 +39,7 @@ class MainInterface(QWidget):
         self.stackedWidget.addWidget(self.page_2)
         self.verticalLayout.addWidget(self.stackedWidget)
         self.retranslateUi(Form)
+        self.stackedWidget.setCurrentIndex(0)
         QMetaObject.connectSlotsByName(Form)
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))

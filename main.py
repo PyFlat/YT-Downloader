@@ -10,10 +10,11 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import *
 
-from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme
+from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition
 from qfluentwidgets import FluentIcon as FIF
 
 from src.GUI.Interfaces.MainInterface import MainInterface
+from src.GUI.Interfaces.SettingInterface import SettingInterface
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -22,12 +23,17 @@ class MainWindow(FluentWindow):
 
         self.main_interface = MainInterface(self)
 
+        self.setting_interface = SettingInterface(self)
+
         self.initNavigation()
 
         self.splashScreen.finish()
 
     def initNavigation(self):
         self.addSubInterface(self.main_interface, FIF.HOME, 'Home')
+        self.navigationInterface.addSeparator()
+
+        self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         self.setWindowTitle('PyFlat YouTube Downloader')
