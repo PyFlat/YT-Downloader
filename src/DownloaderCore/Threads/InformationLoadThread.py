@@ -1,9 +1,9 @@
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, QRunnable
 
-class InformationLoadThread(QThread):
-    __on_finish = Signal(dict, str)
+class InformationLoadThread(QRunnable):
     def __init__(self, url: str, all_playlist: bool, finished_callback: object) -> None:
         super().__init__()
+        self.__on_finish = Signal(dict, str)
         self.__url = url
         self.__all_playlist = all_playlist
         self.__on_finish.connect(finished_callback)
