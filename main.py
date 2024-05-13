@@ -10,7 +10,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import *
 
-from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition
+from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition, MessageBox
 from qfluentwidgets import FluentIcon as FIF
 
 from src.GUI.Interfaces.MainInterface import MainInterface
@@ -18,9 +18,6 @@ from src.GUI.Interfaces.SettingInterface import SettingInterface
 
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
 from src.DownloaderCore.Downloader import Downloader
-
-thread_manager = ThreadManager(10)
-downloader = Downloader(thread_manager)
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -35,12 +32,24 @@ class MainWindow(FluentWindow):
 
         self.splashScreen.finish()
 
-        self.checkForYtdlp(self)
+        self.checkForYtdlp()
+
+    def showDialog(self):
+        title = "yt-dlp not found"
+        content = "Yt-dlp isn't installed without it the downloader can't work. Download it?"
+        msgb = MessageBox(title, content, self)
+        if msgb.exec():
+            self.switchTo(self.setting_interface)
+            self.setting_interface.updateYtDlpCard.button.click()
+        else:
+            self.close()
+            sys.exit()
 
     def checkForYtdlp(self):
-
         if downloader.yt_dlp == None:
-            pass
+            self.showDialog()
+        else:
+            self.setting_interface.update_ytdlp_version()
 
     def initNavigation(self):
         self.addSubInterface(self.main_interface, FIF.HOME, 'Home')
@@ -64,6 +73,8 @@ class MainWindow(FluentWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    thread_manager = ThreadManager(10)
+    downloader = Downloader(thread_manager)
     MainWindow()
     setTheme(Theme.DARK)
     sys.exit(app.exec())
