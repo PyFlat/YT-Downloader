@@ -1,16 +1,12 @@
-from PySide6.QtCore import QThread, QRunnable
-try:
-    from src.DownloaderCore.Threads.Signal import Signal
-except:
-    from Threads.Signal import Signal
-class VideoDownloadThread(QRunnable):
+from PySide6.QtCore import QObject, QRunnable, Signal
+class VideoDownloadThread(QObject, QRunnable):
+    __on_finish = Signal(bool)
+    __on_progress = Signal(str, str)
     def __init__(self, yt_dlp: object, url: str = "https://www.youtube.com/watch?v=HBEsr0MfdmQ", options : dict[str, object] = {}, finished_callback: object| None = None, progress_callback: object | None = None) -> None:
         super().__init__()
         self.yt_dlp = yt_dlp
-        self.__on_finish = Signal(bool)
         if finished_callback != None:
             self.__on_finish.connect(finished_callback)
-        self.__on_progress = Signal(str, str)
         if progress_callback != None:
             self.__on_progress.connect(progress_callback)
         self.__is_cancled = False
