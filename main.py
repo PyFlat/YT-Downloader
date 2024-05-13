@@ -35,6 +35,13 @@ class MainWindow(FluentWindow):
 
         self.splashScreen.finish()
 
+        self.checkForYtdlp(self)
+
+    def checkForYtdlp(self):
+
+        if downloader.yt_dlp == None:
+            pass
+
     def initNavigation(self):
         self.addSubInterface(self.main_interface, FIF.HOME, 'Home')
         self.navigationInterface.addSeparator()

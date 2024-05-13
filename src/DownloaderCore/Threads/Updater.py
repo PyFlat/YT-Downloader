@@ -1,11 +1,11 @@
-from PySide6.QtCore import QRunnable
+from PySide6.QtCore import QRunnable, Signal, QObject
 from urllib.request import urlopen
 from urllib.error import URLError
-import requests
-try:
-    from src.DownloaderCore.Threads.Signal import Signal
-except ModuleNotFoundError:
-    from Signal import Signal
+import requests, os, shutil
+# try:
+#     from src.DownloaderCore.Threads.Signal import Signal
+# except ModuleNotFoundError:
+#     from Signal import Signal
 
 VERSION = '2.0.0'
 class UpdateCheckerThread(QRunnable):
@@ -22,21 +22,22 @@ class UpdateCheckerThread(QRunnable):
         if VERSION < tag[1:]:
             self.update_available.emit(True, tag[1:])
 
-class GithubDownloaderThread(QRunnable):
-
+class GithubDownloaderThread(QObject, QRunnable):
+    on_progress = Signal(int)
+    on_finished = Signal(bool)
 
     def __init__(self, url: str, save_path: str, progress_callback: object | None = None, finished_callback: object | None = None):
         super().__init__()
-        self.on_progress = Signal(float)
-        self.on_finished = Signal(bool)
         self.url = url
         self.save_path = save_path
         if progress_callback != None:
             self.on_progress.connect(progress_callback)
         if finished_callback != None:
-            self.on_progress.connect(finished_callback)
+            self.on_finished.connect(finished_callback)
 
     def run(self):
+        if os.path.isdir("appdata/FFmpeg"):
+            shutil.rmtree("appdata/FFmpeg")
         self.on_progress.emit(0)
         try:
             response = requests.get(self.url, stream=True, timeout=15)
@@ -49,7 +50,6 @@ class GithubDownloaderThread(QRunnable):
                     downloaded_size += len(data)
                     progress = 100*downloaded_size / total_size
                     self.on_progress.emit(int(progress))
-                    print(progress==100.0)
             self.on_finished.emit(True if progress == 100.0 else False)
 
         except requests.exceptions.ConnectionError:

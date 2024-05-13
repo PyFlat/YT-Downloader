@@ -21,10 +21,6 @@ class Downloader():
     def __init__(self, thread_manager: ThreadManager) -> None:
         self.thread_manager = thread_manager
         self.yt_dlp = None
-        try:
-            self.yt_dlp = __import__("yt_dlp")
-        except ModuleNotFoundError:
-            pass
     def get_playlist_info(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)
     def get_video_info(self, url: str, callback: callable) -> None:
@@ -45,7 +41,7 @@ class Downloader():
                         continue
                 self.download_video(entry["url"],f"{outfile_path}{data['title']}/",ffmpeg_path, resolution)
         self.get_playlist_info(url, on_info_recieve)
-    def updateFFmpeg(self, parent, progress_callback: object | None = None, finish_callback: object | None = None):
+    def updateFFmpeg(self, progress_callback: object | None = None, finish_callback: object | None = None):
         def on_finish(ok):
             if not ok:
                 if finish_callback != None:
@@ -60,20 +56,21 @@ class Downloader():
             os.remove("appdata/ffmpeg.zip")
             if finish_callback != None:
                 finish_callback(ok)
-        self.thread_manager.runTask(parent, GithubDownloaderThread("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress_callback, on_finish), True)
+        self.thread_manager.runTask(
+            GithubDownloaderThread("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress_callback, on_finish), True)
     def importYtldp(self, path: str):
         yt_dlp_zipimporter = zipimport.zipimporter(path)
         self.yt_dlp = yt_dlp_zipimporter.load_module('yt_dlp')
     def updateYtdlp(self, progress_callback: object | None = None, finish_callback: object | None = None):
-        def on_finish(ok):
+        def on_finish_(ok):
             if not ok:
                 if finish_callback != None:
                     finish_callback(ok)
                 return
-            self.importYtldp('appdata/yt-dlp')
+            self.importYtldp('appdata/yt_dlp')
             if finish_callback != None:
                 finish_callback(ok)
-        self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", "appdata/yt_dlp",progress_callback,on_finish),True)
+        self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", "appdata/yt_dlp",progress_callback,on_finish_),True)
 if __name__ == "__main__":
     import sys
     from PySide6.QtCore import QCoreApplication, QTimer, QThread

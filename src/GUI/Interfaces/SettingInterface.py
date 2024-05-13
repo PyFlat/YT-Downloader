@@ -12,7 +12,6 @@ from src.GUI.Stylesheet.StyleSheet import StyleSheet
 from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
 from src.DownloaderCore.Downloader import Downloader
 import os
-from yt_dlp import version
 
 class SettingInterface(ScrollArea):
 
@@ -64,7 +63,7 @@ class SettingInterface(ScrollArea):
             "Update",
             CustomIcons.YOUTUBE2,
             "Download the latest version of yt-dlp",
-            f"Current version: {version.__version__}",
+            f"Current version: ",
             parent = self.downloaderGroup
         )
 
@@ -140,15 +139,24 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.downloaderGroup)
         self.expandLayout.addWidget(self.applicationGroup)
 
-    def __showDownloadTooltip(self):
+    def __showDownloadDialog(self, ffmpeg:bool=True):
         msg = DownloadMessageBox(self)
+        def updateProgress(progress):
+            msg.ProgressRing.setValue(progress)
         def finish(success):
-            msg.accept()
+            msg.hide()
+            InfoBar.success(
+                'Succesfull:',
+                'Yt-dlp was installed succesfully',
+                duration=2500,
+                parent=self
+            )
+            self.updateYtDlpCard.setContent(f"Current version: {self.downloader.yt_dlp.version.__version__}")
         msg.show()
-        def cb(*args):
-            print(*args)
-        self.downloader.updateFFmpeg(self, cb, cb)
-
+        if ffmpeg:
+            self.downloader.updateFFmpeg(updateProgress, finish)
+        else:
+            self.downloader.updateYtdlp(updateProgress, finish)
 
     def __showNoFFmpegTooltip(self):
         InfoBar.error(
@@ -190,5 +198,8 @@ class SettingInterface(ScrollArea):
         )
 
         self.downloadFFmpegCard.clicked.connect(
-            self.__showDownloadTooltip
+            self.__showDownloadDialog
+        )
+        self.updateYtDlpCard.clicked.connect(
+            lambda: self.__showDownloadDialog(False)
         )
