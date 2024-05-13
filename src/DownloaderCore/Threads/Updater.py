@@ -2,25 +2,21 @@ from PySide6.QtCore import QRunnable, Signal, QObject
 from urllib.request import urlopen
 from urllib.error import URLError
 import requests, os, shutil
-# try:
-#     from src.DownloaderCore.Threads.Signal import Signal
-# except ModuleNotFoundError:
-#     from Signal import Signal
 
 VERSION = '2.0.0'
-class UpdateCheckerThread(QRunnable):
+class UpdateCheckerThread(QObject, QRunnable):
+    on_update_avaliable = Signal(bool, str)
     def __init__(self):
         super().__init__()
-        self.on_update_avaliable = Signal(bool, str)
     def run(self):
         try:
             f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
         except URLError:
-            self.update_available.emit(False, "no_connection")
+            self.on_update_available.emit(False, "no_connection")
             return
         tag = f.split("/")[-1]
         if VERSION < tag[1:]:
-            self.update_available.emit(True, tag[1:])
+            self.on_update_available.emit(True, tag[1:])
 
 class GithubDownloaderThread(QObject, QRunnable):
     on_progress = Signal(int)

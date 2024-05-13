@@ -1,14 +1,10 @@
-from PySide6.QtCore import QRunnable
-try:
-    from src.DownloaderCore.Threads.Signal import Signal
-except ModuleNotFoundError:
-    from Threads.Signal import Signal
+from PySide6.QtCore import QRunnable, Signal, QObject
 
-class InformationLoadThread(QRunnable):
+class InformationLoadThread(QObject, QRunnable):
+    __on_finish = Signal(dict, str)
     def __init__(self, yt_dlp: object, url: str, all_playlist: bool, finished_callback: object) -> None:
         super().__init__()
         self.yt_dlp = yt_dlp
-        self.__on_finish = Signal(dict, str)
         self.__url = url
         self.__all_playlist = all_playlist
         self.__on_finish.connect(finished_callback)
