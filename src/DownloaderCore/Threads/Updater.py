@@ -6,8 +6,9 @@ import requests, os, shutil
 VERSION = '2.0.0'
 class UpdateCheckerThread(QObject, QRunnable):
     on_update_avaliable = Signal(bool, str)
-    def __init__(self):
+    def __init__(self, callback):
         super().__init__()
+        self.on_update_avaliable.connect(callback)
     def run(self):
         try:
             f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
@@ -17,6 +18,8 @@ class UpdateCheckerThread(QObject, QRunnable):
         tag = f.split("/")[-1]
         if VERSION < tag[1:]:
             self.on_update_available.emit(True, tag[1:])
+        else:
+            self.on_update_avaliable.emit(False, "already_up_to_date")
 
 class GithubDownloaderThread(QObject, QRunnable):
     on_progress = Signal(int)
