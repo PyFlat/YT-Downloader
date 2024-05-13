@@ -80,7 +80,9 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        self.resize(715, 526)
+        self.resize(800, 550)
+        self.setMinimumSize(800, 550)
+
         self.setWindowIcon(QIcon("src/GUI/app-icon.ico"))
         self.setWindowTitle('PyFlat YouTube Downloader')
 

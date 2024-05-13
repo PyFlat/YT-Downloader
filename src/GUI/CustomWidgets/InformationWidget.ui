@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
+    <width>728</width>
     <height>420</height>
    </rect>
   </property>
@@ -44,7 +44,7 @@
       <item>
        <widget class="TitleLabel" name="TitleLabel">
         <property name="text">
-         <string>Paris Saint-Germain - Borussia Dortmund | UEFA Champions League 2023/24, Halbfinale | sportstudio</string>
+         <string> Rick Astley - Never Gonna Give You Up (Official Music Video) </string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -60,14 +60,14 @@
      </layout>
     </widget>
    </item>
-   <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+   <item alignment="Qt::AlignLeft|Qt::AlignTop">
     <widget class="QWidget" name="widget_4" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>15</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>15</number>
       </property>
       <property name="topMargin">
        <number>0</number>

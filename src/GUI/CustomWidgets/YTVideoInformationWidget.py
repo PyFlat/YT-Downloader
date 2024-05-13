@@ -75,6 +75,7 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.BodyLabel_4.setText(upload_date)
 
+
     def fetchThumbnailFromUrl(self, url):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.setThumbnail(response))
