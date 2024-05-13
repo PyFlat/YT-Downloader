@@ -4,7 +4,6 @@ try:
     from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
     from src.DownloaderCore.Threads.ThreadManager import ThreadManager
     from src.DownloaderCore.Threads.Container import Container
-    from src.DownloaderCore.Threads.Signal import Signal
     from src.DownloaderCore.Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
 except:
     from Threads.VideoDownloadThread import VideoDownloadThread
@@ -22,11 +21,12 @@ class Downloader():
         self.thread_manager = thread_manager
         self.yt_dlp_path = yt_dlp_path
         self.yt_dlp = None
-        try:
-            self.yt_dlp = __import__("yt_dlp")
-        except ModuleNotFoundError:
-            if os.path.isfile(self.yt_dlp_path):
-                self.importYtldp(self.yt_dlp_path)
+        # try:
+        #     pass
+        #     self.yt_dlp = __import__("yt_dlp")
+        # except ModuleNotFoundError:
+        if os.path.isfile(self.yt_dlp_path):
+            self.importYtldp(self.yt_dlp_path)
 
     def get_playlist_info(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)

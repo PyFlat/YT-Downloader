@@ -139,19 +139,36 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.downloaderGroup)
         self.expandLayout.addWidget(self.applicationGroup)
 
+    def update_ytdlp_version(self):
+        if self.downloader.yt_dlp:
+            self.updateYtDlpCard.setContent(f"Current version: {self.downloader.yt_dlp.version.__version__}")
+
     def __showDownloadDialog(self, ffmpeg:bool=True):
         msg = DownloadMessageBox(self)
         def updateProgress(progress):
             msg.ProgressRing.setValue(progress)
         def finish(success):
             msg.hide()
-            InfoBar.success(
-                'Succesfull:',
-                'Yt-dlp was installed succesfully',
-                duration=2500,
-                parent=self
-            )
-            self.updateYtDlpCard.setContent(f"Current version: {self.downloader.yt_dlp.version.__version__}")
+            if ffmpeg:
+                text = "FFmpeg"
+            else:
+                text = "yt-dlp"
+                self.update_ytdlp_version()
+            if success:
+                InfoBar.success(
+                    'Succes:',
+                    f'{text} was downloaded and installed succesfully',
+                    duration=2500,
+                    parent=self
+                )
+            else:
+                InfoBar.error(
+                    'Error:',
+                    f'Some error occured when downloading {text}. Download not succesfull.',
+                    duration=2500,
+                    parent=self
+                )
+
         msg.show()
         if ffmpeg:
             self.downloader.updateFFmpeg(updateProgress, finish)
