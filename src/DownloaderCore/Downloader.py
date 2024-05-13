@@ -20,6 +20,10 @@ class Downloader():
     def __init__(self, thread_manager: ThreadManager) -> None:
         self.thread_manager = thread_manager
         self.yt_dlp = None
+        try:
+            self.yt_dlp = __import__("yt_dlp")
+        except ModuleNotFoundError:
+            pass
     def get_playlist_info(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)
     def get_video_info(self, url: str, callback: callable) -> None:
