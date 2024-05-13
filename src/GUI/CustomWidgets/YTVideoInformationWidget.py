@@ -38,9 +38,6 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.PushButton.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
-
-        print(self.size())
-
     def download_video(self):
         self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b")
 
