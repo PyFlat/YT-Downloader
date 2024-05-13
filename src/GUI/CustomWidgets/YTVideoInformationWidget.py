@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QPixmap, QImage, QColor, QPainter
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from qfluentwidgets import TeachingTip, TeachingTipTailPosition, isDarkTheme, TeachingTipView, PushButton
+from qfluentwidgets import TeachingTip, TeachingTipTailPosition, isDarkTheme, TeachingTipView, PushButton, Flyout, FlyoutView
 from src.DownloaderCore.Downloader import Downloader
 from src.Config.Config import cfg
 import json
@@ -105,11 +105,9 @@ class YTVideoInformationWidget(InformationWidget):
         self.widget_8.setGraphicsEffect(shadow_effect)
 
     def showFlyout(self):
-        position = TeachingTipTailPosition.BOTTOM
-        view = TeachingTipView(
+        self.view = FlyoutView(
             title = "",
             content="",
-            isClosable=True
         )
 
         button = PushButton('Video')
@@ -120,19 +118,17 @@ class YTVideoInformationWidget(InformationWidget):
         button1.setIcon(self.best_audio_btn.icon())
         button1.setFixedWidth(120)
 
-        view.addWidget(button, align=Qt.AlignRight)
-        view.addWidget(button1, align=Qt.AlignRight)
+        self.view.addWidget(button, align=Qt.AlignRight)
+        self.view.addWidget(button1, align=Qt.AlignRight)
 
         button.clicked.connect(self.download_video)
 
-        w = TeachingTip.make(
+        Flyout.make(
             target=self.quick_dl_btn,
-            view=view,
-            duration=-1,
-            tailPosition=position,
+            view=self.view,
             parent=self.parent()
         )
-        view.closed.connect(w.close)
+
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())

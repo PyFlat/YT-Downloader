@@ -4,13 +4,16 @@ from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
                             OptionsSettingCard, PushSettingCard,
                             InfoBar, SwitchSettingCard,
                             setTheme, RangeSettingCard,
-                            ComboBoxSettingCard)
+                            ComboBoxSettingCard, HyperlinkCard,
+                            PrimaryPushSettingCard, MessageBox)
 from qfluentwidgets import FluentIcon as FIF
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
+from PySide6.QtGui import QDesktopServices
 from src.GUI.Stylesheet.StyleSheet import StyleSheet
 from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
 from src.DownloaderCore.Downloader import Downloader
+from src.version import VERSION
 import os
 
 class SettingInterface(ScrollArea):
@@ -100,6 +103,31 @@ class SettingInterface(ScrollArea):
             parent = self.applicationGroup
         )
 
+        self.helpCard = HyperlinkCard(
+            "https://github.com/PyFlat/YT-Downloader",
+            "Open help page",
+            FIF.HELP,
+            "Help",
+            "Find help and discover new features about PyFlat YouTube Downloader",
+            self.applicationGroup
+        )
+
+        self.feedbackCard = PrimaryPushSettingCard(
+            "Provide feedback",
+            FIF.FEEDBACK,
+            "Provide feedback",
+            "Help us improve PyFlat YouTube Downloader by providing feedback",
+            self.applicationGroup
+        )
+
+        self.aboutCard = PrimaryPushSettingCard(
+            "Check update",
+            FIF.INFO,
+            "About",
+            f"©2024, PyFlat, Version {VERSION}",
+            self.applicationGroup
+        )
+
         self.__initWidget()
 
     def __initWidget(self):
@@ -131,6 +159,9 @@ class SettingInterface(ScrollArea):
 
         self.applicationGroup.addSettingCard(self.updateOnStartCard)
         self.applicationGroup.addSettingCard(self.logLevelCard)
+        self.applicationGroup.addSettingCard(self.helpCard)
+        self.applicationGroup.addSettingCard(self.feedbackCard)
+        self.applicationGroup.addSettingCard(self.aboutCard)
 
         self.expandLayout.setSpacing(28)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
@@ -204,6 +235,36 @@ class SettingInterface(ScrollArea):
         else:
             self.ffmpegPathCard.setContent(folder)
 
+    def __updateApplication(self):
+        msg = DownloadMessageBox(self)
+
+        def updateAvailableDialog(success, tag, automatic_call):
+            msgb = MessageBox("Search for updates", "", self)
+            msgb.cancelButton.hide()
+            if tag == "no_release_version" and not automatic_call:
+                text = "You already are on a non-released beta version!"
+            elif tag == "already_up_to_date" and not automatic_call:
+                text = "You already are on the latest version!"
+            else:
+
+                msgb.titleLabel.setText("New update available!")
+                text = f"Current version: {VERSION}\nNew version: {tag}\nInstall it?"
+                msgb.cancelButton.show()
+            msgb.contentLabel.setText(text)
+            if msgb.exec():
+                if success:
+                    msg.show()
+                return True
+            else:
+                return False
+
+        def updateProgress(progress):
+            msg.ProgressRing.setValue(progress)
+        def finish(success):
+            MessageBox("Download completed", "The app has to close to perform the update!", self).exec()
+
+        self.downloader.updateApplication(updateProgress, finish, updateAvailableDialog, True, self.parent())
+
     def connectSignalToSlot(self):
 
         self.themeCard.optionChanged.connect(lambda ci: setTheme(cfg.get(ci)))
@@ -225,4 +286,11 @@ class SettingInterface(ScrollArea):
 
         self.maxDlThreads.slider.valueChanged.connect(
             self.downloader.thread_manager.setMaxThreadCount
+        )
+
+        self.feedbackCard.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl("https://github.com/PyFlat/YT-Downloader/issues")))
+
+        self.aboutCard.clicked.connect(
+            self.__updateApplication
         )

@@ -13,7 +13,10 @@ except:
     from Threads.Container import Container
     from Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
 
-import sys, os, zipfile, zipimport
+import subprocess
+import sys, os, zipfile, zipimport, time
+from PySide6.QtWidgets import QWidget, QApplication
+from PySide6.QtCore import QProcess, QDir
 TM = ThreadManager(10)
 
 class Downloader():
@@ -79,10 +82,10 @@ class Downloader():
                 finish_callback(ok)
         self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", self.yt_dlp_path,progress_callback,on_finish_),True)
     #update_check_callback: (bool, str) -> bool dowload_finish_callback: (bool) -> any downlaod_progress_callback: (int) -> None
-    def updateApplication(self, download_finish_callback = None, download_progress_callback = None, update_check_callback = None):
+    def updateApplication(self, download_progress_callback = None, download_finish_callback = None, update_check_callback = None, automatic_call = False, main_window:QWidget = None):
         def on_update_check(success, tag):
             if update_check_callback != None:
-                response = update_check_callback(success, tag)
+                response = update_check_callback(success, tag, automatic_call)
                 if not response:
                     return
             if not success:
@@ -90,14 +93,15 @@ class Downloader():
             def on_download_finish(success):
                 if download_finish_callback != None:
                     wait = download_finish_callback(success)
-                os.popen(f"start appdata/win_installer_v{tag}.exe")
-                sys.exit(0)
+                file = r"C:\Users\Johannes\Documents\Github\YT-Downloader\appdata\win_installer_v1.3.3.exe"
+                QProcess.startDetached(file)
+                QApplication.quit()
             self.thread_manager.runTask(GithubDownloaderThread(f"https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest/download/win_installer_v{tag}.exe", f"appdata/win_installer_v{tag}.exe",download_progress_callback,on_download_finish),True)
         self.thread_manager.runTask(UpdateCheckerThread(on_update_check),True)
-                
-                
 
-            
+
+
+
 if __name__ == "__main__":
     import sys
     from PySide6.QtCore import QCoreApplication, QTimer, QThread

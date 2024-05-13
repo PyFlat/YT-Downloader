@@ -2,13 +2,13 @@ from PySide6.QtCore import QRunnable, Signal, QObject
 from urllib.request import urlopen
 from urllib.error import URLError
 import requests, os, shutil
+from src.version import VERSION
 
-VERSION = '2.0.0'
 class UpdateCheckerThread(QObject, QRunnable):
-    on_update_avaliable = Signal(bool, str)
+    on_update_available = Signal(bool, str)
     def __init__(self, callback):
         super().__init__()
-        self.on_update_avaliable.connect(callback)
+        self.on_update_available.connect(callback)
     def run(self):
         try:
             f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
@@ -18,8 +18,10 @@ class UpdateCheckerThread(QObject, QRunnable):
         tag = f.split("/")[-1]
         if VERSION < tag[1:]:
             self.on_update_available.emit(True, tag[1:])
+        elif VERSION == tag[1:]:
+            self.on_update_available.emit(False, "already_up_to_date")
         else:
-            self.on_update_avaliable.emit(False, "already_up_to_date")
+            self.on_update_available.emit(False, "no_release_version")
 
 class GithubDownloaderThread(QObject, QRunnable):
     on_progress = Signal(int)
