@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 class CustomFilter(logging.Filter):
     def __init__(self):
         super().__init__()
-        self.strings_to_filter = ["📢", "one painter at a time", "Painter not active"]
+        self.strings_to_filter = ["📢", "aQvGIIdgFDM"]
 
     def filter(self, record):
         for string_to_filter in self.strings_to_filter:

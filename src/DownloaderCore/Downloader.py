@@ -28,12 +28,12 @@ class Downloader():
         if os.path.isfile(self.yt_dlp_path):
             self.importYtldp(self.yt_dlp_path)
 
-    def get_playlist_info(self, url: str, callback: callable) -> None:
+    def getPlaylistInfo(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)
-    def get_video_info(self, url: str, callback: callable) -> None:
+    def getVideoInfo(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, False, callback), force=True)
-    def download_video(self, url: str, outfile_path: str, ffmpeg_path: str, resolution: int):
-        self.thread_manager.runTask(YoutubeVideoDownloadThread(self.yt_dlp, url,f"bv[height<={resolution}]+ba[ext=m4a]/b",ffmpeg_path,f"{outfile_path}/%(title)s(%(height)sp).%(ext)s","mp4"))
+    def downloadVideo(self, url: str, outfile_path: str, ffmpeg_path: str, format: str):
+        self.thread_manager.runTask(YoutubeVideoDownloadThread(self.yt_dlp, url,format,ffmpeg_path,f"{outfile_path}/%(title)s(%(height)sp).%(ext)s","mp4"))
     def download_playlist(self, url: str, outfile_path: str, ffmpeg_path: str, resolution: int, playlist_range: tuple[int, int] | None = None):
         def on_info_recieve(data, url):
             if data == {}:

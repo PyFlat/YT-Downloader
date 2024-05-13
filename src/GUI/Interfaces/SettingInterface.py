@@ -93,7 +93,7 @@ class SettingInterface(ScrollArea):
 
         self.logLevelCard = ComboBoxSettingCard(
             cfg.log_level,
-            FIF.QUICK_NOTE,
+            FIF.LABEL,
             "Log Level",
             "Set your preferred log-level",
             texts = ["Info", "Debug"],
@@ -219,4 +219,8 @@ class SettingInterface(ScrollArea):
         )
         self.updateYtDlpCard.clicked.connect(
             lambda: self.__showDownloadDialog(False)
+        )
+
+        self.maxDlThreads.slider.valueChanged.connect(
+            self.downloader.thread_manager.setMaxThreadCount
         )

@@ -33,7 +33,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="LineEdit" name="LineEdit"/>
+       <widget class="LineEdit" name="LineEdit">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>Enter the URL of the video or playlist, or type in a search term.</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="PushButton" name="PushButton">
@@ -53,7 +60,25 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="page"/>
+     <widget class="QWidget" name="page">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_2"/>
     </widget>
    </item>

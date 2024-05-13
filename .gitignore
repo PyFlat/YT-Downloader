@@ -21,3 +21,5 @@ FFmpeg/
 env/
 
 v2.0.0/
+
+config.json

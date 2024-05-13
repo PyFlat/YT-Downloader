@@ -15,9 +15,11 @@ from qfluentwidgets import FluentIcon as FIF
 
 from src.GUI.Interfaces.MainInterface import MainInterface
 from src.GUI.Interfaces.SettingInterface import SettingInterface
+from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
 
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
 from src.DownloaderCore.Downloader import Downloader
+
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -25,6 +27,8 @@ class MainWindow(FluentWindow):
         self.initWindow()
 
         self.main_interface = MainInterface(self)
+        self.main_interface.PushButton.setShortcut(QKeySequence(Qt.Key_Return))
+        self.main_interface.PushButton.clicked.connect(self.searchByUrl)
 
         self.setting_interface = SettingInterface(self, downloader)
 
@@ -33,6 +37,12 @@ class MainWindow(FluentWindow):
         self.splashScreen.finish()
 
         self.checkForYtdlp()
+
+    def searchByUrl(self):
+        def callback(result, url):
+            testWidget = YTVideoInformationWidget(self, result, downloader)
+            self.main_interface.page.layout().addWidget(testWidget)
+        downloader.getVideoInfo(self.main_interface.LineEdit.text(), callback)
 
     def showDialog(self):
         title = "yt-dlp not found"
@@ -58,7 +68,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        self.resize(800, 500)
+        self.resize(900, 526)
         self.setWindowTitle('PyFlat YouTube Downloader')
 
         self.splashScreen = SplashScreen(self.windowIcon(), self)

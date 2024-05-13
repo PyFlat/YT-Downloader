@@ -82,6 +82,9 @@ class ThreadManager():
         return uid
     def getMaxThreadCount(self) -> int:
         return self.__maxthreads
+    def setMaxThreadCount(self, count: int) -> None:
+        self.__maxthreads = count
+        self.__pool.setMaxThreadCount(count)
     def getRunningThreadCount(self, force : bool = False) -> int:
         if force:
             return len(self.__threads_forced)

@@ -15,18 +15,18 @@ class VideoDownloadThread(QObject, QRunnable):
         self.__download_options = options
     def _finish_hook(self, result):
         if result["status"] == "started":
-            self.__on_finish.emit("Postprocessing started", "")
+            self.__on_progress.emit("Postprocessing started", "")
         else:
-            self.__on_finish.emit("Postprocessing finished", "")
+            self.__on_progress.emit("Postprocessing finished", "")
     def _progress_hook(self, result):
         if self.__is_cancled:
             from yt_dlp.utils import DownloadError
             raise DownloadError("Cancelled by user")
-        
+
         self.__progress_counter += 1
         if self.__progress_counter % 20 != 0:
             return
-        
+
         match(result["status"]):
             case "downloading":
                 downloaded_bytes = float(result["downloaded_bytes"])
