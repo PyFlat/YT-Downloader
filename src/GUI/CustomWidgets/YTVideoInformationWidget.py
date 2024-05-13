@@ -23,8 +23,8 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.fetchThumbnailFromUrl(self.thumbnail_url)
 
-        with open("data.json", "w") as f:
-            json.dump(self.info, f)
+        # with open("data.json", "w") as f:
+        #     json.dump(self.info, f)
 
         self.setIcons()
 
