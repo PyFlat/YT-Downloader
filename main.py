@@ -36,6 +36,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
+        self.resize(800, 500)
         self.setWindowTitle('PyFlat YouTube Downloader')
 
         self.splashScreen = SplashScreen(self.windowIcon(), self)

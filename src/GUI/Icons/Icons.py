@@ -11,6 +11,7 @@ class CustomIcons(FluentIconBase, Enum):
     VIDEO = "video"
     WRITE = "write"
     YOUTUBE = "youtube"
+    YOUTUBE2 = "youtube2"
 
     def path(self, theme=Theme.AUTO):
         return f'src/GUI/Icons/icons_{getIconColor(theme)}/{self.value}_{getIconColor(theme)}.svg'

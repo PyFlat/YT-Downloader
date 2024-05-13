@@ -4,12 +4,14 @@ from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
                             OptionsSettingCard, PushSettingCard,
                             InfoBar, SwitchSettingCard,
                             setTheme, RangeSettingCard,
-                            ComboBoxSettingCard)
+                            ComboBoxSettingCard, StateToolTip)
 from qfluentwidgets import FluentIcon as FIF
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
 from src.GUI.Stylesheet.StyleSheet import StyleSheet
+from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
 import os
+from yt_dlp import version
 
 class SettingInterface(ScrollArea):
 
@@ -49,6 +51,21 @@ class SettingInterface(ScrollArea):
             self.downloaderGroup
         )
 
+        self.downloadFFmpegCard = PushSettingCard(
+            "Download",
+            CustomIcons.FFMPEG,
+            "Download the latest FFmpeg version",
+            parent = self.downloaderGroup
+        )
+
+        self.updateYtDlpCard = PushSettingCard(
+            "Update",
+            CustomIcons.YOUTUBE2,
+            "Download the latest version of yt-dlp",
+            f"Current version: {version.__version__}",
+            parent = self.downloaderGroup
+        )
+
         self.maxDlThreads = RangeSettingCard(
             cfg.maximum_download_threads,
             FIF.SPEED_HIGH,
@@ -85,7 +102,6 @@ class SettingInterface(ScrollArea):
         self.__initWidget()
 
     def __initWidget(self):
-        self.resize(1000, 800)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setViewportMargins(0, 80, 0, 20)
         self.setWidget(self.scrollWidget)
@@ -107,6 +123,8 @@ class SettingInterface(ScrollArea):
 
         self.downloaderGroup.addSettingCard(self.downloadFolderCard)
         self.downloaderGroup.addSettingCard(self.ffmpegPathCard)
+        self.downloaderGroup.addSettingCard(self.downloadFFmpegCard)
+        self.downloaderGroup.addSettingCard(self.updateYtDlpCard)
         self.downloaderGroup.addSettingCard(self.maxDlThreads)
         self.downloaderGroup.addSettingCard(self.thumbnailStreamingCard)
 
@@ -119,6 +137,10 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.downloaderGroup)
         self.expandLayout.addWidget(self.applicationGroup)
+
+    def __showDownloadTooltip(self):
+        msg = DownloadMessageBox(self)
+        #msg.exec()
 
     def __showNoFFmpegTooltip(self):
         InfoBar.error(
@@ -157,4 +179,8 @@ class SettingInterface(ScrollArea):
 
         self.ffmpegPathCard.clicked.connect(
             lambda: self.__onDownloadFolderCardClicked(True)
+        )
+
+        self.downloadFFmpegCard.clicked.connect(
+            self.__showDownloadTooltip
         )
