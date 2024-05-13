@@ -7,7 +7,7 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
         MP3 = "mp3"
         MP4 = "mp4"
         SUPPORTED = [MP3,MP4]
-    def __init__(self, url: str, format: str, ffmpeg_path: str, output_template: str, extension: str = EXTENSIONS.MP4,  finished_callback: object | None = None, progress_callback: object | None = None) -> None:
+    def __init__(self, yt_dlp: object, url: str, format: str, ffmpeg_path: str, output_template: str, extension: str = EXTENSIONS.MP4,  finished_callback: object | None = None, progress_callback: object | None = None) -> None:
         if not extension in YoutubeVideoDownloadThread.EXTENSIONS.SUPPORTED:
             raise ValueError(f"Provided extension {extension} does not match with the supported extensions {str(YoutubeVideoDownloadThread.EXTENSIONS.SUPPORTED)}!")
         match (extension):
@@ -44,4 +44,4 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
                 }
             case other:
                 raise ValueError("You messed up terribly. You should not get this error. Good Luck!")
-        super().__init__(url, options, finished_callback, progress_callback)
+        super().__init__(yt_dlp, url, options, finished_callback, progress_callback)

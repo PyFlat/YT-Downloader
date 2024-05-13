@@ -5,8 +5,9 @@ except ModuleNotFoundError:
     from Threads.Signal import Signal
 
 class InformationLoadThread(QRunnable):
-    def __init__(self, url: str, all_playlist: bool, finished_callback: object) -> None:
+    def __init__(self, yt_dlp: object, url: str, all_playlist: bool, finished_callback: object) -> None:
         super().__init__()
+        self.yt_dlp = yt_dlp
         self.__on_finish = Signal(dict, str)
         self.__url = url
         self.__all_playlist = all_playlist
@@ -18,18 +19,11 @@ class InformationLoadThread(QRunnable):
                     }
         if not self.__all_playlist:
             options["playlist_items"] = "0"
-        try:
-            from yt_dlp import YoutubeDL
-            from yt_dlp.utils import DownloadError
-        except ModuleNotFoundError:
-            print("Youtube-dlp has not been found. Have you forgot to install it?")
-            self.__on_finish.emit({"error":"yt-dl-not-found"}, self.__url)
-            return
-        ydl = YoutubeDL(options)
+        ydl = self.yt_dlp.YoutubeDL(options)
         try:
             inf = ydl.extract_info(self.__url, False)
             result = ydl.sanitize_info(inf)
-        except DownloadError as e:
+        except self.yt_dlp.DownloadError as e:
             result = {}
             if "urlopen error" in e.msg:
                 #connection error

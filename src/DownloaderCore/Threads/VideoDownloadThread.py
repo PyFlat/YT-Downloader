@@ -4,8 +4,9 @@ try:
 except:
     from Threads.Signal import Signal
 class VideoDownloadThread(QRunnable):
-    def __init__(self, url: str = "https://www.youtube.com/watch?v=HBEsr0MfdmQ", options : dict[str, object] = {}, finished_callback: object| None = None, progress_callback: object | None = None) -> None:
+    def __init__(self, yt_dlp: object, url: str = "https://www.youtube.com/watch?v=HBEsr0MfdmQ", options : dict[str, object] = {}, finished_callback: object| None = None, progress_callback: object | None = None) -> None:
         super().__init__()
+        self.yt_dlp = yt_dlp
         self.__on_finish = Signal(bool)
         if finished_callback != None:
             self.__on_finish.connect(finished_callback)
@@ -51,15 +52,8 @@ class VideoDownloadThread(QRunnable):
                 self.__on_progress.emit(f"Unknown status {result['status']}","")
     def run(self):
         try:
-            from yt_dlp import YoutubeDL
-            from yt_dlp.utils import DownloadError
-        except ModuleNotFoundError:
-            print("Youtube-dlp has not been found. Have you forgot to install it?")
-            self.__on_finish.emit(False)
-            return
-        try:
-            YoutubeDL(self.__download_options).download(self.__url)
-        except DownloadError as download_error:
+            self.yt_dlp.YoutubeDL(self.__download_options).download(self.__url)
+        except self.yt_dlp.DownloadError as download_error:
             if "urlopen error" in download_error.msg or "The read operation timed out" in download_error.msg:
                 pass#Network error
             elif "Cancelled by user" in download_error.msg:
