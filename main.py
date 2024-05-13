@@ -69,6 +69,7 @@ class MainWindow(FluentWindow):
 
     def initWindow(self):
         self.resize(900, 526)
+        self.setWindowIcon(QIcon("src/GUI/app-icon.ico"))
         self.setWindowTitle('PyFlat YouTube Downloader')
 
         self.splashScreen = SplashScreen(self.windowIcon(), self)
