@@ -5,6 +5,7 @@ try:
     from src.DownloaderCore.Threads.ThreadManager import ThreadManager
     from src.DownloaderCore.Threads.Container import Container
     from src.DownloaderCore.Threads.Signal import Signal
+    from src.DownloaderCore.Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
 except:
     from Threads.VideoDownloadThread import VideoDownloadThread
     from Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
@@ -44,7 +45,7 @@ class Downloader():
                         continue
                 self.download_video(entry["url"],f"{outfile_path}{data['title']}/",ffmpeg_path, resolution)
         self.get_playlist_info(url, on_info_recieve)
-    def updateFFmpeg(self, progress_callback: object | None = None, finish_callback: object | None = None):
+    def updateFFmpeg(self, parent, progress_callback: object | None = None, finish_callback: object | None = None):
         def on_finish(ok):
             if not ok:
                 if finish_callback != None:
@@ -59,7 +60,7 @@ class Downloader():
             os.remove("appdata/ffmpeg.zip")
             if finish_callback != None:
                 finish_callback(ok)
-        self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress_callback, on_finish), True)
+        self.thread_manager.runTask(parent, GithubDownloaderThread("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip", "appdata/ffmpeg.zip", progress_callback, on_finish), True)
     def importYtldp(self, path: str):
         yt_dlp_zipimporter = zipimport.zipimporter(path)
         self.yt_dlp = yt_dlp_zipimporter.load_module('yt_dlp')

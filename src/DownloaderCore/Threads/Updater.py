@@ -23,7 +23,7 @@ class UpdateCheckerThread(QRunnable):
             self.update_available.emit(True, tag[1:])
 
 class GithubDownloaderThread(QRunnable):
-    
+
 
     def __init__(self, url: str, save_path: str, progress_callback: object | None = None, finished_callback: object | None = None):
         super().__init__()
@@ -47,8 +47,9 @@ class GithubDownloaderThread(QRunnable):
                 for data in response.iter_content(chunk_size=4096):
                     file.write(data)
                     downloaded_size += len(data)
-                    progress = downloaded_size / total_size * 100
-                    self.on_progress.emit(progress)
+                    progress = 100*downloaded_size / total_size
+                    self.on_progress.emit(int(progress))
+                    print(progress==100.0)
             self.on_finished.emit(True if progress == 100.0 else False)
 
         except requests.exceptions.ConnectionError:

@@ -16,6 +16,12 @@ from qfluentwidgets import FluentIcon as FIF
 from src.GUI.Interfaces.MainInterface import MainInterface
 from src.GUI.Interfaces.SettingInterface import SettingInterface
 
+from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+from src.DownloaderCore.Downloader import Downloader
+
+thread_manager = ThreadManager(10)
+downloader = Downloader(thread_manager)
+
 class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
@@ -23,7 +29,7 @@ class MainWindow(FluentWindow):
 
         self.main_interface = MainInterface(self)
 
-        self.setting_interface = SettingInterface(self)
+        self.setting_interface = SettingInterface(self, downloader)
 
         self.initNavigation()
 

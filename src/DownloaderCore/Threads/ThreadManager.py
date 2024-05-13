@@ -7,19 +7,19 @@ class UID():
         return UID.__i
     def max():
         return UID.__i
-    
+
 class ThreadWorker(QThread):
     __on_start_callback = Signal(int)
     __on_finish_callback = Signal(int)
-    def __init__(self, thread: QRunnable, uid: int, finish_callback: object | None = None, start_callback: object | None = None) -> None:
-        super().__init__()
+    def __init__(self, parent, thread: QRunnable, uid: int, finish_callback: object | None = None, start_callback: object | None = None) -> None:
+        super().__init__(parent)
         if start_callback != None:
             self.__on_start_callback.connect(start_callback)
         if finish_callback != None:
             self.__on_finish_callback.connect(finish_callback)
         self.__thread = thread
         self.__uid = uid
-        
+
     def run(self):
         if self.__on_start_callback != None:
             self.__on_start_callback.emit(self.__uid)
@@ -28,15 +28,15 @@ class ThreadWorker(QThread):
             self.__on_finish_callback.emit(self.__uid)
 class RunnableWrapper(QRunnable):
     __on_start_callback = Signal(int)
-    def __init__(self, thread: QRunnable, uid: int, finish_callback: object | None = None, start_callback: object | None = None) -> None:
-        super().__init__()
+    def __init__(self, parent, thread: QRunnable, uid: int, finish_callback: object | None = None, start_callback: object | None = None) -> None:
+        super().__init__(parent)
         self.__on_start_callback = start_callback
         self.__on_finish_callback = finish_callback
         self.__thread = thread
         self.__uid = uid
         self.__on_finish_callback = finish_callback
         self.__on_start_callback = start_callback
-        
+
     def run(self):
         if self.__on_start_callback != None:
             self.__on_start_callback(self.__uid)
@@ -57,7 +57,7 @@ class ThreadManager():
         self.__executed_tasks: list[int] = [0]*self.__MAX_EXECUTED_TASK_TRACKING
         self.__current_tracking_index = 0
         #Tracks the state of a task {uid: (state, forced)} forced: 0 => waiting, 1 => running, 2 => finished
-        
+
     def __start(self, uid: int) -> None:
         pass #Optional for logging
     def __finish(self, uid: int) -> None:
@@ -65,18 +65,18 @@ class ThreadManager():
             self.__threads_pool.pop(str(uid))
         else:
             self.__threads_forced.pop(str(uid))
-    def runTask(self, task : QRunnable, force: bool = False) -> int:
+    def runTask(self, parent, task : QRunnable, force: bool = False) -> int:
         uid = UID.get()
-        
+
         self.__executed_tasks[self.__current_tracking_index] = uid
         self.__current_tracking_index = (self.__current_tracking_index+1)%self.__MAX_EXECUTED_TASK_TRACKING
 
         if force:
-            worker = ThreadWorker(task, uid, self.__finish, self.__start)
+            worker = ThreadWorker(parent, task, uid, self.__finish, self.__start)
             self.__threads_forced[str(uid)] = worker
             worker.start()
         else:
-            worker = RunnableWrapper(task, uid, self.__finish, self.__start)
+            worker = RunnableWrapper(parent, task, uid, self.__finish, self.__start)
             self.__threads_pool[str(uid)] = worker
             self.__pool.start(worker)
         return uid

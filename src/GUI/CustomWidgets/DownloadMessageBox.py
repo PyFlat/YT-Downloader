@@ -46,3 +46,6 @@ class DownloadMessageBox(MessageBoxBase):
         self.horizontalLayout_2.addWidget(self.widget_2, 0, Qt.AlignVCenter)
 
         self.viewLayout.addWidget(self.widget, 0, Qt.AlignLeft)
+
+    def updateProgress(self, progress):
+        self.ProgressRing.setValue(progress)

@@ -10,13 +10,15 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
 from src.GUI.Stylesheet.StyleSheet import StyleSheet
 from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
+from src.DownloaderCore.Downloader import Downloader
 import os
 from yt_dlp import version
 
 class SettingInterface(ScrollArea):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, downloader:Downloader=None):
         super().__init__(parent=parent)
+        self.downloader = downloader
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
@@ -140,7 +142,13 @@ class SettingInterface(ScrollArea):
 
     def __showDownloadTooltip(self):
         msg = DownloadMessageBox(self)
-        #msg.exec()
+        def finish(success):
+            msg.accept()
+        msg.show()
+        def cb(*args):
+            print(*args)
+        self.downloader.updateFFmpeg(self, cb, cb)
+
 
     def __showNoFFmpegTooltip(self):
         InfoBar.error(
