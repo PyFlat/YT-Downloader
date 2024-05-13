@@ -18,9 +18,16 @@ import sys, os, zipfile, zipimport
 TM = ThreadManager(10)
 
 class Downloader():
-    def __init__(self, thread_manager: ThreadManager) -> None:
+    def __init__(self, thread_manager: ThreadManager, yt_dlp_path: str = "appdata/yt_dlp") -> None:
         self.thread_manager = thread_manager
+        self.yt_dlp_path = yt_dlp_path
         self.yt_dlp = None
+        try:
+            self.yt_dlp = __import__("yt_dlp")
+        except ModuleNotFoundError:
+            if os.path.isfile(self.yt_dlp_path):
+                self.importYtldp(self.yt_dlp_path)
+
     def get_playlist_info(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)
     def get_video_info(self, url: str, callback: callable) -> None:
@@ -67,10 +74,10 @@ class Downloader():
                 if finish_callback != None:
                     finish_callback(ok)
                 return
-            self.importYtldp('appdata/yt_dlp')
+            self.importYtldp(self.yt_dlp_path)
             if finish_callback != None:
                 finish_callback(ok)
-        self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", "appdata/yt_dlp",progress_callback,on_finish_),True)
+        self.thread_manager.runTask(GithubDownloaderThread("https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp", self.yt_dlp_path,progress_callback,on_finish_),True)
 if __name__ == "__main__":
     import sys
     from PySide6.QtCore import QCoreApplication, QTimer, QThread
