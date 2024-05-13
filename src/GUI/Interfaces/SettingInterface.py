@@ -1,13 +1,15 @@
 from src.GUI.Icons.Icons import CustomIcons
 from src.Config.Config import cfg
 from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
-                            OptionsSettingCard, CustomColorSettingCard,
-                            SwitchSettingCard,
-                            setTheme, setThemeColor)
+                            OptionsSettingCard, PushSettingCard,
+                            InfoBar, SwitchSettingCard,
+                            setTheme, RangeSettingCard,
+                            ComboBoxSettingCard)
 from qfluentwidgets import FluentIcon as FIF
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QLabel
+from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
 from src.GUI.Stylesheet.StyleSheet import StyleSheet
+import os
 
 class SettingInterface(ScrollArea):
 
@@ -28,34 +30,56 @@ class SettingInterface(ScrollArea):
                 "Light", "Dark",
                 "Use system setting"
             ],
-            parent=self.personalGroup
+            parent = self.personalGroup
         )
-        self.themeColorCard = CustomColorSettingCard(
-            cfg.themeColor,
-            FIF.PALETTE,
-            "Theme color",
-            "Change the theme color of the application",
-            self.personalGroup
+        self.downloaderGroup = SettingCardGroup("Downloader", self.scrollWidget)
+        self.downloadFolderCard = PushSettingCard(
+            "Choose Folder",
+            FIF.DOWNLOAD,
+            "Download directory",
+            cfg.get(cfg.download_folder),
+            self.downloaderGroup
         )
 
-        self.preferencesGroup = SettingCardGroup("Preferences", self.scrollWidget)
-        self.minimizeAsTray =  SwitchSettingCard(
-            icon = FIF.MINIMIZE,
-            title = "System Tray",
-            content = "Minimize application to system tray instead of exiting",
-            configItem = cfg.enableMinimizeAsTray
+        self.ffmpegPathCard = PushSettingCard(
+            "Choose Folder",
+            CustomIcons.FFMPEG,
+            "FFmpeg location",
+            cfg.get(cfg.ffmpeg_path),
+            self.downloaderGroup
         )
-        self.showOnStartup =  SwitchSettingCard(
-            icon = FIF.UP,
-            title = "Show on Startup",
-            content = "Shows the app instead of running in the background on startup",
-            configItem = cfg.enableShowOnStartup
+
+        self.maxDlThreads = RangeSettingCard(
+            cfg.maximum_download_threads,
+            FIF.SPEED_HIGH,
+            "Maximum Download Threads",
+            parent=self.downloaderGroup
         )
-        self.startWithWindows =  SwitchSettingCard(
-            icon = CustomIcons.VIDEO,
-            title = "Start with Windows",
-            content = "Launch the application upon Windows startup",
-            configItem = cfg.enableStartWithWindows
+
+        self.thumbnailStreamingCard = SwitchSettingCard(
+            FIF.PHOTO,
+            "Stream Thumbnails",
+            configItem=cfg.thumbnail_streaming,
+            parent=self.downloaderGroup
+        )
+
+        self.applicationGroup = SettingCardGroup("Application", self.scrollWidget)
+
+        self.updateOnStartCard = SwitchSettingCard(
+            FIF.UPDATE,
+            "Check for updates when the application starts",
+            "The new version will fix known bugs and have more features",
+            configItem=cfg.check_for_updates,
+            parent=self.applicationGroup
+        )
+
+        self.logLevelCard = ComboBoxSettingCard(
+            cfg.log_level,
+            FIF.QUICK_NOTE,
+            "Log Level",
+            "Set your preferred log-level",
+            texts = ["Info", "Debug"],
+            parent = self.applicationGroup
         )
 
         self.__initWidget()
@@ -80,19 +104,57 @@ class SettingInterface(ScrollArea):
         self.settingLabel.move(36, 30)
 
         self.personalGroup.addSettingCard(self.themeCard)
-        self.personalGroup.addSettingCard(self.themeColorCard)
 
-        self.preferencesGroup.addSettingCard(self.minimizeAsTray)
-        self.preferencesGroup.addSettingCard(self.showOnStartup)
-        self.preferencesGroup.addSettingCard(self.startWithWindows)
+        self.downloaderGroup.addSettingCard(self.downloadFolderCard)
+        self.downloaderGroup.addSettingCard(self.ffmpegPathCard)
+        self.downloaderGroup.addSettingCard(self.maxDlThreads)
+        self.downloaderGroup.addSettingCard(self.thumbnailStreamingCard)
+
+        self.applicationGroup.addSettingCard(self.updateOnStartCard)
+        self.applicationGroup.addSettingCard(self.logLevelCard)
 
         self.expandLayout.setSpacing(28)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
-        self.expandLayout.addWidget(self.personalGroup)
-        self.expandLayout.addWidget(self.preferencesGroup)
 
+        self.expandLayout.addWidget(self.personalGroup)
+        self.expandLayout.addWidget(self.downloaderGroup)
+        self.expandLayout.addWidget(self.applicationGroup)
+
+    def __showNoFFmpegTooltip(self):
+        InfoBar.error(
+            'Error:',
+            'FFmpeg Not Found in Specified Path',
+            duration=2500,
+            parent=self
+        )
+
+    def __onDownloadFolderCardClicked(self, ffmpeg=False):
+        folder = QFileDialog.getExistingDirectory(self, "Choose folder", "./")
+
+        current_path =  cfg.ffmpeg_path if ffmpeg else cfg.download_folder
+
+        if not folder or cfg.get(current_path) == folder:
+            return
+
+        if ffmpeg and not (os.path.isfile(f"{folder}/ffmpeg.exe") and os.path.isfile(f"{folder}/ffprobe.exe")):
+            self.__showNoFFmpegTooltip()
+            return
+
+        cfg.set(current_path, folder)
+
+        if not ffmpeg:
+            self.downloadFolderCard.setContent(folder)
+        else:
+            self.ffmpegPathCard.setContent(folder)
 
     def connectSignalToSlot(self):
 
         self.themeCard.optionChanged.connect(lambda ci: setTheme(cfg.get(ci)))
-        self.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
+
+        self.downloadFolderCard.clicked.connect(
+            self.__onDownloadFolderCardClicked
+        )
+
+        self.ffmpegPathCard.clicked.connect(
+            lambda: self.__onDownloadFolderCardClicked(True)
+        )

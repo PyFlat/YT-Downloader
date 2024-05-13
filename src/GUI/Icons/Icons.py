@@ -5,6 +5,7 @@ class CustomIcons(FluentIconBase, Enum):
     AUDIO = "audio"
     CALENDER = "calender"
     DOWNLOAD = "download"
+    FFMPEG = "ffmpeg"
     PERSON = "person"
     TIME = "time"
     VIDEO = "video"
