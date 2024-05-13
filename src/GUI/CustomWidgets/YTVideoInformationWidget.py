@@ -89,17 +89,19 @@ class YTVideoInformationWidget(InformationWidget):
 
             pixmap = pixmap.scaled(QSize(400, 225), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             pixmap = self.round_pixmap_corners(pixmap, 10)
+            self.updateDropShadow()
 
             self.PixmapLabel_2.setPixmap(pixmap)
-
-            shadow_effect = QGraphicsDropShadowEffect(self.widget_8)
-            shadow_effect.setBlurRadius(30)
-            color = QColor(Qt.white) if isDarkTheme() else QColor(Qt.black)
-            shadow_effect.setColor(color)
-            shadow_effect.setOffset(0,0)
-            self.widget_8.setGraphicsEffect(shadow_effect)
         else:
             print("Failed to download image. Error:", reply.errorString())
+
+    def updateDropShadow(self):
+        shadow_effect = QGraphicsDropShadowEffect(self.widget_8)
+        shadow_effect.setBlurRadius(30)
+        color = QColor(Qt.white) if isDarkTheme() else QColor(Qt.black)
+        shadow_effect.setColor(color)
+        shadow_effect.setOffset(0,0)
+        self.widget_8.setGraphicsEffect(shadow_effect)
 
     def showFlyout(self):
         position = TeachingTipTailPosition.BOTTOM

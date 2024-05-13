@@ -4,7 +4,7 @@ from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
                             OptionsSettingCard, PushSettingCard,
                             InfoBar, SwitchSettingCard,
                             setTheme, RangeSettingCard,
-                            ComboBoxSettingCard, StateToolTip)
+                            ComboBoxSettingCard)
 from qfluentwidgets import FluentIcon as FIF
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
@@ -151,6 +151,8 @@ class SettingInterface(ScrollArea):
             msg.hide()
             if ffmpeg:
                 text = "FFmpeg"
+                cfg.set(cfg.ffmpeg_path, "appdata/FFmpeg/bin")
+                self.ffmpegPathCard.setContent(cfg.get(cfg.ffmpeg_path))
             else:
                 text = "yt-dlp"
                 self.update_ytdlp_version()

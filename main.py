@@ -25,6 +25,7 @@ class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.initWindow()
+        self.info_widget = None
 
         self.main_interface = MainInterface(self)
         self.main_interface.PushButton.setShortcut(QKeySequence(Qt.Key_Return))
@@ -32,17 +33,28 @@ class MainWindow(FluentWindow):
 
         self.setting_interface = SettingInterface(self, downloader)
 
+        self.setting_interface.themeCard.optionChanged.connect(self.updateVideoWidget)
+
         self.initNavigation()
 
         self.splashScreen.finish()
 
         self.checkForYtdlp()
 
+    def updateVideoWidget(self):
+        if self.info_widget:
+            self.info_widget.updateDropShadow()
+
+    def videoInformationCallback(self, result, url):
+        if self.info_widget:
+            self.info_widget.deleteLater()
+            self.info_widget = None
+
+        self.info_widget = YTVideoInformationWidget(self, result, downloader)
+        self.main_interface.page.layout().addWidget(self.info_widget, 0, Qt.AlignTop)
+
     def searchByUrl(self):
-        def callback(result, url):
-            testWidget = YTVideoInformationWidget(self, result, downloader)
-            self.main_interface.page.layout().addWidget(testWidget)
-        downloader.getVideoInfo(self.main_interface.LineEdit.text(), callback)
+        downloader.getVideoInfo(self.main_interface.LineEdit.text(), self.videoInformationCallback)
 
     def showDialog(self):
         title = "yt-dlp not found"
@@ -68,7 +80,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        self.resize(900, 526)
+        self.resize(715, 526)
         self.setWindowIcon(QIcon("src/GUI/app-icon.ico"))
         self.setWindowTitle('PyFlat YouTube Downloader')
 
@@ -87,5 +99,4 @@ if __name__ == "__main__":
     thread_manager = ThreadManager(10)
     downloader = Downloader(thread_manager)
     MainWindow()
-    setTheme(Theme.DARK)
     sys.exit(app.exec())
