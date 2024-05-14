@@ -43,6 +43,7 @@ class MainWindow(FluentWindow):
         self.setting_interface = SettingInterface(self, downloader)
 
         self.setting_interface.themeCard.optionChanged.connect(self.updateVideoWidget)
+        self.setting_interface.themeCard.optionChanged.connect(self.updateDownloadWidget)
 
         self.initNavigation()
 
@@ -56,13 +57,15 @@ class MainWindow(FluentWindow):
         self.splashScreen.finish()
 
     def doATest(self):
-        newWidget = VideoDownloadWidget(self.download_interface)
-        self.download_interface.verticalLayout.addWidget(newWidget, 0, Qt.AlignTop | Qt.AlignCenter)
-
-        newWidget.fetchThumbnails()
+        self.download_widget = VideoDownloadWidget(self.download_interface)
+        self.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+        self.download_widget.fetchThumbnails()
         newWidget2 = HorizontalSeparator(self.download_interface)
         self.download_interface.verticalLayout.addWidget(newWidget2, 0, Qt.AlignTop)
 
+    def updateDownloadWidget(self):
+        if self.download_widget:
+            self.download_widget.update_pixmap()
 
     def updateVideoWidget(self):
         if self.info_widget:
