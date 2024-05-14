@@ -24,11 +24,14 @@ build_exe_options = {
         "fileinput",
         "xml.etree.ElementTree",
         "ctypes.wintypes",
-        "asyncio"
+        "asyncio",
+        "glob"
     ],
     "excludes": [
         "tkinter",
-        "yt_dlp"],
+        "yt_dlp",
+        "scipy",
+        "numpy"],
     "include_files": include_files,
     "zip_include_packages": ["PySide6"],
 }

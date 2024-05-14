@@ -5,7 +5,7 @@ from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
                             InfoBar, SwitchSettingCard,
                             setTheme, RangeSettingCard,
                             ComboBoxSettingCard, HyperlinkCard,
-                            PrimaryPushSettingCard, MessageBox)
+                            PrimaryPushSettingCard, MessageBox, FluentWindow)
 from qfluentwidgets import FluentIcon as FIF
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
@@ -18,9 +18,10 @@ import os
 
 class SettingInterface(ScrollArea):
 
-    def __init__(self, parent=None, downloader:Downloader=None):
+    def __init__(self, parent:FluentWindow=None, downloader:Downloader=None):
         super().__init__(parent=parent)
         self.downloader = downloader
+        self.__parent = parent
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
@@ -235,35 +236,49 @@ class SettingInterface(ScrollArea):
         else:
             self.ffmpegPathCard.setContent(folder)
 
-    def __updateApplication(self):
-        msg = DownloadMessageBox(self)
+    def updateApplication(self, automatic_call: bool = False):
+        # Ensure the current widget is this instance before proceeding
+        if self.__parent.stackedWidget.currentWidget() != self:
+            self.__parent.switchTo(self)
 
-        def updateAvailableDialog(success, tag, automatic_call):
-            msgb = MessageBox("Search for updates", "", self)
-            msgb.cancelButton.hide()
-            if tag == "no_release_version" and not automatic_call:
-                text = "You already are on a non-released beta version!"
-            elif tag == "already_up_to_date" and not automatic_call:
-                text = "You already are on the latest version!"
+        # Create a message box for displaying download progress
+        download_msg_box = DownloadMessageBox(self)
+
+        def handle_update_dialog(available, tag):
+            # Skip update dialog for automatic calls if no update is available
+            if automatic_call and not available:
+                return False
+
+            # Create a message box for update notifications
+            update_msg_box = MessageBox("Search for updates", "", self)
+            update_msg_box.cancelButton.hide()
+
+            # Customize message based on update status
+            if tag == "no_release_version":
+                message = "You are already on a non-released beta version!"
+            elif tag == "already_up_to_date":
+                message = "You are already on the latest version!"
             else:
+                update_msg_box.titleLabel.setText("New update available!")
+                message = f"Current version: {VERSION}\nNew version: {tag}\nInstall it?"
+                update_msg_box.cancelButton.show()
 
-                msgb.titleLabel.setText("New update available!")
-                text = f"Current version: {VERSION}\nNew version: {tag}\nInstall it?"
-                msgb.cancelButton.show()
-            msgb.contentLabel.setText(text)
-            if msgb.exec():
-                if success:
-                    msg.show()
+            # Set message content and prompt user
+            update_msg_box.contentLabel.setText(message)
+            if update_msg_box.exec():
+                if available:
+                    download_msg_box.show()
                 return True
             else:
                 return False
 
-        def updateProgress(progress):
-            msg.ProgressRing.setValue(progress)
-        def finish(success):
+        def update_progress(progress):
+            download_msg_box.ProgressRing.setValue(progress)
+
+        def handle_download_completion(success):
             MessageBox("Download completed", "The app has to close to perform the update!", self).exec()
 
-        self.downloader.updateApplication(updateProgress, finish, updateAvailableDialog, True, self.parent())
+        self.downloader.updateApplication(update_progress, handle_download_completion, handle_update_dialog, self.__parent)
 
     def connectSignalToSlot(self):
 
@@ -292,5 +307,5 @@ class SettingInterface(ScrollArea):
             lambda: QDesktopServices.openUrl(QUrl("https://github.com/PyFlat/YT-Downloader/issues")))
 
         self.aboutCard.clicked.connect(
-            self.__updateApplication
+            self.updateApplication
         )

@@ -17,6 +17,8 @@ from src.GUI.Interfaces.MainInterface import MainInterface
 from src.GUI.Interfaces.SettingInterface import SettingInterface
 from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
 
+from src.Config.Config import cfg
+
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
 from src.DownloaderCore.Downloader import Downloader
 
@@ -37,9 +39,14 @@ class MainWindow(FluentWindow):
 
         self.initNavigation()
 
-        self.splashScreen.finish()
+
 
         self.checkForYtdlp()
+
+        if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
+            self.setting_interface.updateApplication(True)
+
+        self.splashScreen.finish()
 
     def updateVideoWidget(self):
         if self.info_widget:
