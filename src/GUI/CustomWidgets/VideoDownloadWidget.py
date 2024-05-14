@@ -5,6 +5,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkRe
 from PySide6.QtCore import QUrl, Qt
 
 from qfluentwidgets import isDarkTheme
+from qfluentwidgets import FluentIcon as FIF
 
 class VideoDownloadWidget(DownloadWidget):
     def __init__(self, parent:DownloadInterface=None):
@@ -13,6 +14,20 @@ class VideoDownloadWidget(DownloadWidget):
         self.setFixedWidth(self.__parent.size().width()-50)
         self.setFixedHeight(215)
         self.image_data = None
+
+        self.PushButton.setIcon(FIF.CANCEL_MEDIUM)
+
+        self.PushButton_2.setIcon(FIF.PAUSE)
+        self.icon = False
+        self.PushButton_2.clicked.connect(self.switch)
+
+    def switch(self):
+
+        if not self.icon:
+            self.PushButton_2.setIcon(FIF.PLAY)
+        else:
+            self.PushButton_2.setIcon(FIF.PAUSE)
+        self.icon = not self.icon
 
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
