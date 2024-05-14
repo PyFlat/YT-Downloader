@@ -14,4 +14,4 @@ def download_thumbnails(video_url, output_folder="thumbnails"):
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([video_url])
 
-download_thumbnails("https://www.youtube.com/shorts/7yFbn-9Bw60")
+download_thumbnails("https://www.youtube.com/watch?v=JSuWJoDWoJI")

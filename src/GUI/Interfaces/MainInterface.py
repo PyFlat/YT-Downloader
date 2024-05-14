@@ -5,9 +5,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QSizePolicy, QStackedWidget,
-    QVBoxLayout, QWidget)
-from qfluentwidgets import (LineEdit, PushButton)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QSizePolicy, QSpacerItem,
+    QStackedWidget, QVBoxLayout, QWidget)
+from qfluentwidgets import (IndeterminateProgressRing, LineEdit, PushButton, TitleLabel)
 class MainInterface(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -41,13 +41,28 @@ class MainInterface(QWidget):
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
+        self.verticalLayout_2 = QVBoxLayout(self.page_2)
+        self.verticalLayout_2.setSpacing(25)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalLayout_2.addItem(self.verticalSpacer)
+        self.TitleLabel = TitleLabel(self.page_2)
+        self.TitleLabel.setObjectName(u"TitleLabel")
+        self.verticalLayout_2.addWidget(self.TitleLabel, 0, Qt.AlignHCenter|Qt.AlignVCenter)
+        self.IndeterminateProgressRing = IndeterminateProgressRing(self.page_2)
+        self.IndeterminateProgressRing.setObjectName(u"IndeterminateProgressRing")
+        self.verticalLayout_2.addWidget(self.IndeterminateProgressRing, 0, Qt.AlignHCenter|Qt.AlignVCenter)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalLayout_2.addItem(self.verticalSpacer_2)
         self.stackedWidget.addWidget(self.page_2)
         self.verticalLayout.addWidget(self.stackedWidget)
         self.retranslateUi(Form)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QMetaObject.connectSlotsByName(Form)
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.LineEdit.setPlaceholderText(QCoreApplication.translate("Form", u"Enter the URL of the video or playlist, or type in a search term.", None))
         self.PushButton.setText(QCoreApplication.translate("Form", u"Search", None))
         self.PushButton.setShortcut(QCoreApplication.translate("Form", u"Return", None))
+        self.TitleLabel.setText(QCoreApplication.translate("Form", u"Searching...", None))

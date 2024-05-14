@@ -10,12 +10,15 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import *
 
-from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition, MessageBox
+from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition, MessageBox, HorizontalSeparator
 from qfluentwidgets import FluentIcon as FIF
 
 from src.GUI.Interfaces.MainInterface import MainInterface
+from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 from src.GUI.Interfaces.SettingInterface import SettingInterface
+
 from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
+from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
 
 from src.Config.Config import cfg
 
@@ -30,8 +33,12 @@ class MainWindow(FluentWindow):
         self.info_widget = None
 
         self.main_interface = MainInterface(self)
+        self.main_interface.stackedWidget.setCurrentIndex(0)
         self.main_interface.PushButton.setShortcut(QKeySequence(Qt.Key_Return))
         self.main_interface.PushButton.clicked.connect(self.searchByUrl)
+
+        self.download_interface = DownloadInterface(self)
+        self.download_interface.setStyleSheet("background: transparent; border: none")
 
         self.setting_interface = SettingInterface(self, downloader)
 
@@ -39,14 +46,22 @@ class MainWindow(FluentWindow):
 
         self.initNavigation()
 
-
-
         self.checkForYtdlp()
 
         if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
+        self.doATest()
+
         self.splashScreen.finish()
+
+    def doATest(self):
+        newWidget = VideoDownloadWidget(self.download_interface)
+        self.download_interface.verticalLayout.addWidget(newWidget, 0, Qt.AlignTop)
+        newWidget.fetchThumbnails()
+        newWidget2 = HorizontalSeparator(self.download_interface)
+        self.download_interface.verticalLayout.addWidget(newWidget2, 0, Qt.AlignTop)
+
 
     def updateVideoWidget(self):
         if self.info_widget:
@@ -59,8 +74,10 @@ class MainWindow(FluentWindow):
 
         self.info_widget = YTVideoInformationWidget(self, result, downloader)
         self.main_interface.page.layout().addWidget(self.info_widget, 0, Qt.AlignTop)
+        self.main_interface.stackedWidget.setCurrentIndex(0)
 
     def searchByUrl(self):
+        self.main_interface.stackedWidget.setCurrentIndex(1)
         downloader.getVideoInfo(self.main_interface.LineEdit.text(), self.videoInformationCallback)
 
     def showDialog(self):
@@ -82,6 +99,7 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
         self.addSubInterface(self.main_interface, FIF.HOME, 'Home')
+        self.addSubInterface(self.download_interface, FIF.DOWNLOAD, 'Download')
         self.navigationInterface.addSeparator()
 
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)

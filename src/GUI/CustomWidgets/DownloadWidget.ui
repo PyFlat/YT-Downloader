@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QFrame" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>657</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Frame</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="SubtitleLabel" name="SubtitleLabel">
+        <property name="text">
+         <string> TWILIGHT OF THE GODS | Epic Dark Dramatic Music – Best Epic Heroic Orchestral Music </string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="StrongBodyLabel" name="StrongBodyLabel">
+        <property name="text">
+         <string>by Epic Music VN</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_3" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>25</number>
+      </property>
+      <item>
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_2">
+        <property name="text">
+         <string>Status: Downloading...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="BodyLabel" name="BodyLabel_2">
+        <property name="text">
+         <string>Format: Video/mp4</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="BodyLabel" name="BodyLabel_3">
+        <property name="text">
+         <string>Quality: 1080p/Best Audio</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>25</number>
+      </property>
+      <item>
+       <widget class="ProgressBar" name="ProgressBar">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>6</height>
+         </size>
+        </property>
+        <property name="value">
+         <number>69</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="BodyLabel" name="BodyLabel">
+        <property name="text">
+         <string>69% / 84 mb - 00:28 left</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="PushButton" name="PushButton">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="PushButton" name="PushButton_2">
+        <property name="text">
+         <string>Pause</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>StrongBodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SubtitleLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>ProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
