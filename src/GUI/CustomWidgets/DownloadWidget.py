@@ -14,7 +14,7 @@ class DownloadWidget(QWidget):
         super().__init__(parent=parent)
         self.setObjectName("DownloadWidget")
         Form = self
-        Form.resize(657, 300)
+        Form.resize(861, 254)
         self.verticalLayout_2 = QVBoxLayout(Form)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.widget = QWidget(Form)
@@ -45,7 +45,7 @@ class DownloadWidget(QWidget):
         self.BodyLabel_3 = BodyLabel(self.widget_3)
         self.BodyLabel_3.setObjectName(u"BodyLabel_3")
         self.horizontalLayout_2.addWidget(self.BodyLabel_3)
-        self.verticalLayout_2.addWidget(self.widget_3)
+        self.verticalLayout_2.addWidget(self.widget_3, 0, Qt.AlignLeft)
         self.widget_2 = QWidget(Form)
         self.widget_2.setObjectName(u"widget_2")
         self.horizontalLayout = QHBoxLayout(self.widget_2)

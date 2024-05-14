@@ -57,7 +57,7 @@ class MainWindow(FluentWindow):
 
     def doATest(self):
         newWidget = VideoDownloadWidget(self.download_interface)
-        self.download_interface.verticalLayout.addWidget(newWidget, 0, Qt.AlignTop)
+        self.download_interface.verticalLayout.addWidget(newWidget, 0, Qt.AlignTop | Qt.AlignCenter)
 
         newWidget.fetchThumbnails()
         newWidget2 = HorizontalSeparator(self.download_interface)
