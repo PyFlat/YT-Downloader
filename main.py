@@ -52,7 +52,7 @@ class MainWindow(FluentWindow):
         if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
-        self.doATest()
+        #self.doATest()
 
         self.splashScreen.finish()
 

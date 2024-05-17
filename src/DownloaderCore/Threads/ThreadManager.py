@@ -26,23 +26,26 @@ class ThreadWorker(QThread):
         self.__thread.run()
         if self.__on_finish_callback != None:
             self.__on_finish_callback.emit(self.__uid)
+
+class RunnableWrapperSignals(QObject):
+    _on_start_callback = Signal(int)
+    _on_finish_callback = Signal(int)
+
 class RunnableWrapper(QRunnable):
-    __on_start_callback = Signal(int)
     def __init__(self, thread: QRunnable, uid: int, finish_callback: object | None = None, start_callback: object | None = None) -> None:
         super().__init__()
-        self.__on_start_callback = start_callback
-        self.__on_finish_callback = finish_callback
+        self.signals = RunnableWrapperSignals()
+        if start_callback != None:
+            self.signals._on_start_callback.connect(start_callback)
+        if finish_callback != None:
+            self.signals._on_finish_callback.connect(finish_callback)
         self.__thread = thread
         self.__uid = uid
-        self.__on_finish_callback = finish_callback
-        self.__on_start_callback = start_callback
-
     def run(self):
-        if self.__on_start_callback != None:
-            self.__on_start_callback(self.__uid)
+        self.signals._on_start_callback.emit(self.__uid)
         self.__thread.run()
-        if self.__on_finish_callback != None:
-            self.__on_finish_callback(self.__uid)
+        self.signals._on_finish_callback.emit(self.__uid)
+
 class ThreadManager():
     def __init__(self, maxthreads: int | None = None) -> None:
         self.__MAX_EXECUTED_TASK_TRACKING = 10000
@@ -55,22 +58,25 @@ class ThreadManager():
         self.__threads_pool: dict[str, QRunnable] = {}
         self.__threads_forced: dict[str, QRunnable] = {}
         self.__executed_tasks: list[int] = [0]*self.__MAX_EXECUTED_TASK_TRACKING
+        self.__callbacks: dict = {}
         self.__current_tracking_index = 0
         #Tracks the state of a task {uid: (state, forced)} forced: 0 => waiting, 1 => running, 2 => finished
 
     def __start(self, uid: int) -> None:
-        pass #Optional for logging
+        if str(uid) in self.__callbacks:
+            self.__callbacks[str(uid)].__call__()
     def __finish(self, uid: int) -> None:
         if str(uid) in self.__threads_pool:
             self.__threads_pool.pop(str(uid))
         else:
             self.__threads_forced.pop(str(uid))
-    def runTask(self, task : QRunnable, force: bool = False) -> int:
+    def runTask(self, task : QRunnable, force: bool = False, on_start_callback: object | None = None) -> int:
         uid = UID.get()
 
         self.__executed_tasks[self.__current_tracking_index] = uid
         self.__current_tracking_index = (self.__current_tracking_index+1)%self.__MAX_EXECUTED_TASK_TRACKING
-
+        if on_start_callback:
+            self.__callbacks[str(uid)] = on_start_callback
         if force:
             worker = ThreadWorker(task, uid, self.__finish, self.__start)
             self.__threads_forced[str(uid)] = worker

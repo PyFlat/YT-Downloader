@@ -1,4 +1,5 @@
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
+from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
 from datetime import datetime
 from src.GUI.Icons.Icons import CustomIcons
 from PySide6.QtCore import Qt, QSize, QUrl
@@ -14,6 +15,7 @@ class YTVideoInformationWidget(InformationWidget):
     def __init__(self, parent=None, info_dict:dict=None, downloader:Downloader=None):
         super().__init__(parent)
         self.downloader = downloader
+        self._parent = parent
         self.info = info_dict
         self.url = self.info["original_url"]
 
@@ -39,7 +41,18 @@ class YTVideoInformationWidget(InformationWidget):
         self.PushButton.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
     def download_video(self):
-        self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b")
+
+        self.download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"])
+        self._parent.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+        def start():
+            print("Download started")
+        def progress(result, percent, eta):
+            self.download_widget.updateStatus(result, percent)
+            #self.download_widget.ProgressBar.setValue(percent)
+        def finish(success):
+            print(success)
+
+        self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b", start, progress, finish)
 
     def setIcons(self):
 

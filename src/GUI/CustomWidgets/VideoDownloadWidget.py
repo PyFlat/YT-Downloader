@@ -8,18 +8,22 @@ from qfluentwidgets import isDarkTheme
 from qfluentwidgets import FluentIcon as FIF
 
 class VideoDownloadWidget(DownloadWidget):
-    def __init__(self, parent:DownloadInterface=None):
+    def __init__(self, parent:DownloadInterface=None, display_id:str=None):
         super().__init__(parent)
         self.__parent = parent
+        self.display_id = display_id
         self.setFixedWidth(self.__parent.size().width()-50)
         self.setFixedHeight(215)
         self.image_data = None
+        self.last_eta = 0
 
         self.PushButton.setIcon(FIF.CANCEL_MEDIUM)
 
         self.PushButton_2.setIcon(FIF.PAUSE)
         self.icon = False
         self.PushButton_2.clicked.connect(self.switch)
+
+        self.fetchThumbnails()
 
     def switch(self):
 
@@ -32,7 +36,7 @@ class VideoDownloadWidget(DownloadWidget):
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.handle_response(response))
-        request = QNetworkRequest(QUrl("https://i.ytimg.com/vi/JSuWJoDWoJI/mqdefault.jpg"))
+        request = QNetworkRequest(QUrl(f"https://i.ytimg.com/vi/{self.display_id}/mqdefault.jpg"))
         response = manager.get(request)
 
     def handle_response(self, reply: QNetworkReply):
@@ -74,3 +78,14 @@ class VideoDownloadWidget(DownloadWidget):
         painter.drawRoundedRect(pixmap.rect(), radius, radius)
         painter.end()
         return rounded
+
+    def updateStatus(self, status_dict:dict, progress:int):
+        self.ProgressBar.setValue(progress)
+        if "_eta_str" in status_dict and status_dict["_eta_str"]:
+            eta = status_dict["_eta_str"]
+            if eta == "Unknown":
+                eta = self.last_eta
+            else:
+                self.last_eta = eta
+
+            self.BodyLabel.setText(f"{progress}% / {status_dict['_total_bytes_str']} - {eta} left")
