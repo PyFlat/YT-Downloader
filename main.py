@@ -1,5 +1,7 @@
+import logging
+import sys
+
 from src.Logger import Logger
-import logging, sys
 
 if __name__ == "__main__":
     logger_object = Logger(logs_folder="logs")
@@ -7,23 +9,27 @@ if __name__ == "__main__":
     logger.info("Logging Started")
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import *
-
-from qfluentwidgets import FluentWindow, SplashScreen, setTheme, Theme, NavigationItemPosition, MessageBox, HorizontalSeparator
+from PySide6.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
-
-from src.GUI.Interfaces.MainInterface import MainInterface
-from src.GUI.Interfaces.DownloadInterface import DownloadInterface
-from src.GUI.Interfaces.SettingInterface import SettingInterface
-
-from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
-from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
+from qfluentwidgets import (
+    FluentWindow,
+    HorizontalSeparator,
+    MessageBox,
+    NavigationItemPosition,
+    SplashScreen,
+    Theme,
+    setTheme,
+)
 
 from src.Config.Config import cfg
-
-from src.DownloaderCore.Threads.ThreadManager import ThreadManager
 from src.DownloaderCore.Downloader import Downloader
+from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
+from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
+from src.GUI.Interfaces.DownloadInterface import DownloadInterface
+from src.GUI.Interfaces.MainInterface import MainInterface
+from src.GUI.Interfaces.SettingInterface import SettingInterface
 
 
 class MainWindow(FluentWindow):

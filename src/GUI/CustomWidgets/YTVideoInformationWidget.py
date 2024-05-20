@@ -1,15 +1,17 @@
+from datetime import datetime
+
+from PySide6.QtCore import QSize, Qt, QUrl
+from PySide6.QtGui import QColor, QPainter, QPixmap
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
+from PySide6.QtWidgets import QGraphicsDropShadowEffect
+from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
+
+from src.Config.Config import cfg
+from src.DownloaderCore.Downloader import Downloader
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
 from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
-from datetime import datetime
 from src.GUI.Icons.Icons import CustomIcons
-from PySide6.QtCore import Qt, QSize, QUrl
-from PySide6.QtGui import QPixmap, QImage, QColor, QPainter
-from PySide6.QtWidgets import QGraphicsDropShadowEffect
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from qfluentwidgets import TeachingTip, TeachingTipTailPosition, isDarkTheme, TeachingTipView, PushButton, Flyout, FlyoutView
-from src.DownloaderCore.Downloader import Downloader
-from src.Config.Config import cfg
-import json
+
 
 class YTVideoInformationWidget(InformationWidget):
     def __init__(self, parent=None, info_dict:dict=None, downloader:Downloader=None):

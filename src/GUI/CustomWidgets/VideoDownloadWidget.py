@@ -1,11 +1,12 @@
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap, QResizeEvent
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
+from qfluentwidgets import FluentIcon as FIF
+from qfluentwidgets import isDarkTheme
+
 from src.GUI.CustomWidgets.DownloadWidget import DownloadWidget
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPalette, QResizeEvent
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from PySide6.QtCore import QUrl, Qt
 
-from qfluentwidgets import isDarkTheme
-from qfluentwidgets import FluentIcon as FIF
 
 class VideoDownloadWidget(DownloadWidget):
     def __init__(self, parent:DownloadInterface=None, display_id:str=None):

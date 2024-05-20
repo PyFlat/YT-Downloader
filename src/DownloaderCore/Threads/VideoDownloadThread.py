@@ -1,4 +1,6 @@
 from PySide6.QtCore import QObject, QRunnable, Signal
+
+
 class VideoDownloadThread(QObject, QRunnable):
     __on_finish = Signal(bool)
     __on_progress = Signal(dict, int, object)
