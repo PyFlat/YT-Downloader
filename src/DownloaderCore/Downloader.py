@@ -1,22 +1,27 @@
 try:
-    from src.DownloaderCore.Threads.VideoDownloadThread import VideoDownloadThread
-    from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
     from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
     from src.DownloaderCore.Threads.ThreadManager import ThreadManager
-    from src.DownloaderCore.Threads.Container import Container
-    from src.DownloaderCore.Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
+    from src.DownloaderCore.Threads.Updater import (
+        GithubDownloaderThread,
+        UpdateCheckerThread,
+    )
+    from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import (
+        YoutubeVideoDownloadThread,
+    )
 except:
-    from Threads.VideoDownloadThread import VideoDownloadThread
     from Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
     from Threads.InformationLoadThread import InformationLoadThread
     from Threads.ThreadManager import ThreadManager
-    from Threads.Container import Container
     from Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
 
-import subprocess
-import sys, os, zipfile, zipimport, time
-from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore import QProcess, QDir
+import os
+import sys
+import zipfile
+import zipimport
+
+from PySide6.QtCore import QProcess
+from PySide6.QtWidgets import QWidget
+
 TM = ThreadManager(10)
 
 class Downloader():
@@ -104,7 +109,9 @@ class Downloader():
 
 if __name__ == "__main__":
     import sys
-    from PySide6.QtCore import QCoreApplication, QTimer, QThread
+
+    from PySide6.QtCore import QCoreApplication, QThread, QTimer
+
     #download https://www.youtube.com/watch?v=HBEsr0MfdmQ mp4 C:/Users/jonas/AppData/Local/Programs/PyFlat Youtube Downloader(2)/appdata/FFmpeg/bin bv[height<=720]+ba[ext=m4a]/b (%(height)sp).%(ext)s
     def cb(*args):
         print(*args)

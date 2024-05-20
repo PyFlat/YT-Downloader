@@ -1,4 +1,3 @@
-import logging
 import sys
 
 from src.Logger import Logger
@@ -49,7 +48,6 @@ class MainWindow(FluentWindow):
         self.setting_interface = SettingInterface(self, downloader)
 
         self.setting_interface.themeCard.optionChanged.connect(self.updateVideoWidget)
-        self.setting_interface.themeCard.optionChanged.connect(self.updateDownloadWidget)
 
         self.initNavigation()
 
@@ -58,24 +56,16 @@ class MainWindow(FluentWindow):
         if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
-        # self.doATest()
-
         self.splashScreen.finish()
 
-    def doATest(self):
-        self.download_widget = VideoDownloadWidget(self.download_interface)
-        self.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
-        self.download_widget.fetchThumbnails()
-        newWidget2 = HorizontalSeparator(self.download_interface)
-        self.download_interface.verticalLayout.addWidget(newWidget2, 0, Qt.AlignTop)
-
-    def updateDownloadWidget(self):
-        if self.download_widget:
-            self.download_widget.update_pixmap()
-
     def updateVideoWidget(self):
+        if not cfg.get(cfg.thumbnail_streaming):
+            self.info_widget.setDefaultThumbnail()
+            return
+
         if self.info_widget:
             self.info_widget.updateDropShadow()
+
 
     def videoInformationCallback(self, result, url):
         if self.info_widget:
@@ -143,6 +133,7 @@ class MainWindow(FluentWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     thread_manager = ThreadManager(10)
+    thread_manager.setMaxThreadCount(cfg.get(cfg.maximum_download_threads))
     downloader = Downloader(thread_manager)
     MainWindow()
     sys.exit(app.exec())

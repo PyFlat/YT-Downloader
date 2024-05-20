@@ -23,7 +23,10 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg"
 
-        self.fetchThumbnailFromUrl(self.thumbnail_url)
+        if cfg.get(cfg.thumbnail_streaming):
+            self.fetchThumbnailFromUrl(self.thumbnail_url)
+        else:
+            self.setDefaultThumbnail()
 
         # with open("data.json", "w") as f:
         #     json.dump(self.info, f)
@@ -100,6 +103,13 @@ class YTVideoInformationWidget(InformationWidget):
         manager.finished.connect(lambda: self.setThumbnail(response))
         request = QNetworkRequest(QUrl(url))
         response = manager.get(request)
+
+    def setDefaultThumbnail(self):
+        color = "black" if isDarkTheme() else "white"
+        pixmap = QPixmap(f"src/GUI/Images/thumbnail_streaming_{color}")
+        pixmap = self.round_pixmap_corners(pixmap, 10)
+        self.updateDropShadow()
+        self.PixmapLabel_2.setPixmap(pixmap)
 
     def setThumbnail(self, reply: QNetworkReply):
         if reply.error() == QNetworkReply.NoError:

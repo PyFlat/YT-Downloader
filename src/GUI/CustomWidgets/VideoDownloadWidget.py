@@ -1,11 +1,10 @@
-import json
-
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap, QResizeEvent
+from PySide6.QtCore import QRect, Qt, QUrl
+from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import isDarkTheme
 
+from src.Config.Config import cfg
 from src.GUI.CustomWidgets.DownloadWidget import DownloadWidget
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
@@ -29,7 +28,11 @@ class VideoDownloadWidget(DownloadWidget):
         self.icon = False
         self.pause_btn.clicked.connect(self.switch)
 
-        self.fetchThumbnails()
+        if cfg.get(cfg.thumbnail_streaming):
+            self.fetchThumbnails()
+        else:
+            color = "202020" if isDarkTheme() else "eeeeee"
+            self.setStyleSheet(f"background: #{color}; border-radius: 10px")
 
     def switch(self):
 

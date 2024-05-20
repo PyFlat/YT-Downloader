@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QSizePolicy,
     QVBoxLayout, QWidget)
 from qfluentwidgets import (BodyLabel, ProgressBar, PushButton, StrongBodyLabel,
     SubtitleLabel)
-class DownloadWidget(QWidget):
+class DownloadWidget(QFrame):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.setObjectName("DownloadWidget")
