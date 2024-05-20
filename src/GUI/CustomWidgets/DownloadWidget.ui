@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>861</width>
-    <height>254</height>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="SubtitleLabel" name="SubtitleLabel">
+       <widget class="SubtitleLabel" name="title_label">
         <property name="text">
          <string> TWILIGHT OF THE GODS | Epic Dark Dramatic Music – Best Epic Heroic Orchestral Music </string>
         </property>
@@ -34,7 +34,7 @@
        </widget>
       </item>
       <item>
-       <widget class="StrongBodyLabel" name="StrongBodyLabel">
+       <widget class="StrongBodyLabel" name="channel_label">
         <property name="text">
          <string>by Epic Music VN</string>
         </property>
@@ -50,21 +50,21 @@
        <number>25</number>
       </property>
       <item>
-       <widget class="StrongBodyLabel" name="StrongBodyLabel_2">
+       <widget class="StrongBodyLabel" name="status_label">
         <property name="text">
-         <string>Status: Downloading...</string>
+         <string>Status: Download started...</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="BodyLabel" name="BodyLabel_2">
+       <widget class="BodyLabel" name="format_label">
         <property name="text">
          <string>Format: Video/mp4</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="BodyLabel" name="BodyLabel_3">
+       <widget class="BodyLabel" name="quality_label">
         <property name="text">
          <string>Quality: 1080p/Best Audio</string>
         </property>
@@ -79,38 +79,59 @@
       <property name="spacing">
        <number>25</number>
       </property>
-      <item>
-       <widget class="ProgressBar" name="ProgressBar">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>6</height>
-         </size>
-        </property>
-        <property name="value">
-         <number>69</number>
-        </property>
-        <property name="textVisible">
-         <bool>true</bool>
-        </property>
+      <item alignment="Qt::AlignVCenter">
+       <widget class="QWidget" name="widget_4" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>18</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item alignment="Qt::AlignHCenter">
+          <widget class="BodyLabel" name="progress_label">
+           <property name="text">
+            <string>0% / ?? MB - ??:?? left (0 MB/s)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ProgressBar" name="progress_bar">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>6</height>
+            </size>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="textVisible">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="BodyLabel" name="BodyLabel">
-        <property name="text">
-         <string>69% / 84 mb - 00:28 left</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="PushButton" name="PushButton">
+       <widget class="PushButton" name="cancel_btn">
         <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="PushButton" name="PushButton_2">
+       <widget class="PushButton" name="pause_btn">
         <property name="text">
          <string>Pause</string>
         </property>

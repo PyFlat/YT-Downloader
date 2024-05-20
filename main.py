@@ -15,11 +15,11 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import (
     FluentWindow,
     HorizontalSeparator,
+    InfoBadge,
+    InfoBadgePosition,
     MessageBox,
     NavigationItemPosition,
     SplashScreen,
-    Theme,
-    setTheme,
 )
 
 from src.Config.Config import cfg
@@ -58,7 +58,7 @@ class MainWindow(FluentWindow):
         if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
-        #self.doATest()
+        # self.doATest()
 
         self.splashScreen.finish()
 
@@ -108,8 +108,17 @@ class MainWindow(FluentWindow):
             self.setting_interface.update_ytdlp_version()
 
     def initNavigation(self):
-        self.addSubInterface(self.main_interface, FIF.HOME, 'Home')
-        self.addSubInterface(self.download_interface, FIF.DOWNLOAD, 'Download')
+        self.addSubInterface(self.main_interface, FIF.HOME, "Home")
+        self.download_interface_nav_item = self.addSubInterface(
+            self.download_interface, FIF.DOWNLOAD, "Download"
+        )
+        InfoBadge.attension(
+            text=0,
+            parent=self.download_interface_nav_item.parent(),
+            target=self.download_interface_nav_item,
+            position=InfoBadgePosition.NAVIGATION_ITEM,
+        )
+
         self.navigationInterface.addSeparator()
 
         self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)

@@ -44,7 +44,7 @@ class YTVideoInformationWidget(InformationWidget):
 
     def download_video(self):
 
-        self.download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"])
+        self.download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
         self._parent.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
         def start():
             print("Download started")
@@ -52,7 +52,7 @@ class YTVideoInformationWidget(InformationWidget):
             self.download_widget.updateStatus(result, percent)
             #self.download_widget.ProgressBar.setValue(percent)
         def finish(success):
-            print(success)
+            self.download_widget.finishStatus(success)
 
         self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b", start, progress, finish)
 

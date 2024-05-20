@@ -1,3 +1,5 @@
+import json
+
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap, QResizeEvent
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
@@ -9,29 +11,34 @@ from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 
 class VideoDownloadWidget(DownloadWidget):
-    def __init__(self, parent:DownloadInterface=None, display_id:str=None):
+    def __init__(self, parent:DownloadInterface=None, display_id:str=None, title:str=None, uploader:str=None):
         super().__init__(parent)
         self.__parent = parent
         self.display_id = display_id
         self.setFixedWidth(self.__parent.size().width()-50)
-        self.setFixedHeight(215)
+        self.setFixedHeight(245)
         self.image_data = None
         self.last_eta = 0
+        self.last_speed =  ""
+        self.total_size  = ""
 
-        self.PushButton.setIcon(FIF.CANCEL_MEDIUM)
+        self.title_label.setText(title)
+        self.channel_label.setText(uploader)
 
-        self.PushButton_2.setIcon(FIF.PAUSE)
+        self.cancel_btn.setIcon(FIF.CANCEL_MEDIUM)
+
+        self.pause_btn.setIcon(FIF.PAUSE)
         self.icon = False
-        self.PushButton_2.clicked.connect(self.switch)
+        self.pause_btn.clicked.connect(self.switch)
 
         self.fetchThumbnails()
 
     def switch(self):
 
         if not self.icon:
-            self.PushButton_2.setIcon(FIF.PLAY)
+            self.pause_btn.setIcon(FIF.PLAY)
         else:
-            self.PushButton_2.setIcon(FIF.PAUSE)
+            self.pause_btn.setIcon(FIF.PAUSE)
         self.icon = not self.icon
 
     def fetchThumbnails(self):
@@ -80,13 +87,33 @@ class VideoDownloadWidget(DownloadWidget):
         painter.end()
         return rounded
 
-    def updateStatus(self, status_dict:dict, progress:int):
-        self.ProgressBar.setValue(progress)
-        if "_eta_str" in status_dict and status_dict["_eta_str"]:
-            eta = status_dict["_eta_str"]
-            if eta == "Unknown":
-                eta = self.last_eta
-            else:
-                self.last_eta = eta
+    def updateStatus(self, status_dict: dict, progress: int):
+        self.progress_bar.setValue(progress)
 
-            self.BodyLabel.setText(f"{progress}% / {status_dict['_total_bytes_str']} - {eta} left")
+        eta = status_dict.get("_eta_str", self.last_eta)
+        if eta != "Unknown":
+            self.last_eta = eta
+        else:
+            eta  = self.last_eta
+
+        speed = status_dict.get("_speed_str", self.last_speed).lstrip()
+        if "Unknown" not in speed:
+            self.last_speed = speed
+        else:
+            speed = self.last_speed
+
+        total_size = status_dict.get('_total_bytes_str', self.total_size).lstrip()
+        if not self.total_size:
+            self.total_size = total_size
+
+        self.progress_label.setText(f"{progress}% / {total_size} - {eta} left ({speed})")
+
+
+    def finishStatus(self, success):
+        if success:
+            self.progress_bar.setValue(100)
+            self.progress_label.setText(f"100% / {self.total_size}")
+            self.status_label.setText("Status: Download finished")
+        else:
+            self.progress_bar.setValue(0)
+            self.status_label.setText("Status: Download failed")
