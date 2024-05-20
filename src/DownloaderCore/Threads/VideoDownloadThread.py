@@ -3,7 +3,7 @@ from PySide6.QtCore import QObject, QRunnable, Signal
 
 class VideoDownloadThread(QObject, QRunnable):
     __on_finish = Signal(bool)
-    __on_progress = Signal(dict, int, object)
+    __on_progress = Signal(dict)
     def __init__(self, yt_dlp: object, url: str = "https://www.youtube.com/watch?v=HBEsr0MfdmQ", options : dict[str, object] = {}, finished_callback: object| None = None, progress_callback: object | None = None) -> None:
         super().__init__()
         self.yt_dlp = yt_dlp
@@ -17,9 +17,9 @@ class VideoDownloadThread(QObject, QRunnable):
         self.__download_options = options
     def _finish_hook(self, result):
         if result["status"] == "started":
-            self.__on_progress.emit({}, "Postprocessing started", "")
+            self.__on_progress.emit({"postprocessing": "started"})
         else:
-            self.__on_progress.emit({}, "Postprocessing finished", "")
+            self.__on_progress.emit({"postprocessing": "finished"})
     def _progress_hook(self, result):
         if self.__is_cancled:
             raise self.yt_dlp.utils.DownloadError("Cancelled by user")
@@ -28,25 +28,7 @@ class VideoDownloadThread(QObject, QRunnable):
         if self.__progress_counter % 20 != 0:
             return
 
-        match(result["status"]):
-            case "downloading":
-                downloaded_bytes = float(result["downloaded_bytes"])
-                total_bytes = 0
-                if "total_bytes" in result:
-                    total_bytes = float(result["total_bytes"])
-                elif "total_bytes_estimate" in result:
-                    total_bytes = float(result["total_bytes_estimate"])
-                else:
-                    return
-                percent_progress = round(100*downloaded_bytes/total_bytes)
-                eta = "unknown"
-                if "eta" in result and result["eta"]:
-                    eta = result["eta"]
-                self.__on_progress.emit(result, percent_progress, eta)
-            case "finished":
-                self.__on_progress.emit(result, "","")
-            case other:
-                self.__on_progress.emit(result, f"Unknown status {result['status']}","")
+        self.__on_progress.emit(result)
     def run(self):
         try:
             self.yt_dlp.YoutubeDL(self.__download_options).download(self.__url)

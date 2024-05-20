@@ -48,9 +48,11 @@ class YTVideoInformationWidget(InformationWidget):
         self._parent.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
         def start():
             print("Download started")
-        def progress(result, percent, eta):
-            self.download_widget.updateStatus(result, percent)
-            #self.download_widget.ProgressBar.setValue(percent)
+        def progress(result:dict):
+            if result.get("postprocessing"):
+                self.download_widget.updatePostProcessStatus(result)
+            else:
+                self.download_widget.updateStatus(result)
         def finish(success):
             self.download_widget.finishStatus(success)
 

@@ -85,12 +85,18 @@ class VideoDownloadWidget(DownloadWidget):
         painter.end()
         return rounded
 
-    def updateStatus(self, status_dict: dict, progress: int):
-
+    def updateStatus(self, status_dict: dict):
         # with open('test.json', 'a') as file:
         #     file.write(json.dumps(status_dict))
 
         self.status_label.setText("Status: Downloading...")
+
+        downloaded_bytes = status_dict.get("downloaded_bytes", 0)
+        total_bytes = status_dict.get("total_bytes") or status_dict.get("total_bytes_estimate")
+        if total_bytes:
+            progress = round(100 * downloaded_bytes / total_bytes)
+        else:
+            progress = 0
 
         self.progress_bar.setValue(progress)
 
@@ -106,12 +112,18 @@ class VideoDownloadWidget(DownloadWidget):
         else:
             speed = self.last_speed
 
-        total_size = status_dict.get('_total_bytes_str', self.total_size).lstrip()
+        total_size = status_dict.get('_total_bytes_str', "N/A").lstrip()
         if total_size == "N/A":
-            total_size = status_dict.get('_total_bytes_estimate_str', self.total_size).lstrip()
+            total_size = status_dict.get('_total_bytes_estimate_str', "???").lstrip()
             total_size = "~" + total_size
 
         self.progress_label.setText(f"{progress}% of {total_size} at ({speed}) - {eta} left")
+
+    def updatePostProcessStatus(self, status_dict: dict):
+        if status_dict.get("postprocessing") == "started":
+            self.status_label.setText("Status: Postprocessing started")
+        else:
+            self.status_label.setText("Status: Postprocessing finished")
 
     def finishStatus(self, success):
         if success:
