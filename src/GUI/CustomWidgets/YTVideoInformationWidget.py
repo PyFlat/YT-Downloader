@@ -21,9 +21,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.info = info_dict
         self.url = self.info["original_url"]
 
-        for thumbnail in self.info["thumbnails"]:
-            if thumbnail["url"].endswith("mqdefault.jpg"):
-                self.thumbnail_url = thumbnail["url"]
+        self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info["display_id"]}/mqdefault.jpg"
 
         self.fetchThumbnailFromUrl(self.thumbnail_url)
 
