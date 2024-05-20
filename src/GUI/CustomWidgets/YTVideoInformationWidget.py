@@ -21,7 +21,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.info = info_dict
         self.url = self.info["original_url"]
 
-        self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info["display_id"]}/mqdefault.jpg"
+        self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg"
 
         self.fetchThumbnailFromUrl(self.thumbnail_url)
 
@@ -41,18 +41,22 @@ class YTVideoInformationWidget(InformationWidget):
         self.PushButton.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
     def download_video(self):
+        # Erstelle ein neues Widget für den Download
+        download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
+        self._parent.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
 
-        self.download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
-        self._parent.download_interface.verticalLayout.addWidget(self.download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+        # Definiere die Funktionen für den Downloadprozess
         def start():
             print("Download started")
-        def progress(result:dict):
+
+        def progress(result: dict):
             if result.get("postprocessing"):
-                self.download_widget.updatePostProcessStatus(result)
+                download_widget.updatePostProcessStatus(result)
             else:
-                self.download_widget.updateStatus(result)
+                download_widget.updateStatus(result)
+
         def finish(success):
-            self.download_widget.finishStatus(success)
+            download_widget.finishStatus(success)
 
         self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b", start, progress, finish)
 
