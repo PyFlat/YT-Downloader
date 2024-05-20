@@ -20,8 +20,6 @@ class VideoDownloadWidget(DownloadWidget):
         self.image_data = None
         self.last_eta = 0
         self.last_speed =  ""
-        self.total_size  = ""
-
         self.title_label.setText(title)
         self.channel_label.setText(uploader)
 
@@ -88,6 +86,12 @@ class VideoDownloadWidget(DownloadWidget):
         return rounded
 
     def updateStatus(self, status_dict: dict, progress: int):
+
+        # with open('test.json', 'a') as file:
+        #     file.write(json.dumps(status_dict))
+
+        self.status_label.setText("Status: Downloading...")
+
         self.progress_bar.setValue(progress)
 
         eta = status_dict.get("_eta_str", self.last_eta)
@@ -103,16 +107,16 @@ class VideoDownloadWidget(DownloadWidget):
             speed = self.last_speed
 
         total_size = status_dict.get('_total_bytes_str', self.total_size).lstrip()
-        if not self.total_size:
-            self.total_size = total_size
+        if total_size == "N/A":
+            total_size = status_dict.get('_total_bytes_estimate_str', self.total_size).lstrip()
+            total_size = "~" + total_size
 
-        self.progress_label.setText(f"{progress}% / {total_size} - {eta} left ({speed})")
-
+        self.progress_label.setText(f"{progress}% of {total_size} at ({speed}) - {eta} left")
 
     def finishStatus(self, success):
         if success:
             self.progress_bar.setValue(100)
-            self.progress_label.setText(f"100% / {self.total_size}")
+            self.progress_label.setText("100%")
             self.status_label.setText("Status: Download finished")
         else:
             self.progress_bar.setValue(0)

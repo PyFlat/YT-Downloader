@@ -136,13 +136,13 @@ class YTVideoInformationWidget(InformationWidget):
         self.view.addWidget(button, align=Qt.AlignRight)
         self.view.addWidget(button1, align=Qt.AlignRight)
 
-        button.clicked.connect(self.download_video)
-
-        Flyout.make(
+        flyout = Flyout.make(
             target=self.quick_dl_btn,
             view=self.view,
             parent=self.parent()
         )
+
+        button.clicked.connect(lambda: [self.download_video(), flyout.close()])
 
 
     def round_pixmap_corners(self, pixmap, radius):
