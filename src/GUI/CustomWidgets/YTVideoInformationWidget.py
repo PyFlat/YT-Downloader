@@ -1,11 +1,13 @@
+import re
 from datetime import datetime
 
 from PySide6.QtCore import QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
-from PySide6.QtWidgets import QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QListWidgetItem
 from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
 
+from formats import YOUTUBE_VIDEO
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
@@ -21,7 +23,12 @@ class YTVideoInformationWidget(InformationWidget):
         self.info = info_dict
         self.url = self.info["original_url"]
 
+        self.back_to_all_formats = False
+
         self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg"
+
+        self.video_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("video_formats", [])]
+        self.audio_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("audio_formats", [])]
 
         if cfg.get(cfg.thumbnail_streaming):
             self.fetchThumbnailFromUrl(self.thumbnail_url)
@@ -37,11 +44,27 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.stackedWidget.setCurrentIndex(0)
 
-        self.best_video_btn.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
-        self.best_audio_btn.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        self.best_video_btn.clicked.connect(lambda: self.setFormatOptions())
+        self.best_audio_btn.clicked.connect(lambda: self.setFormatOptions(video = False))
         self.quick_dl_btn.clicked.connect(self.showFlyout)
+        self.custom_dl_btn.clicked.connect(self.setAllFormatOptions)
+        self.custom_dl_next_btn.clicked.connect(self.setResolutionOptions)
+        self.custom_dl_back_btn.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        self.custom_dl_list_widget.itemSelectionChanged.connect(self.changeBtnVisibility)
 
-        self.PushButton.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        self.custom_dl_next_btn.setVisible(False)
+        self.custom_dl_dl_btn.setVisible(False)
+
+        self.PushButton.clicked.connect(self.goBack)
+
+        self.SearchLineEdit.textChanged.connect(self.filter_list)
+
+    def filter_list(self, text):
+        text = text.lower()
+        for index in range(self.ListWidget.count()):
+            item = self.ListWidget.item(index)
+            item_text = item.text().lower()
+            item.setHidden(text not in item_text)
 
     def download_video(self):
         # Erstelle ein neues Widget für den Download
@@ -97,6 +120,62 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.BodyLabel_4.setText(upload_date)
 
+    def changeBtnVisibility(self):
+        selectedItems = self.custom_dl_list_widget.selectedItems()
+        if len(selectedItems) == 0:
+            self.custom_dl_next_btn.setVisible(False)
+            self.custom_dl_dl_btn.setVisible(False)
+            return
+
+        if "video" in selectedItems[0].text().lower():
+            self.custom_dl_next_btn.setVisible(True)
+            self.custom_dl_dl_btn.setVisible(False)
+        else:
+            self.custom_dl_next_btn.setVisible(False)
+            self.custom_dl_dl_btn.setVisible(True)
+
+    def goBack(self):
+        if self.back_to_all_formats:
+            self.setAllFormatOptions()
+        else:
+            self.stackedWidget.setCurrentIndex(0)
+
+    def setFormatOptions(self, video=True):
+        self.ListWidget.clear()
+        self.ListWidget.clearSelection()
+        self.stackedWidget.setCurrentIndex(1)
+        self.back_to_all_formats = False
+
+        if video:
+            available_extensions = self.video_formats
+            self.ListWidget.addItems(available_extensions)
+        else:
+            available_extensions = self.audio_formats
+            self.ListWidget.addItems(available_extensions)
+
+    def setAllFormatOptions(self):
+        self.custom_dl_list_widget.clear()
+        self.custom_dl_list_widget.clearSelection()
+        self.stackedWidget.setCurrentIndex(2)
+        self.back_to_all_formats = True
+        self.custom_dl_list_widget.addItems([f"{x} (Video)" for x in self.video_formats])
+        self.custom_dl_list_widget.addItems([f"{x} (Audio)" for x in self.audio_formats])
+
+    def setResolutionOptions(self):
+        self.ListWidget.clear()
+        self.ListWidget.clearSelection()
+        self.stackedWidget.setCurrentIndex(1)
+        self.ListWidget.addItems(self.get_available_resolutions())
+
+    def get_available_resolutions(self):
+        resolution = []
+        for stream in self.info["formats"]:
+            if stream["video_ext"] != "none":
+                stre = f"{stream['resolution'].split('x')[1]}p"
+                if stre not in resolution:
+                    resolution.append(stre)
+        resolution = sorted(resolution, key=lambda s: int(re.compile(r'\d+').search(s).group()), reverse=True)
+        return resolution
 
     def fetchThumbnailFromUrl(self, url):
         manager = QNetworkAccessManager(self)
@@ -157,7 +236,6 @@ class YTVideoInformationWidget(InformationWidget):
         )
 
         button.clicked.connect(lambda: [self.download_video(), flyout.close()])
-
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())

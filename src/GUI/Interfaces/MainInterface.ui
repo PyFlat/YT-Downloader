@@ -33,22 +33,12 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="LineEdit" name="LineEdit">
+       <widget class="SearchLineEdit" name="LineEdit">
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
         <property name="placeholderText">
          <string>Enter the URL of the video or playlist, or type in a search term.</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="PushButton" name="PushButton">
-        <property name="text">
-         <string>Search</string>
-        </property>
-        <property name="shortcut">
-         <string>Return</string>
         </property>
        </widget>
       </item>
@@ -140,11 +130,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PushButton</class>
-   <extends>QPushButton</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
    <class>TitleLabel</class>
    <extends>QLabel</extends>
    <header>qfluentwidgets</header>
@@ -157,6 +142,11 @@
   <customwidget>
    <class>LineEdit</class>
    <extends>QLineEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SearchLineEdit</class>
+   <extends>LineEdit</extends>
    <header>qfluentwidgets</header>
   </customwidget>
  </customwidgets>

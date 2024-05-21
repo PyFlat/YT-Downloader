@@ -39,8 +39,8 @@ class MainWindow(FluentWindow):
 
         self.main_interface = MainInterface(self)
         self.main_interface.stackedWidget.setCurrentIndex(0)
-        self.main_interface.PushButton.setShortcut(QKeySequence(Qt.Key_Return))
-        self.main_interface.PushButton.clicked.connect(self.searchByUrl)
+        self.main_interface.LineEdit.searchButton.setShortcut(QKeySequence(Qt.Key_Return))
+        self.main_interface.LineEdit.searchButton.clicked.connect(self.searchByUrl)
 
         self.download_interface = DownloadInterface(self)
         self.download_interface.setStyleSheet("background: transparent; border: none")

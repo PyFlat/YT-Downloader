@@ -7,7 +7,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QSizePolicy, QSpacerItem,
     QStackedWidget, QVBoxLayout, QWidget)
-from qfluentwidgets import (IndeterminateProgressRing, LineEdit, PushButton, TitleLabel)
+from qfluentwidgets import (IndeterminateProgressRing, LineEdit, SearchLineEdit, TitleLabel)
 class MainInterface(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -22,13 +22,10 @@ class MainInterface(QWidget):
         self.horizontalLayout.setSpacing(10)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.LineEdit = LineEdit(self.widget)
+        self.LineEdit = SearchLineEdit(self.widget)
         self.LineEdit.setObjectName(u"LineEdit")
         self.LineEdit.setAlignment(Qt.AlignCenter)
         self.horizontalLayout.addWidget(self.LineEdit)
-        self.PushButton = PushButton(self.widget)
-        self.PushButton.setObjectName(u"PushButton")
-        self.horizontalLayout.addWidget(self.PushButton)
         self.verticalLayout.addWidget(self.widget)
         self.stackedWidget = QStackedWidget(Form)
         self.stackedWidget.setObjectName(u"stackedWidget")
@@ -63,6 +60,4 @@ class MainInterface(QWidget):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.LineEdit.setPlaceholderText(QCoreApplication.translate("Form", u"Enter the URL of the video or playlist, or type in a search term.", None))
-        self.PushButton.setText(QCoreApplication.translate("Form", u"Search", None))
-        self.PushButton.setShortcut(QCoreApplication.translate("Form", u"Return", None))
         self.TitleLabel.setText(QCoreApplication.translate("Form", u"Searching...", None))

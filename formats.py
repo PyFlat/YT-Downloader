@@ -2,7 +2,7 @@ YOUTUBE_VIDEO = {
     "webpage_url_domain": "youtube.com",
     "video_formats": [
         {
-            "extension": "mp4",
+            "extension": "MP4",
             "yt_dlp_options": {
                 "socket_timeout": 15,
                 "quiet": True,
@@ -20,7 +20,7 @@ YOUTUBE_VIDEO = {
     ],
     "audio_formats": [
         {
-            "extension": "mp3",
+            "extension": "MP3",
             "yt_dlp_options": {
                 "socket_timeout": 15,
                 "quiet": True,
