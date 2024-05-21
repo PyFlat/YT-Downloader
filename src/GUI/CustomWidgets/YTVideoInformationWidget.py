@@ -4,7 +4,7 @@ from datetime import datetime
 from PySide6.QtCore import QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
-from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QListWidgetItem
+from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QListWidget
 from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
 
 from formats import YOUTUBE_VIDEO
@@ -57,21 +57,20 @@ class YTVideoInformationWidget(InformationWidget):
 
         self.PushButton.clicked.connect(self.goBack)
 
-        self.SearchLineEdit.textChanged.connect(self.filter_list)
+        self.SearchLineEdit.textChanged.connect(lambda text: self.filter_list(text, self.ListWidget))
+        self.custom_dl_line_edit.textChanged.connect(lambda text: self.filter_list(text, self.custom_dl_list_widget))
 
-    def filter_list(self, text):
+    def filter_list(self, text:str, list_widget: QListWidget):
         text = text.lower()
-        for index in range(self.ListWidget.count()):
-            item = self.ListWidget.item(index)
-            item_text = item.text().lower()
-            item.setHidden(text not in item_text)
+        for index in range(list_widget.count()):
+            item = list_widget.item(index)
+            item.setHidden(text not in item.text().lower())
+
 
     def download_video(self):
-        # Erstelle ein neues Widget für den Download
         download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
         self._parent.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
 
-        # Definiere die Funktionen für den Downloadprozess
         def start():
             print("Download started")
 
@@ -144,6 +143,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.ListWidget.clear()
         self.ListWidget.clearSelection()
         self.stackedWidget.setCurrentIndex(1)
+        self.SearchLineEdit.clear()
         self.back_to_all_formats = False
 
         if video:
@@ -157,6 +157,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.custom_dl_list_widget.clear()
         self.custom_dl_list_widget.clearSelection()
         self.stackedWidget.setCurrentIndex(2)
+        self.custom_dl_line_edit.clear()
         self.back_to_all_formats = True
         self.custom_dl_list_widget.addItems([f"{x} (Video)" for x in self.video_formats])
         self.custom_dl_list_widget.addItems([f"{x} (Audio)" for x in self.audio_formats])
@@ -165,6 +166,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.ListWidget.clear()
         self.ListWidget.clearSelection()
         self.stackedWidget.setCurrentIndex(1)
+        self.SearchLineEdit.clear()
         self.ListWidget.addItems(self.get_available_resolutions())
 
     def get_available_resolutions(self):
