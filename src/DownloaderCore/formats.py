@@ -3,6 +3,7 @@ YOUTUBE_VIDEO = {
     "video_formats": [
         {
             "extension": "MP4",
+            "ID": 1,
             "yt_dlp_options": {
                 "socket_timeout": 15,
                 "quiet": True,
@@ -21,6 +22,7 @@ YOUTUBE_VIDEO = {
     "audio_formats": [
         {
             "extension": "MP3",
+            "ID": 2,
             "yt_dlp_options": {
                 "socket_timeout": 15,
                 "quiet": True,

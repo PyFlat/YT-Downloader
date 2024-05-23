@@ -40,8 +40,8 @@ class Downloader():
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, True, callback), force=True)
     def getVideoInfo(self, url: str, callback: callable) -> None:
         self.thread_manager.runTask(InformationLoadThread(self.yt_dlp, url, False, callback), force=True)
-    def downloadVideo(self, url: str, outfile_path: str, ffmpeg_path: str, format: str, start_callback: object | None = None, progress_callback: object | None = None, finish_callback: object | None = None):
-        self.thread_manager.runTask(YoutubeVideoDownloadThread(self.yt_dlp, url,format,ffmpeg_path,f"{outfile_path}/%(title)s(%(height)sp).%(ext)s","mp4",finish_callback,progress_callback),False,start_callback)
+    def downloadVideo(self, url: str, start_callback: object | None = None, progress_callback: object | None = None, finish_callback: object | None = None, **options):
+        self.thread_manager.runTask(YoutubeVideoDownloadThread(self.yt_dlp, url, finish_callback,progress_callback, **options),False,start_callback)
     def download_playlist(self, url: str, outfile_path: str, ffmpeg_path: str, resolution: int, playlist_range: tuple[int, int] | None = None):
         def on_info_recieve(data, url):
             if data == {}:

@@ -7,9 +7,9 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequ
 from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QListWidget
 from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
 
-from formats import YOUTUBE_VIDEO
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
+from src.DownloaderCore.formats import YOUTUBE_VIDEO
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
 from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
 from src.GUI.Icons.Icons import CustomIcons
@@ -83,7 +83,15 @@ class YTVideoInformationWidget(InformationWidget):
         def finish(success):
             download_widget.finishStatus(success)
 
-        self.downloader.downloadVideo(self.url, cfg.get(cfg.download_folder), cfg.get(cfg.ffmpeg_path), "bv*+ba[ext=m4a]/b", start, progress, finish)
+        options = {
+            "ID": 1,
+            "format": "bv*+ba[ext=m4a]/b",
+            "ffmpeg_path": cfg.get(cfg.ffmpeg_path),
+            "outtmpl": f"{cfg.get(cfg.download_folder)}/%(title)s(%(height)sp).%(ext)s",
+            "overwrites": True
+        }
+
+        self.downloader.downloadVideo(self.url, start, progress, finish, **options)
 
     def setIcons(self):
 
