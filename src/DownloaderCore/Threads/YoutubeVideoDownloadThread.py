@@ -14,8 +14,8 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
         if new_options == {}:
             raise ValueError("Invalid or missing ID")
 
-        # new_options["progress_hooks"] = [super()._progress_hook]
-        # new_options["postprocessor_hooks"] = [super()._finish_hook]
+        new_options["progress_hooks"] = [super()._progress_hook]
+        new_options["postprocessor_hooks"] = [super()._finish_hook]
 
         for key in options:
             if key in new_options:
@@ -23,5 +23,5 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
                     new_options[key] = new_options[key].format(options[key])
                 else:
                     new_options[key] = options[key]
-        print(new_options)
+
         super().__init__(yt_dlp, url, new_options, finished_callback, progress_callback)

@@ -24,11 +24,15 @@ class YTVideoInformationWidget(InformationWidget):
         self.url = self.info["original_url"]
 
         self.back_to_all_formats = False
+        self.button_type_clicked = None
 
         self.thumbnail_url = f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg"
 
         self.video_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("video_formats", [])]
+        self.best_video_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("video_formats", []) if x.get("best_format")]
+
         self.audio_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("audio_formats", [])]
+        self.best_audio_formats = [x["extension"] for x in YOUTUBE_VIDEO.get("audio_formats", []) if x.get("best_format")]
 
         if cfg.get(cfg.thumbnail_streaming):
             self.fetchThumbnailFromUrl(self.thumbnail_url)
@@ -56,6 +60,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.custom_dl_dl_btn.setVisible(False)
 
         self.PushButton.clicked.connect(self.goBack)
+        self.PrimaryPushButton_4.clicked.connect(self.perform_download)
 
         self.SearchLineEdit.textChanged.connect(lambda text: self.filter_list(text, self.ListWidget))
         self.custom_dl_line_edit.textChanged.connect(lambda text: self.filter_list(text, self.custom_dl_list_widget))
@@ -66,6 +71,42 @@ class YTVideoInformationWidget(InformationWidget):
             item = list_widget.item(index)
             item.setHidden(text not in item.text().lower())
 
+    def perform_download(self):
+        match self.button_type_clicked:
+            case "best_video":
+                type = "video"
+                ext = self.ListWidget.currentItem().text().lower()
+            case "best_audio":
+                type = "audio"
+                ext = self.ListWidget.currentItem().text().lower()
+            case "custom":
+                pass
+            case other:
+                return
+
+        download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
+        self._parent.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+
+        def start():
+            print("Download started")
+
+        def progress(result: dict):
+            if result.get("postprocessing"):
+                download_widget.updatePostProcessStatus(result)
+            else:
+                download_widget.updateStatus(result)
+
+        def finish(success):
+            download_widget.finishStatus(success)
+
+        options = {
+            "ID": f"{type}/{ext}/best",
+            "ffmpeg_path": cfg.get(cfg.ffmpeg_path),
+            "outtmpl": cfg.get(cfg.download_folder),
+            "overwrites": True
+        }
+
+        self.downloader.downloadVideo(self.url, start, progress, finish, **options)
 
     def download_video(self):
         download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
@@ -179,11 +220,11 @@ class YTVideoInformationWidget(InformationWidget):
         self.back_to_all_formats = False
 
         if video:
-            available_extensions = self.video_formats
-            self.ListWidget.addItems(available_extensions)
+            self.button_type_clicked = "best_video"
+            self.ListWidget.addItems(self.best_video_formats)
         else:
-            available_extensions = self.audio_formats
-            self.ListWidget.addItems(available_extensions)
+            self.button_type_clicked = "best_audio"
+            self.ListWidget.addItems(self.best_audio_formats)
 
     def setAllFormatOptions(self):
         self.custom_dl_list_widget.clear()
@@ -191,6 +232,7 @@ class YTVideoInformationWidget(InformationWidget):
         self.stackedWidget.setCurrentIndex(2)
         self.custom_dl_line_edit.clear()
         self.back_to_all_formats = True
+        self.button_type_clicked = "custom"
         self.custom_dl_list_widget.addItems([f"{x} (Video)" for x in self.video_formats])
         self.custom_dl_list_widget.addItems([f"{x} (Audio)" for x in self.audio_formats])
 
@@ -269,8 +311,8 @@ class YTVideoInformationWidget(InformationWidget):
             parent=self.parent()
         )
 
-        button.clicked.connect(lambda: [self.download_video(), flyout.close()])
-        button1.clicked.connect(lambda: [self.download_audio(), flyout.close()])
+        # button.clicked.connect(lambda: [self.download_video(), flyout.close()])
+        # button1.clicked.connect(lambda: [self.download_audio(), flyout.close()])
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())

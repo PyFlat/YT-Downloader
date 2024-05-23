@@ -15,6 +15,11 @@ BASE_YOUTUBE_OPTIONS_VIDEO = {
     "outtmpl": "{}/%(title)s (%(height)sp).%(ext)s"
 }
 
+BASE_YOUTUBE_OPTIONS_AUDIO = {
+    **BASE_YOUTUBE_OPTIONS,
+    "outtmpl": "{}/%(title)s.%(ext)s"
+}
+
 YOUTUBE_VIDEO = {
     "webpage_url_domain": "youtube.com",
     "video_formats": [
@@ -37,15 +42,35 @@ YOUTUBE_VIDEO = {
                 "merge_output_format": "mp4",
                 "format": "bv*+ba[ext=m4a]/b",
             },
+        },
+        {
+            "extension": "MKV",
+            "ID": "video/mkv/best",
+            "best_format": True,
+            "yt_dlp_options": {
+                **BASE_YOUTUBE_OPTIONS_VIDEO,
+                "merge_output_format": "mkv",
+                "format": "bv*+ba[ext=m4a]/b",
+            },
+        },
+        {
+            "extension": "AVI",
+            "ID": "video/avi/best",
+            "best_format": True,
+            "yt_dlp_options": {
+                **BASE_YOUTUBE_OPTIONS_VIDEO,
+                "merge_output_format": "avi",
+                "format": "bv*+ba[ext=m4a]/b",
+            },
         }
     ],
     "audio_formats": [
         {
             "extension": "MP3",
             "ID": "audio/mp3/best",
-            "best": True,
+            "best_format": True,
             "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS,
+                **BASE_YOUTUBE_OPTIONS_AUDIO,
                 "format": "bestaudio/best",
                 "postprocessors": [
                     {
