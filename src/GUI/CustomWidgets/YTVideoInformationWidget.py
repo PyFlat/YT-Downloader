@@ -84,10 +84,34 @@ class YTVideoInformationWidget(InformationWidget):
             download_widget.finishStatus(success)
 
         options = {
-            "ID": 1,
-            "format": "bv*+ba[ext=m4a]/b",
+            "ID": "video/mp4/best",
             "ffmpeg_path": cfg.get(cfg.ffmpeg_path),
-            "outtmpl": f"{cfg.get(cfg.download_folder)}/%(title)s(%(height)sp).%(ext)s",
+            "outtmpl": cfg.get(cfg.download_folder),
+            "overwrites": True
+        }
+
+        self.downloader.downloadVideo(self.url, start, progress, finish, **options)
+
+    def download_audio(self):
+        download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'])
+        self._parent.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+
+        def start():
+            print("Download started")
+
+        def progress(result: dict):
+            if result.get("postprocessing"):
+                download_widget.updatePostProcessStatus(result)
+            else:
+                download_widget.updateStatus(result)
+
+        def finish(success):
+            download_widget.finishStatus(success)
+
+        options = {
+            "ID": "audio/mp3/best",
+            "ffmpeg_path": cfg.get(cfg.ffmpeg_path),
+            "outtmpl": cfg.get(cfg.download_folder),
             "overwrites": True
         }
 
@@ -246,6 +270,7 @@ class YTVideoInformationWidget(InformationWidget):
         )
 
         button.clicked.connect(lambda: [self.download_video(), flyout.close()])
+        button1.clicked.connect(lambda: [self.download_audio(), flyout.close()])
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())
