@@ -5,6 +5,7 @@ BASE_YOUTUBE_OPTIONS = {
     "overwrites": None,
     "ffmpeg_location": None,
     "outtmpl": None,
+    "updatetime": False,
     "progress_hooks": [],
     "postprocessor_hooks": [],
 }
@@ -68,7 +69,6 @@ YOUTUBE_VIDEO = {
         {
             "extension": "MP3",
             "ID": "audio/mp3/best",
-            "best_format": True,
             "yt_dlp_options": {
                 **BASE_YOUTUBE_OPTIONS_AUDIO,
                 "format": "bestaudio/best",
@@ -76,6 +76,21 @@ YOUTUBE_VIDEO = {
                     {
                         "key": "FFmpegExtractAudio",
                         "preferredcodec": "mp3",
+                        "preferredquality": "192",
+                    }
+                ],
+            },
+        },
+        {
+            "extension": "M4A",
+            "ID": "audio/m4a/best",
+            "yt_dlp_options": {
+                **BASE_YOUTUBE_OPTIONS_AUDIO,
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "m4a",
                         "preferredquality": "192",
                     }
                 ],

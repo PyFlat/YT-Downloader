@@ -3,13 +3,17 @@ try:
     from src.DownloaderCore.Threads.VideoDownloadThread import VideoDownloadThread
 except ModuleNotFoundError:
     from Threads.VideoDownloadThread import VideoDownloadThread
+
+import copy
+import json
+
+
 class YoutubeVideoDownloadThread(VideoDownloadThread):
     def __init__(self, yt_dlp: object, url: str, finished_callback: object | None = None, progress_callback: object | None = None, **options) -> None:
-
         new_options = {}
-        for option in YOUTUBE_VIDEO.get("video_formats") + YOUTUBE_VIDEO.get("audio_formats"):
+        for option in YOUTUBE_VIDEO["video_formats"] +  YOUTUBE_VIDEO["audio_formats"]:
             if "ID" in options and options["ID"] == option["ID"]:
-                new_options = option["yt_dlp_options"]
+                new_options = copy.deepcopy(option["yt_dlp_options"])
 
         if new_options == {}:
             raise ValueError("Invalid or missing ID")

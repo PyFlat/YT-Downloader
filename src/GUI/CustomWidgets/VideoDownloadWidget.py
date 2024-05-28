@@ -10,7 +10,7 @@ from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 
 class VideoDownloadWidget(DownloadWidget):
-    def __init__(self, parent:DownloadInterface=None, display_id:str=None, title:str=None, uploader:str=None):
+    def __init__(self, parent:DownloadInterface=None, display_id:str=None, title:str=None, uploader:str=None, format_str:str=None):
         super().__init__(parent)
         self.__parent = parent
         self.display_id = display_id
@@ -21,6 +21,8 @@ class VideoDownloadWidget(DownloadWidget):
         self.last_speed =  ""
         self.title_label.setText(title)
         self.channel_label.setText(uploader)
+
+        self.updateFormatLabels(format_str)
 
         self.cancel_btn.setIcon(FIF.CANCEL_MEDIUM)
 
@@ -33,6 +35,22 @@ class VideoDownloadWidget(DownloadWidget):
         else:
             color = "202020" if isDarkTheme() else "eeeeee"
             self.setStyleSheet(f"background: #{color}; border-radius: 10px")
+
+    def updateFormatLabels(self, format_str:str):
+        parts = format_str.split('/')
+        print(parts)
+        format_str = "Format: " + parts[0].capitalize() + "/" + parts[1].upper()
+
+        if parts[0] == 'video':
+            if parts[2] == 'best':
+                quality_str = "Quality: Best Video/Best Audio"
+            else:
+                quality_str = "Quality: " + parts[2].capitalize() + "p/Best Audio"
+        elif parts[0] == 'audio':
+            quality_str = "Quality: Best Audio"
+
+        self.format_label.setText(format_str)
+        self.quality_label.setText(quality_str)
 
     def switch(self):
 
