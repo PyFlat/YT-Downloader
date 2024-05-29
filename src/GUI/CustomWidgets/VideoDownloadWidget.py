@@ -1,5 +1,5 @@
-from PySide6.QtCore import QRect, Qt, QUrl
-from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPixmap
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import isDarkTheme
@@ -38,7 +38,6 @@ class VideoDownloadWidget(DownloadWidget):
 
     def updateFormatLabels(self, format_str:str):
         parts = format_str.split('/')
-        print(parts)
         format_str = "Format: " + parts[0].capitalize() + "/" + parts[1].upper()
 
         if parts[0] == 'video':
@@ -118,8 +117,8 @@ class VideoDownloadWidget(DownloadWidget):
             progress = round(100 * downloaded_bytes / total_bytes)
         else:
             progress = 0
-
-        self.progress_bar.setValue(progress)
+        if self.progress_bar.value() != progress:
+            self.progress_bar.setValue(progress)
 
         eta = status_dict.get("_eta_str", self.last_eta)
         if eta != "Unknown":
@@ -137,8 +136,9 @@ class VideoDownloadWidget(DownloadWidget):
         if total_size == "N/A":
             total_size = status_dict.get('_total_bytes_estimate_str', "???").lstrip()
             total_size = "~" + total_size
-
-        self.progress_label.setText(f"{progress}% of {total_size} at ({speed}) - {eta} left")
+        text_to_set = f"{progress}% of {total_size} at ({speed}) - {eta} left"
+        if self.progress_label.text() != text_to_set:
+            self.progress_label.setText(text_to_set)
 
     def updatePostProcessStatus(self, status_dict: dict):
         if status_dict.get("postprocessing") == "started":

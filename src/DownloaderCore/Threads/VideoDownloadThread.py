@@ -24,10 +24,6 @@ class VideoDownloadThread(QObject, QRunnable):
         if self.__is_cancled:
             raise self.yt_dlp.utils.DownloadError("Cancelled by user")
 
-        self.__progress_counter += 1
-        if self.__progress_counter % 20 != 0:
-            return
-
         self.__on_progress.emit(result)
     def run(self):
         try:

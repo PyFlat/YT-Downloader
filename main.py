@@ -13,7 +13,6 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import (
     FluentWindow,
-    HorizontalSeparator,
     InfoBadge,
     InfoBadgePosition,
     MessageBox,
@@ -24,8 +23,8 @@ from qfluentwidgets import (
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
-from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
 from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
+from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 from src.GUI.Interfaces.MainInterface import MainInterface
 from src.GUI.Interfaces.SettingInterface import SettingInterface
@@ -135,5 +134,6 @@ if __name__ == "__main__":
     thread_manager = ThreadManager(10)
     thread_manager.setMaxThreadCount(cfg.get(cfg.maximum_download_threads))
     downloader = Downloader(thread_manager)
-    MainWindow()
+    main_window = MainWindow()
+    download_widget_manager.setInterface(main_window.download_interface, downloader)
     sys.exit(app.exec())

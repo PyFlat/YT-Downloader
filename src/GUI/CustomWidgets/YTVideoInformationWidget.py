@@ -12,6 +12,7 @@ from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.formats import YOUTUBE_VIDEO
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
 from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
+from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Icons.Icons import CustomIcons
 
 
@@ -100,22 +101,7 @@ class YTVideoInformationWidget(InformationWidget):
             options["format"] = resolution
             format_id = f"{format_id.rsplit('/', 1)[0]}/{resolution}"
 
-        download_widget = VideoDownloadWidget(self._parent.download_interface, self.info["display_id"], self.info["title"], self.info['channel'], format_id)
-        self._parent.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
-
-        def start():
-            print("Download started")
-
-        def progress(result: dict):
-            if result.get("postprocessing"):
-                download_widget.updatePostProcessStatus(result)
-            else:
-                download_widget.updateStatus(result)
-
-        def finish(success):
-            download_widget.finishStatus(success)
-
-        self.downloader.downloadVideo(self.url, start, progress, finish, **options)
+        download_widget_manager.addVideoDownloadWidget(self.info["display_id"], self.info["title"], self.info['channel'], format_id, self.url, **options)
 
     def setIcons(self):
 
@@ -158,12 +144,8 @@ class YTVideoInformationWidget(InformationWidget):
             self.custom_dl_dl_btn.setVisible(False)
             return
 
-        if "video" in selectedItems[0].text().lower():
-            self.custom_dl_next_btn.setVisible(True)
-            self.custom_dl_dl_btn.setVisible(False)
-        else:
-            self.custom_dl_next_btn.setVisible(False)
-            self.custom_dl_dl_btn.setVisible(True)
+        self.custom_dl_next_btn.setVisible(True)
+        self.custom_dl_dl_btn.setVisible(False)
 
     def setDownloadBtnVisible(self):
         selectedItems = self.ListWidget.selectedItems()
