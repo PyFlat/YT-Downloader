@@ -38,7 +38,9 @@ class MainWindow(FluentWindow):
 
         self.main_interface = MainInterface(self)
         self.main_interface.stackedWidget.setCurrentIndex(0)
-        self.main_interface.LineEdit.searchButton.setShortcut(QKeySequence(Qt.Key_Return))
+        self.main_interface.LineEdit.searchButton.setShortcut(
+            QKeySequence(Qt.Key_Return)
+        )
         self.main_interface.LineEdit.searchButton.clicked.connect(self.searchByUrl)
 
         self.download_interface = DownloadInterface(self)
@@ -52,7 +54,7 @@ class MainWindow(FluentWindow):
 
         self.checkForYtdlp()
 
-        if getattr(sys, 'frozen', False) and cfg.get(cfg.check_for_updates):
+        if getattr(sys, "frozen", False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
         self.splashScreen.finish()
@@ -65,7 +67,6 @@ class MainWindow(FluentWindow):
         if self.info_widget:
             self.info_widget.updateDropShadow()
 
-
     def videoInformationCallback(self, result, url):
         if self.info_widget:
             self.info_widget.deleteLater()
@@ -77,11 +78,15 @@ class MainWindow(FluentWindow):
 
     def searchByUrl(self):
         self.main_interface.stackedWidget.setCurrentIndex(1)
-        downloader.getVideoInfo(self.main_interface.LineEdit.text(), self.videoInformationCallback)
+        downloader.getVideoInfo(
+            self.main_interface.LineEdit.text(), self.videoInformationCallback
+        )
 
     def showDialog(self):
         title = "yt-dlp not found"
-        content = "Yt-dlp isn't installed without it the downloader can't work. Download it?"
+        content = (
+            "Yt-dlp isn't installed without it the downloader can't work. Download it?"
+        )
         msgb = MessageBox(title, content, self)
         if msgb.exec():
             self.switchTo(self.setting_interface)
@@ -110,14 +115,19 @@ class MainWindow(FluentWindow):
 
         self.navigationInterface.addSeparator()
 
-        self.addSubInterface(self.setting_interface, FIF.SETTING, "Settings", NavigationItemPosition.BOTTOM)
+        self.addSubInterface(
+            self.setting_interface,
+            FIF.SETTING,
+            "Settings",
+            NavigationItemPosition.BOTTOM,
+        )
 
     def initWindow(self):
         self.resize(800, 550)
         self.setMinimumSize(800, 550)
 
         self.setWindowIcon(QIcon("src/GUI/app-icon.ico"))
-        self.setWindowTitle('PyFlat YouTube Downloader')
+        self.setWindowTitle("PyFlat YouTube Downloader")
 
         self.splashScreen = SplashScreen(self.windowIcon(), self)
         self.splashScreen.setIconSize(QSize(106, 106))
@@ -125,9 +135,10 @@ class MainWindow(FluentWindow):
 
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()
-        self.move(w//2 - self.width()//2, h//2 - self.height()//2)
+        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
         self.show()
         QApplication.processEvents()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

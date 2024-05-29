@@ -10,15 +10,22 @@ from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 
 class VideoDownloadWidget(DownloadWidget):
-    def __init__(self, parent:DownloadInterface=None, display_id:str=None, title:str=None, uploader:str=None, format_str:str=None):
+    def __init__(
+        self,
+        parent: DownloadInterface = None,
+        display_id: str = None,
+        title: str = None,
+        uploader: str = None,
+        format_str: str = None,
+    ):
         super().__init__(parent)
         self.__parent = parent
         self.display_id = display_id
-        self.setFixedWidth(self.__parent.size().width()-50)
+        self.setFixedWidth(self.__parent.size().width() - 50)
         self.setFixedHeight(245)
         self.image_data = None
         self.last_eta = 0
-        self.last_speed =  ""
+        self.last_speed = ""
         self.title_label.setText(title)
         self.channel_label.setText(uploader)
 
@@ -36,16 +43,16 @@ class VideoDownloadWidget(DownloadWidget):
             color = "202020" if isDarkTheme() else "eeeeee"
             self.setStyleSheet(f"background: #{color}; border-radius: 10px")
 
-    def updateFormatLabels(self, format_str:str):
-        parts = format_str.split('/')
+    def updateFormatLabels(self, format_str: str):
+        parts = format_str.split("/")
         format_str = "Format: " + parts[0].capitalize() + "/" + parts[1].upper()
 
-        if parts[0] == 'video':
-            if parts[2] == 'best':
+        if parts[0] == "video":
+            if parts[2] == "best":
                 quality_str = "Quality: Best Video/Best Audio"
             else:
                 quality_str = "Quality: " + parts[2].capitalize() + "p/Best Audio"
-        elif parts[0] == 'audio':
+        elif parts[0] == "audio":
             quality_str = "Quality: Best Audio"
 
         self.format_label.setText(format_str)
@@ -62,7 +69,9 @@ class VideoDownloadWidget(DownloadWidget):
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.handle_response(response))
-        request = QNetworkRequest(QUrl(f"https://i.ytimg.com/vi/{self.display_id}/mqdefault.jpg"))
+        request = QNetworkRequest(
+            QUrl(f"https://i.ytimg.com/vi/{self.display_id}/mqdefault.jpg")
+        )
         response = manager.get(request)
 
     def handle_response(self, reply: QNetworkReply):
@@ -71,7 +80,8 @@ class VideoDownloadWidget(DownloadWidget):
             self.update_pixmap()
 
     def update_pixmap(self):
-        if self.image_data is None: return
+        if self.image_data is None:
+            return
         pixmap = QPixmap()
         pixmap.loadFromData(self.image_data)
 
@@ -112,7 +122,9 @@ class VideoDownloadWidget(DownloadWidget):
         self.status_label.setText("Status: Downloading...")
 
         downloaded_bytes = status_dict.get("downloaded_bytes", 0)
-        total_bytes = status_dict.get("total_bytes") or status_dict.get("total_bytes_estimate")
+        total_bytes = status_dict.get("total_bytes") or status_dict.get(
+            "total_bytes_estimate"
+        )
         if total_bytes:
             progress = round(100 * downloaded_bytes / total_bytes)
         else:
@@ -124,7 +136,7 @@ class VideoDownloadWidget(DownloadWidget):
         if eta != "Unknown":
             self.last_eta = eta
         else:
-            eta  = self.last_eta
+            eta = self.last_eta
 
         speed = status_dict.get("_speed_str", self.last_speed).lstrip()
         if "Unknown" not in speed:
@@ -132,9 +144,9 @@ class VideoDownloadWidget(DownloadWidget):
         else:
             speed = self.last_speed
 
-        total_size = status_dict.get('_total_bytes_str', "N/A").lstrip()
+        total_size = status_dict.get("_total_bytes_str", "N/A").lstrip()
         if total_size == "N/A":
-            total_size = status_dict.get('_total_bytes_estimate_str', "???").lstrip()
+            total_size = status_dict.get("_total_bytes_estimate_str", "???").lstrip()
             total_size = "~" + total_size
         text_to_set = f"{progress}% of {total_size} at ({speed}) - {eta} left"
         if self.progress_label.text() != text_to_set:

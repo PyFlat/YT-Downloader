@@ -1,4 +1,3 @@
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 
@@ -13,17 +12,25 @@ class DownloadWidgetManager:
         self.downloader = None
         self.widgets = []
 
-    def setInterface(self, download_interface:DownloadInterface, downloader:Downloader):
+    def setInterface(
+        self, download_interface: DownloadInterface, downloader: Downloader
+    ):
         self.download_interface = download_interface
         self.downloader = downloader
 
-    def addVideoDownloadWidget(self, display_id, title, channel, format_id, url, **options):
+    def addVideoDownloadWidget(
+        self, display_id, title, channel, format_id, url, **options
+    ):
         if self.download_interface == None:
             return
 
-        download_widget = VideoDownloadWidget(self.download_interface, display_id, title, channel, format_id)
+        download_widget = VideoDownloadWidget(
+            self.download_interface, display_id, title, channel, format_id
+        )
         self.widgets.append(download_widget)
-        self.download_interface.verticalLayout.addWidget(download_widget, 0, Qt.AlignTop | Qt.AlignCenter)
+        self.download_interface.verticalLayout.addWidget(
+            download_widget, 0, Qt.AlignTop | Qt.AlignCenter
+        )
 
         def start():
             print(f"Download started")
@@ -38,5 +45,6 @@ class DownloadWidgetManager:
             download_widget.finishStatus(success)
 
         self.downloader.downloadVideo(url, start, progress, finish, **options)
+
 
 download_widget_manager = DownloadWidgetManager()
