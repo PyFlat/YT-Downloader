@@ -1,24 +1,37 @@
-from src.GUI.Icons.Icons import CustomIcons
-from src.Config.Config import cfg
-from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
-                            OptionsSettingCard, PushSettingCard,
-                            InfoBar, SwitchSettingCard,
-                            setTheme, RangeSettingCard,
-                            ComboBoxSettingCard, HyperlinkCard,
-                            PrimaryPushSettingCard, MessageBox, FluentWindow)
-from qfluentwidgets import FluentIcon as FIF
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
-from PySide6.QtGui import QDesktopServices
-from src.GUI.Stylesheet.StyleSheet import StyleSheet
-from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
-from src.DownloaderCore.Downloader import Downloader
-from src.version import VERSION
 import os
+
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QFileDialog, QLabel, QWidget
+from qfluentwidgets import ComboBoxSettingCard, ExpandLayout
+from qfluentwidgets import FluentIcon as FIF
+from qfluentwidgets import (
+    FluentWindow,
+    HyperlinkCard,
+    InfoBar,
+    MessageBox,
+    OptionsSettingCard,
+    PrimaryPushSettingCard,
+    PushSettingCard,
+    RangeSettingCard,
+    ScrollArea,
+    SettingCardGroup,
+    SwitchSettingCard,
+    setTheme,
+)
+
+from src.Config.Config import cfg
+from src.DownloaderCore.Downloader import Downloader
+from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
+from src.GUI.CustomWidgets.YouTubeSettingCard import YouTubeSettingCard
+from src.GUI.Icons.Icons import CustomIcons
+from src.GUI.Stylesheet.StyleSheet import StyleSheet
+from src.version import VERSION
+
 
 class SettingInterface(ScrollArea):
 
-    def __init__(self, parent:FluentWindow=None, downloader:Downloader=None):
+    def __init__(self, parent: FluentWindow = None, downloader: Downloader = None):
         super().__init__(parent=parent)
         self.downloader = downloader
         self.__parent = parent
@@ -33,11 +46,8 @@ class SettingInterface(ScrollArea):
             FIF.BRUSH,
             "Application theme",
             "Change the appearance of the application",
-            texts=[
-                "Light", "Dark",
-                "Use system setting"
-            ],
-            parent = self.personalGroup
+            texts=["Light", "Dark", "Use system setting"],
+            parent=self.personalGroup,
         )
         self.downloaderGroup = SettingCardGroup("Downloader", self.scrollWidget)
         self.downloadFolderCard = PushSettingCard(
@@ -45,7 +55,7 @@ class SettingInterface(ScrollArea):
             FIF.DOWNLOAD,
             "Download directory",
             cfg.get(cfg.download_folder),
-            self.downloaderGroup
+            self.downloaderGroup,
         )
 
         self.ffmpegPathCard = PushSettingCard(
@@ -53,14 +63,14 @@ class SettingInterface(ScrollArea):
             CustomIcons.FFMPEG,
             "FFmpeg location",
             cfg.get(cfg.ffmpeg_path),
-            self.downloaderGroup
+            self.downloaderGroup,
         )
 
         self.downloadFFmpegCard = PushSettingCard(
             "Download",
             CustomIcons.FFMPEG,
             "Download the latest FFmpeg version",
-            parent = self.downloaderGroup
+            parent=self.downloaderGroup,
         )
 
         self.updateYtDlpCard = PushSettingCard(
@@ -68,22 +78,24 @@ class SettingInterface(ScrollArea):
             CustomIcons.YOUTUBE2,
             "Download the latest version of yt-dlp",
             f"Current version: ",
-            parent = self.downloaderGroup
+            parent=self.downloaderGroup,
         )
 
         self.maxDlThreads = RangeSettingCard(
             cfg.maximum_download_threads,
             FIF.SPEED_HIGH,
             "Maximum Download Threads",
-            parent=self.downloaderGroup
+            parent=self.downloaderGroup,
         )
 
         self.thumbnailStreamingCard = SwitchSettingCard(
             FIF.PHOTO,
             "Stream Thumbnails",
             configItem=cfg.thumbnail_streaming,
-            parent=self.downloaderGroup
+            parent=self.downloaderGroup,
         )
+
+        self.youtubeCard = YouTubeSettingCard(self.downloaderGroup)
 
         self.applicationGroup = SettingCardGroup("Application", self.scrollWidget)
 
@@ -92,7 +104,7 @@ class SettingInterface(ScrollArea):
             "Check for updates when the application starts",
             "The new version will fix known bugs and have more features",
             configItem=cfg.check_for_updates,
-            parent=self.applicationGroup
+            parent=self.applicationGroup,
         )
 
         self.logLevelCard = ComboBoxSettingCard(
@@ -100,8 +112,8 @@ class SettingInterface(ScrollArea):
             FIF.LABEL,
             "Log Level",
             "Set your preferred log-level",
-            texts = ["Info", "Debug"],
-            parent = self.applicationGroup
+            texts=["Info", "Debug"],
+            parent=self.applicationGroup,
         )
 
         self.helpCard = HyperlinkCard(
@@ -110,7 +122,7 @@ class SettingInterface(ScrollArea):
             FIF.HELP,
             "Help",
             "Find help and discover new features about PyFlat YouTube Downloader",
-            self.applicationGroup
+            self.applicationGroup,
         )
 
         self.feedbackCard = PrimaryPushSettingCard(
@@ -118,7 +130,7 @@ class SettingInterface(ScrollArea):
             FIF.FEEDBACK,
             "Provide feedback",
             "Help us improve PyFlat YouTube Downloader by providing feedback",
-            self.applicationGroup
+            self.applicationGroup,
         )
 
         self.aboutCard = PrimaryPushSettingCard(
@@ -126,7 +138,7 @@ class SettingInterface(ScrollArea):
             FIF.INFO,
             "About",
             f"©2024, PyFlat, Version {VERSION}",
-            self.applicationGroup
+            self.applicationGroup,
         )
 
         self.__initWidget()
@@ -157,6 +169,7 @@ class SettingInterface(ScrollArea):
         self.downloaderGroup.addSettingCard(self.updateYtDlpCard)
         self.downloaderGroup.addSettingCard(self.maxDlThreads)
         self.downloaderGroup.addSettingCard(self.thumbnailStreamingCard)
+        self.downloaderGroup.addSettingCard(self.youtubeCard)
 
         self.applicationGroup.addSettingCard(self.updateOnStartCard)
         self.applicationGroup.addSettingCard(self.logLevelCard)
@@ -173,12 +186,16 @@ class SettingInterface(ScrollArea):
 
     def update_ytdlp_version(self):
         if self.downloader.yt_dlp:
-            self.updateYtDlpCard.setContent(f"Current version: {self.downloader.yt_dlp.version.__version__}")
+            self.updateYtDlpCard.setContent(
+                f"Current version: {self.downloader.yt_dlp.version.__version__}"
+            )
 
-    def __showDownloadDialog(self, ffmpeg:bool=True):
+    def __showDownloadDialog(self, ffmpeg: bool = True):
         msg = DownloadMessageBox(self)
+
         def updateProgress(progress):
             msg.ProgressRing.setValue(progress)
+
         def finish(success):
             msg.hide()
             if ffmpeg:
@@ -190,17 +207,17 @@ class SettingInterface(ScrollArea):
                 self.update_ytdlp_version()
             if success:
                 InfoBar.success(
-                    'Succes:',
-                    f'{text} was downloaded and installed succesfully',
+                    "Succes:",
+                    f"{text} was downloaded and installed succesfully",
                     duration=2500,
-                    parent=self
+                    parent=self,
                 )
             else:
                 InfoBar.error(
-                    'Error:',
-                    f'Some error occured when downloading {text}. Download not succesfull.',
+                    "Error:",
+                    f"Some error occured when downloading {text}. Download not succesfull.",
                     duration=2500,
-                    parent=self
+                    parent=self,
                 )
 
         msg.show()
@@ -211,21 +228,21 @@ class SettingInterface(ScrollArea):
 
     def __showNoFFmpegTooltip(self):
         InfoBar.error(
-            'Error:',
-            'FFmpeg Not Found in Specified Path',
-            duration=2500,
-            parent=self
+            "Error:", "FFmpeg Not Found in Specified Path", duration=2500, parent=self
         )
 
     def __onDownloadFolderCardClicked(self, ffmpeg=False):
         folder = QFileDialog.getExistingDirectory(self, "Choose folder", "./")
 
-        current_path =  cfg.ffmpeg_path if ffmpeg else cfg.download_folder
+        current_path = cfg.ffmpeg_path if ffmpeg else cfg.download_folder
 
         if not folder or cfg.get(current_path) == folder:
             return
 
-        if ffmpeg and not (os.path.isfile(f"{folder}/ffmpeg.exe") and os.path.isfile(f"{folder}/ffprobe.exe")):
+        if ffmpeg and not (
+            os.path.isfile(f"{folder}/ffmpeg.exe")
+            and os.path.isfile(f"{folder}/ffprobe.exe")
+        ):
             self.__showNoFFmpegTooltip()
             return
 
@@ -276,36 +293,40 @@ class SettingInterface(ScrollArea):
             download_msg_box.ProgressRing.setValue(progress)
 
         def handle_download_completion(success):
-            MessageBox("Download completed", "The app has to close to perform the update!", self).exec()
+            MessageBox(
+                "Download completed",
+                "The app has to close to perform the update!",
+                self,
+            ).exec()
 
-        self.downloader.updateApplication(update_progress, handle_download_completion, handle_update_dialog, self.__parent)
+        self.downloader.updateApplication(
+            update_progress,
+            handle_download_completion,
+            handle_update_dialog,
+            self.__parent,
+        )
 
     def connectSignalToSlot(self):
 
         self.themeCard.optionChanged.connect(lambda ci: setTheme(cfg.get(ci)))
 
-        self.downloadFolderCard.clicked.connect(
-            self.__onDownloadFolderCardClicked
-        )
+        self.downloadFolderCard.clicked.connect(self.__onDownloadFolderCardClicked)
 
         self.ffmpegPathCard.clicked.connect(
             lambda: self.__onDownloadFolderCardClicked(True)
         )
 
-        self.downloadFFmpegCard.clicked.connect(
-            self.__showDownloadDialog
-        )
-        self.updateYtDlpCard.clicked.connect(
-            lambda: self.__showDownloadDialog(False)
-        )
+        self.downloadFFmpegCard.clicked.connect(self.__showDownloadDialog)
+        self.updateYtDlpCard.clicked.connect(lambda: self.__showDownloadDialog(False))
 
         self.maxDlThreads.slider.valueChanged.connect(
             self.downloader.thread_manager.setMaxThreadCount
         )
 
         self.feedbackCard.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl("https://github.com/PyFlat/YT-Downloader/issues")))
-
-        self.aboutCard.clicked.connect(
-            self.updateApplication
+            lambda: QDesktopServices.openUrl(
+                QUrl("https://github.com/PyFlat/YT-Downloader/issues")
+            )
         )
+
+        self.aboutCard.clicked.connect(self.updateApplication)
