@@ -87,6 +87,7 @@ class SettingInterface(ScrollArea):
             "Maximum Download Threads",
             parent=self.downloaderGroup,
         )
+        self.maxDlThreads.slider.setPageStep(1)
 
         self.thumbnailStreamingCard = SwitchSettingCard(
             FIF.PHOTO,
