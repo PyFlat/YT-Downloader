@@ -13,16 +13,24 @@ BASE_YOUTUBE_OPTIONS = {
 BASE_YOUTUBE_OPTIONS_VIDEO = {
     **BASE_YOUTUBE_OPTIONS,
     "concurrent_fragments": 2,
-    "outtmpl": "{}/%(title)s (%(height)sp).%(ext)s"
+    "outtmpl": "{}/%(title)s (%(height)sp).%(ext)s",
 }
 
-BASE_YOUTUBE_OPTIONS_AUDIO = {
-    **BASE_YOUTUBE_OPTIONS,
-    "outtmpl": "{}/%(title)s.%(ext)s"
-}
+BASE_YOUTUBE_OPTIONS_AUDIO = {**BASE_YOUTUBE_OPTIONS, "outtmpl": "{}/%(title)s.%(ext)s"}
 
 YOUTUBE_VIDEO = {
     "webpage_url_domain": "youtube.com",
+    "resolutions": [
+        "4320p",
+        "2160p",
+        "1440p",
+        "1080p",
+        "720p",
+        "480p",
+        "360p",
+        "240p",
+        "144p",
+    ],
     "video_formats": [
         {
             "extension": "MP4",
@@ -63,12 +71,13 @@ YOUTUBE_VIDEO = {
                 "merge_output_format": "avi",
                 "format": "bv*+ba[ext=m4a]/b",
             },
-        }
+        },
     ],
     "audio_formats": [
         {
             "extension": "MP3",
             "ID": "audio/mp3/best",
+            "best_format": True,
             "yt_dlp_options": {
                 **BASE_YOUTUBE_OPTIONS_AUDIO,
                 "format": "bestaudio/best",
@@ -84,6 +93,7 @@ YOUTUBE_VIDEO = {
         {
             "extension": "M4A",
             "ID": "audio/m4a/best",
+            "best_format": True,
             "yt_dlp_options": {
                 **BASE_YOUTUBE_OPTIONS_AUDIO,
                 "format": "bestaudio/best",
@@ -95,6 +105,6 @@ YOUTUBE_VIDEO = {
                     }
                 ],
             },
-        }
+        },
     ],
 }

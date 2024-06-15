@@ -1,11 +1,16 @@
-import os, sys, logging
+import logging
+import os
+import sys
 from datetime import datetime, timedelta
 
 
 class CustomFilter(logging.Filter):
     def __init__(self):
         super().__init__()
-        self.strings_to_filter = ["📢", "aQvGIIdgFDM"]
+        self.strings_to_filter = [
+            "📢",
+            "aQvGIIdgFDM",
+        ]
 
     def filter(self, record):
         for string_to_filter in self.strings_to_filter:

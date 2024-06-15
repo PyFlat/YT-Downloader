@@ -98,15 +98,29 @@ class YTVideoInformationWidget(InformationWidget):
             item = list_widget.item(index)
             item.setHidden(text not in item.text().lower())
 
-    def perform_download(self):
-        item = self.ListWidget.currentItem()
+    def perform_download(self, quickdl: bool = False, video: bool = None):
+        item = None
+        format_id = ""
 
-        if not isinstance(item, CustomListWidgetItem):
-            item = self.custom_dl_list_widget.currentItem()
+        if not quickdl:
+            item = self.ListWidget.currentItem()
             if not isinstance(item, CustomListWidgetItem):
+                item = self.custom_dl_list_widget.currentItem()
+                if not isinstance(item, CustomListWidgetItem):
+                    return
+
+            format_id = item.item_id
+        else:
+            format_id = cfg.get(
+                cfg.yt_video_quick_dl if video else cfg.yt_audio_quick_dl
+            )
+            if not format_id:
                 return
 
-        format_id = item.item_id
+            format, resolution = format_id.rsplit("/", 1)
+            if resolution != "best":
+                format_id = f"{format}/custom_res"
+                resolution = resolution[:-1]
 
         options = {
             "ID": format_id,
@@ -115,8 +129,8 @@ class YTVideoInformationWidget(InformationWidget):
             "overwrites": True,
         }
 
-        if "custom_res" in item.item_id:
-            resolution = self.ListWidget.currentItem().text()[:-1]
+        if "custom_res" in format_id:
+            resolution = item.text()[:-1] if item and not quickdl else resolution
             options["format"] = resolution
             format_id = f"{format_id.rsplit('/', 1)[0]}/{resolution}"
 
@@ -298,8 +312,12 @@ class YTVideoInformationWidget(InformationWidget):
             target=self.quick_dl_btn, view=self.view, parent=self.parent()
         )
 
-        # button.clicked.connect(lambda: [self.download_video(), flyout.close()])
-        # button1.clicked.connect(lambda: [self.download_audio(), flyout.close()])
+        button.clicked.connect(
+            lambda: [self.perform_download(quickdl=True, video=True), flyout.close()]
+        )
+        button1.clicked.connect(
+            lambda: [self.perform_download(quickdl=True, video=False), flyout.close()]
+        )
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())

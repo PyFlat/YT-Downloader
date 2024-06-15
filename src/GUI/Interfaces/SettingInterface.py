@@ -95,7 +95,7 @@ class SettingInterface(ScrollArea):
             parent=self.downloaderGroup,
         )
 
-        self.youtubeCard = YouTubeSettingCard(self.downloaderGroup)
+        self.youtubeCard = YouTubeSettingCard(self.downloaderGroup, self)
 
         self.applicationGroup = SettingCardGroup("Application", self.scrollWidget)
 
