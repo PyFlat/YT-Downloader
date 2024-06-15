@@ -18,10 +18,12 @@ class FormatSelectDialog(MessageBoxBase):
         subtitle: str = None,
         data: list[list[str]] = None,
         resolutions: list[str] = None,
+        config_key: str = None,
         alignment: Qt.AlignmentFlag = Qt.AlignCenter,
     ):
         super().__init__(parent=parent)
         self.resolutions = resolutions
+        self.config_key = config_key
         self.data = data or []
         self.alignment = alignment
 
@@ -123,10 +125,7 @@ class FormatSelectDialog(MessageBoxBase):
         else:
             resulting_id = format_id
 
-        config_key = (
-            cfg.yt_video_quick_dl if "video" in resulting_id else cfg.yt_audio_quick_dl
-        )
-        cfg.set(config_key, resulting_id)
+        cfg.set(self.config_key, resulting_id)
 
         self.accept()
 

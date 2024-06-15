@@ -77,11 +77,11 @@ class BaseSettingCard(ExpandGroupSettingCard):
             "Select file extension",
             selectable_formats,
             format_dict.get("resolutions"),
+            config_key,
         )
         dialog.exec()
 
         download_type = "video" if is_video else "audio"
-        config_key = cfg.yt_video_quick_dl if is_video else cfg.yt_audio_quick_dl
         format_str = self.format_formatId_string(cfg.get(config_key))
 
         label = self.video_label if is_video else self.audio_label
