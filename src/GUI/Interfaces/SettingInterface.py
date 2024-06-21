@@ -73,6 +73,15 @@ class SettingInterface(ScrollArea):
             parent=self.downloaderGroup,
         )
 
+        self.ytDlpUpdateChannelCard = OptionsSettingCard(
+            cfg.ytDlpUpdateChannel,
+            FIF.UPDATE,
+            "Update Channel",
+            "Change the update channel of the application",
+            texts=["Stable", "Nightly", "Master"],
+            parent=self.downloaderGroup,
+        )
+
         self.updateYtDlpCard = PushSettingCard(
             "Update",
             CustomIcons.YOUTUBE2,
@@ -167,6 +176,7 @@ class SettingInterface(ScrollArea):
         self.downloaderGroup.addSettingCard(self.downloadFolderCard)
         self.downloaderGroup.addSettingCard(self.ffmpegPathCard)
         self.downloaderGroup.addSettingCard(self.downloadFFmpegCard)
+        self.downloaderGroup.addSettingCard(self.ytDlpUpdateChannelCard)
         self.downloaderGroup.addSettingCard(self.updateYtDlpCard)
         self.downloaderGroup.addSettingCard(self.maxDlThreads)
         self.downloaderGroup.addSettingCard(self.thumbnailStreamingCard)
@@ -192,6 +202,7 @@ class SettingInterface(ScrollArea):
             )
 
     def __showDownloadDialog(self, ffmpeg: bool = True):
+
         msg = DownloadMessageBox(self)
 
         def updateProgress(progress):

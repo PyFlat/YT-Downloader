@@ -52,12 +52,12 @@ class MainWindow(FluentWindow):
 
         self.initNavigation()
 
-        self.checkForYtdlp()
-
         if getattr(sys, "frozen", False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
         self.splashScreen.finish()
+
+        self.checkForYtdlp()
 
     def updateVideoWidget(self):
         if not cfg.get(cfg.thumbnail_streaming):
@@ -96,7 +96,9 @@ class MainWindow(FluentWindow):
             sys.exit()
 
     def checkForYtdlp(self):
-        if downloader.yt_dlp == None:
+        try:
+            from yt_dlp import YoutubeDL
+        except ModuleNotFoundError:
             self.showDialog()
         else:
             self.setting_interface.update_ytdlp_version()

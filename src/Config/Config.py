@@ -14,6 +14,13 @@ class Config(QConfig):
     ffmpeg_path = ConfigItem(
         "Downloader", "ffmpeg-location-path", "", FolderValidator()
     )
+    ytDlpUpdateChannel = OptionsConfigItem(
+        "Downloader",
+        "ytdlp-update-channel",
+        "Nightly",
+        OptionsValidator(["Stable", "Nightly", "Master"]),
+    )
+
     maximum_download_threads = RangeConfigItem(
         "Downloader", "max-download-threads", 1, RangeValidator(1, 10)
     )

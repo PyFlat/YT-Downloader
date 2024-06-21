@@ -116,8 +116,6 @@ class VideoDownloadWidget(DownloadWidget):
         return rounded
 
     def updateStatus(self, status_dict: dict):
-        # with open('test.json', 'a') as file:
-        #     file.write(json.dumps(status_dict))
 
         self.status_label.setText("Status: Downloading...")
 

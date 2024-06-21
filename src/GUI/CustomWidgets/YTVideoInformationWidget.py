@@ -130,7 +130,8 @@ class YTVideoInformationWidget(InformationWidget):
         }
 
         if "custom_res" in format_id:
-            resolution = item.text()[:-1] if item and not quickdl else resolution
+            resolution_text = self.ListWidget.currentItem().text()
+            resolution = resolution_text[:-1] if item and not quickdl else resolution
             options["format"] = resolution
             format_id = f"{format_id.rsplit('/', 1)[0]}/{resolution}"
 

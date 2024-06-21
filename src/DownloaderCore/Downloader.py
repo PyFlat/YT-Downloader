@@ -1,26 +1,23 @@
-try:
-    from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
-    from src.DownloaderCore.Threads.ThreadManager import ThreadManager
-    from src.DownloaderCore.Threads.Updater import (
-        GithubDownloaderThread,
-        UpdateCheckerThread,
-    )
-    from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import (
-        YoutubeVideoDownloadThread,
-    )
-except:
-    from Threads.YoutubeVideoDownloadThread import YoutubeVideoDownloadThread
-    from Threads.InformationLoadThread import InformationLoadThread
-    from Threads.ThreadManager import ThreadManager
-    from Threads.Updater import GithubDownloaderThread, UpdateCheckerThread
-
 import os
+import shutil
 import sys
 import zipfile
 import zipimport
 
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QWidget
+
+import src.DownloaderCore.Constants as CONST
+from src.Config.Config import cfg
+from src.DownloaderCore.Threads.InformationLoadThread import InformationLoadThread
+from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+from src.DownloaderCore.Threads.Updater import (
+    GithubDownloaderThread,
+    UpdateCheckerThread,
+)
+from src.DownloaderCore.Threads.YoutubeVideoDownloadThread import (
+    YoutubeVideoDownloadThread,
+)
 
 TM = ThreadManager(10)
 
@@ -118,6 +115,9 @@ class Downloader:
             if finish_callback != None:
                 finish_callback(ok)
 
+        if os.path.isdir("appdata/FFmpeg"):
+            shutil.rmtree("appdata/FFmpeg")
+
         self.thread_manager.runTask(
             GithubDownloaderThread(
                 "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip",
@@ -137,6 +137,14 @@ class Downloader:
         progress_callback: object | None = None,
         finish_callback: object | None = None,
     ):
+        channel_url_map = {
+            "nightly": CONST.NIGHTLY_CHANNEL_URL,
+            "master": CONST.MASTER_CHANNEL_URL,
+        }
+
+        channel: str = cfg.get(cfg.ytDlpUpdateChannel)
+        channel_url = channel_url_map.get(channel.lower(), CONST.STABLE_CHANNEL_URL)
+
         def on_finish_(ok):
             if not ok:
                 if finish_callback != None:
@@ -146,9 +154,12 @@ class Downloader:
             if finish_callback != None:
                 finish_callback(ok)
 
+        if os.path.isfile("appdata/yt_dlp"):
+            os.remove("appdata/yt_dlp")
+
         self.thread_manager.runTask(
             GithubDownloaderThread(
-                "https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp",
+                f"{channel_url}/releases/latest/download/yt-dlp",
                 self.yt_dlp_path,
                 progress_callback,
                 on_finish_,
