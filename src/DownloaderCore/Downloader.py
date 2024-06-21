@@ -150,9 +150,9 @@ class Downloader:
                 if finish_callback != None:
                     finish_callback(ok)
                 return
-            self.importYtldp(self.yt_dlp_path)
             if finish_callback != None:
                 finish_callback(ok)
+            cfg.appRestartSig.emit()
 
         if os.path.isfile("appdata/yt_dlp"):
             os.remove("appdata/yt_dlp")

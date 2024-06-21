@@ -24,6 +24,7 @@ from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
 from src.GUI.CustomWidgets.DownloadMessageBox import DownloadMessageBox
 from src.GUI.CustomWidgets.YouTubeSettingCard import YouTubeSettingCard
+from src.GUI.Dialogs.RestartMessageBox import show_decision_message_box
 from src.GUI.Icons.Icons import CustomIcons
 from src.GUI.Stylesheet.StyleSheet import StyleSheet
 from src.version import VERSION
@@ -165,6 +166,8 @@ class SettingInterface(ScrollArea):
 
         StyleSheet.SETTING_INTERFACE.apply(self)
 
+        self.currentUpdateChannel = cfg.get(cfg.ytDlpUpdateChannel)
+
         self.initLayout()
         self.connectSignalToSlot()
 
@@ -201,7 +204,7 @@ class SettingInterface(ScrollArea):
                 f"Current version: {self.downloader.yt_dlp.version.__version__}"
             )
 
-    def __showDownloadDialog(self, ffmpeg: bool = True):
+    def __showDownloadDialog(self, ffmpeg: bool = True, show_warning: bool = True):
 
         msg = DownloadMessageBox(self)
 
@@ -232,11 +235,29 @@ class SettingInterface(ScrollArea):
                     parent=self,
                 )
 
+        if not ffmpeg and show_warning:
+            if not show_decision_message_box(
+                self.__parent,
+                "Warning",
+                "After the download is finished, the application needs to restart!",
+            ):
+                return
+
         msg.show()
         if ffmpeg:
             self.downloader.updateFFmpeg(updateProgress, finish)
         else:
             self.downloader.updateYtdlp(updateProgress, finish)
+
+    def __infoUserChannelChange(self):
+        if show_decision_message_box(
+            self.__parent,
+            "Info",
+            "A different version of yt-dlp needs to be downloaded! After the download is finished, the application needs to restart!",
+        ):
+            self.__showDownloadDialog(ffmpeg=False, show_warning=False)
+        else:
+            self.ytDlpUpdateChannelCard.setValue(self.currentUpdateChannel)
 
     def __showNoFFmpegTooltip(self):
         InfoBar.error(
@@ -329,6 +350,7 @@ class SettingInterface(ScrollArea):
         )
 
         self.downloadFFmpegCard.clicked.connect(self.__showDownloadDialog)
+        self.ytDlpUpdateChannelCard.optionChanged.connect(self.__infoUserChannelChange)
         self.updateYtDlpCard.clicked.connect(lambda: self.__showDownloadDialog(False))
 
         self.maxDlThreads.slider.valueChanged.connect(

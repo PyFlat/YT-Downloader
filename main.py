@@ -1,3 +1,4 @@
+import os
 import sys
 
 from src.Logger import Logger
@@ -55,6 +56,8 @@ class MainWindow(FluentWindow):
         if getattr(sys, "frozen", False) and cfg.get(cfg.check_for_updates):
             self.setting_interface.updateApplication(True)
 
+        cfg.appRestartSig.connect(self.restartApplication)
+
         self.splashScreen.finish()
 
         self.checkForYtdlp()
@@ -102,6 +105,14 @@ class MainWindow(FluentWindow):
             self.showDialog()
         else:
             self.setting_interface.update_ytdlp_version()
+
+    def restartApplication(self):
+        self.closeEvent(QCloseEvent())
+        if getattr(sys, "frozen", False):
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        else:
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
 
     def initNavigation(self):
         self.addSubInterface(self.main_interface, FIF.HOME, "Home")
