@@ -8,7 +8,7 @@ if __name__ == "__main__":
     logger = logger_object.logger
     logger.info("Logging Started")
 
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, QUrl
 from PySide6.QtGui import *
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
@@ -127,6 +127,16 @@ class MainWindow(FluentWindow):
         )
 
         self.navigationInterface.addSeparator()
+
+        self.navigationInterface.addItem(
+            routeKey="price",
+            icon=FIF.HEART,
+            text="Donate",
+            onClick=lambda: QDesktopServices.openUrl(QUrl("https://ko-fi.com/pyflat")),
+            selectable=False,
+            tooltip="Donate",
+            position=NavigationItemPosition.BOTTOM,
+        )
 
         self.addSubInterface(
             self.setting_interface,

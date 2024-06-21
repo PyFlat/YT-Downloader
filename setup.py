@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from cx_Freeze import Executable, setup
+
 from src.version import VERSION
 
 try:
@@ -8,7 +9,7 @@ try:
 except ImportError:
     get_qt_plugins_paths = None
 
-include_files = ["appdata", "languages"]
+include_files = ["appdata", "languages", "src"]
 
 if get_qt_plugins_paths:
     include_files += get_qt_plugins_paths("PySide6", "platform")
@@ -25,13 +26,9 @@ build_exe_options = {
         "xml.etree.ElementTree",
         "ctypes.wintypes",
         "asyncio",
-        "glob"
+        "glob",
     ],
-    "excludes": [
-        "tkinter",
-        "yt_dlp",
-        "scipy",
-        "numpy"],
+    "excludes": ["tkinter", "yt_dlp", "scipy", "numpy"],
     "include_files": include_files,
     "zip_include_packages": ["PySide6"],
 }
