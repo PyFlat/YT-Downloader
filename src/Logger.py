@@ -83,3 +83,8 @@ class Logger:
 
         def flush(self):
             pass
+
+
+logger_object = Logger(logs_folder="logs")
+logger = logger_object.logger
+logger.info("Logging Started")

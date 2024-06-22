@@ -1,13 +1,6 @@
 import os
 import sys
 
-from src.Logger import Logger
-
-if __name__ == "__main__":
-    logger_object = Logger(logs_folder="logs")
-    logger = logger_object.logger
-    logger.info("Logging Started")
-
 from PySide6.QtCore import QSize, QUrl
 from PySide6.QtGui import *
 from PySide6.QtWidgets import QApplication
@@ -70,20 +63,24 @@ class MainWindow(FluentWindow):
         if self.info_widget:
             self.info_widget.updateDropShadow()
 
-    def videoInformationCallback(self, result, url):
+    def videoInformationCallback(self, result: dict, url):
         if self.info_widget:
             self.info_widget.deleteLater()
             self.info_widget = None
 
-        self.info_widget = YTVideoInformationWidget(self, result, downloader)
-        self.main_interface.page.layout().addWidget(self.info_widget, 0, Qt.AlignTop)
+        if result.get("error") != "ytsearch":
+            self.info_widget = YTVideoInformationWidget(self, result, downloader)
+            self.main_interface.page.layout().addWidget(
+                self.info_widget, 0, Qt.AlignTop
+            )
         self.main_interface.stackedWidget.setCurrentIndex(0)
 
     def searchByUrl(self):
+        search_text = self.main_interface.LineEdit.text().replace(" ", "")
+        if search_text == "":
+            return
         self.main_interface.stackedWidget.setCurrentIndex(1)
-        downloader.getVideoInfo(
-            self.main_interface.LineEdit.text(), self.videoInformationCallback
-        )
+        downloader.getVideoInfo(search_text, self.videoInformationCallback)
 
     def showDialog(self):
         title = "yt-dlp not found"
@@ -99,9 +96,7 @@ class MainWindow(FluentWindow):
             sys.exit()
 
     def checkForYtdlp(self):
-        try:
-            from yt_dlp import YoutubeDL
-        except ModuleNotFoundError:
+        if downloader.yt_dlp == None:
             self.showDialog()
         else:
             self.setting_interface.update_ytdlp_version()
