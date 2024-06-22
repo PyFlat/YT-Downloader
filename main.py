@@ -14,10 +14,11 @@ from qfluentwidgets import (
     SplashScreen,
 )
 
+from GUI.CustomWidgets.YTInformationWidget import YTInformationWidget
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
+from src.DownloaderCore.formats import YOUTUBE_VIDEO
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
-from src.GUI.CustomWidgets.YTVideoInformationWidget import YTVideoInformationWidget
 from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 from src.GUI.Interfaces.MainInterface import MainInterface
@@ -68,8 +69,10 @@ class MainWindow(FluentWindow):
             self.info_widget.deleteLater()
             self.info_widget = None
 
-        if result.get("error") != "ytsearch":
-            self.info_widget = YTVideoInformationWidget(self, result, downloader)
+        if result.get("error") != "ytsearch" and result.get(
+            "webpage_url_domain"
+        ) == YOUTUBE_VIDEO.get("webpage_url_domain"):
+            self.info_widget = YTInformationWidget(self, result, downloader)
             self.main_interface.page.layout().addWidget(
                 self.info_widget, 0, Qt.AlignTop
             )

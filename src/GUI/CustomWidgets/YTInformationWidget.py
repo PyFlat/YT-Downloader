@@ -7,7 +7,7 @@ from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
 from src.GUI.Icons.Icons import CustomIcons
 
 
-class YTVideoInformationWidget(BaseInformationWidget):
+class YTInformationWidget(BaseInformationWidget):
     def __init__(
         self, parent=None, info_dict: dict = None, downloader: Downloader = None
     ):

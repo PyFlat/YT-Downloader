@@ -1,4 +1,4 @@
-BASE_YOUTUBE_OPTIONS = {
+BASE_OPTIONS = {
     "socket_timeout": 15,
     "quiet": True,
     "noprogress": True,
@@ -11,12 +11,12 @@ BASE_YOUTUBE_OPTIONS = {
 }
 
 BASE_YOUTUBE_OPTIONS_VIDEO = {
-    **BASE_YOUTUBE_OPTIONS,
+    **BASE_OPTIONS,
     "concurrent_fragments": 2,
     "outtmpl": "{}/%(title)s (%(height)sp).%(ext)s",
 }
 
-BASE_YOUTUBE_OPTIONS_AUDIO = {**BASE_YOUTUBE_OPTIONS, "outtmpl": "{}/%(title)s.%(ext)s"}
+BASE_YOUTUBE_OPTIONS_AUDIO = {**BASE_OPTIONS, "outtmpl": "{}/%(title)s.%(ext)s"}
 
 YOUTUBE_VIDEO = {
     "webpage_url_domain": "youtube.com",
