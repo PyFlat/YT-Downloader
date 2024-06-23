@@ -26,6 +26,7 @@ class BaseInformationWidget(InformationWidget):
         self._parent = parent
         self.back_to_all_formats = False
         self.button_type_clicked = None
+        self.image_data = None
 
         self.setIcons()
 
@@ -35,7 +36,7 @@ class BaseInformationWidget(InformationWidget):
 
         thumbnail_url = self.widget_information.get("thumbnail-url")
 
-        if cfg.get(cfg.thumbnail_streaming):
+        if cfg.get(cfg.thumbnail_streaming) and thumbnail_url:
             self.fetchThumbnailFromUrl(thumbnail_url)
         else:
             self.setDefaultThumbnail()
@@ -85,6 +86,9 @@ class BaseInformationWidget(InformationWidget):
         self.custom_dl_btn.setIcon(CustomIcons.WRITE)
 
     def setTexts(self):
+        url_type = self.widget_information.get("url-type")
+        self.HyperlinkLabel.setText(url_type)
+
         title = self.widget_information.get("title")
         self.TitleLabel.setText(title)
 
@@ -132,21 +136,32 @@ class BaseInformationWidget(InformationWidget):
         painter.end()
         return rounded
 
-    def setThumbnail(self, reply: QNetworkReply):
-        if reply.error() == QNetworkReply.NoError:
-            image_data = reply.readAll()
+    def setThumbnail(self, reply: QNetworkReply = None):
+        if reply is None or reply.error() == QNetworkReply.NoError:
+            if self.image_data == None:
+                self.image_data = reply.readAll()
             pixmap = QPixmap()
-            pixmap.loadFromData(image_data)
+            pixmap.loadFromData(self.image_data)
 
-            pixmap = pixmap.scaled(
+            scaled_pixmap = pixmap.scaled(
                 QSize(400, 225), Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
-            pixmap = self.round_pixmap_corners(pixmap, 10)
+
+            final_pixmap = QPixmap(400, 225)
+            final_pixmap.fill(QColor("#202020") if isDarkTheme() else QColor("#F3F3F3"))
+
+            painter = QPainter(final_pixmap)
+            x_offset = (final_pixmap.width() - scaled_pixmap.width()) // 2
+            y_offset = (final_pixmap.height() - scaled_pixmap.height()) // 2
+            painter.drawPixmap(x_offset, y_offset, scaled_pixmap)
+            painter.end()
+
+            final_pixmap = self.round_pixmap_corners(final_pixmap, 10)
             self.updateDropShadow()
 
-            self.PixmapLabel_2.setPixmap(pixmap)
+            self.PixmapLabel_2.setPixmap(final_pixmap)
         else:
-            logger.error("Failed to download image. Error:", reply.errorString())
+            logger.error("Failed to download image. Error: %s", reply.errorString())
 
     def showFlyout(self):
         self.view = FlyoutView(

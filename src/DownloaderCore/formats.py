@@ -18,6 +18,22 @@ BASE_YOUTUBE_OPTIONS_VIDEO = {
 
 BASE_YOUTUBE_OPTIONS_AUDIO = {**BASE_OPTIONS, "outtmpl": "{}/%(title)s.%(ext)s"}
 
+X_VIDEO = {
+    "webpage_url_domain": "x.com",
+    "video_formats": [
+        {
+            "extension": "MP4",
+            "ID": "video/mp4/best",
+            "best_format": True,
+            "yt_dlp_options": {
+                **BASE_YOUTUBE_OPTIONS_VIDEO,
+                "merge_output_format": "mp4",
+                "format": "bv*+ba[ext=m4a]/b",
+            },
+        },
+    ],
+}
+
 YOUTUBE_VIDEO = {
     "webpage_url_domain": "youtube.com",
     "resolutions": [

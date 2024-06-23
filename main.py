@@ -20,8 +20,11 @@ from qfluentwidgets import (
 
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
-from src.DownloaderCore.formats import YOUTUBE_VIDEO
+from src.DownloaderCore.formats import X_VIDEO, YOUTUBE_VIDEO
+from src.DownloaderCore.SupportedSites import VIDEO_SITES
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
+from src.GUI.CustomWidgets.XInformationWidget import XInformationWidget
 from src.GUI.CustomWidgets.YTInformationWidget import YTInformationWidget
 from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
@@ -33,7 +36,7 @@ class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.initWindow()
-        self.info_widget = None
+        self.info_widget: BaseInformationWidget = None
 
         self.main_interface = MainInterface(self)
         self.main_interface.stackedWidget.setCurrentIndex(0)
@@ -67,19 +70,24 @@ class MainWindow(FluentWindow):
 
         if self.info_widget:
             self.info_widget.updateDropShadow()
+            self.info_widget.setThumbnail()
 
-    def videoInformationCallback(self, result: dict, url):
+    def videoInformationCallback(self, result: dict, url: str):
         if self.info_widget:
             self.info_widget.deleteLater()
             self.info_widget = None
 
-        if result.get("error") != "ytsearch" and result.get(
-            "webpage_url_domain"
-        ) == YOUTUBE_VIDEO.get("webpage_url_domain"):
-            self.info_widget = YTInformationWidget(self, result, downloader)
+        webpage_url: str = result.get("webpage_url_domain")
+
+        if webpage_url in VIDEO_SITES:
+            site: dict = VIDEO_SITES.get(webpage_url)
+            info_widget_class: BaseInformationWidget = site.get("widget")
+
+            self.info_widget = info_widget_class(self, result, downloader)
             self.main_interface.page.layout().addWidget(
                 self.info_widget, 0, Qt.AlignTop
             )
+
         self.main_interface.stackedWidget.setCurrentIndex(0)
 
     def searchByUrl(self):

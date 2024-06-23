@@ -1,5 +1,7 @@
 from enum import Enum
-from qfluentwidgets import getIconColor, Theme, FluentIconBase
+
+from qfluentwidgets import FluentIconBase, Theme, getIconColor
+
 
 class CustomIcons(FluentIconBase, Enum):
     AUDIO = "audio"
@@ -12,9 +14,10 @@ class CustomIcons(FluentIconBase, Enum):
     WRITE = "write"
     YOUTUBE = "youtube"
     YOUTUBE2 = "youtube2"
+    X = "x"
 
     def path(self, theme=Theme.AUTO):
-        return f'src/GUI/Icons/icons_{getIconColor(theme)}/{self.value}_{getIconColor(theme)}.svg'
+        return f"src/GUI/Icons/icons_{getIconColor(theme)}/{self.value}_{getIconColor(theme)}.svg"
 
     def toString(self):
         return self.value
