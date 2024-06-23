@@ -2,7 +2,6 @@ import re
 from datetime import datetime
 
 from src.DownloaderCore.Downloader import Downloader
-from src.DownloaderCore.formats import YOUTUBE_VIDEO
 from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
 from src.GUI.Icons.Icons import CustomIcons
 
