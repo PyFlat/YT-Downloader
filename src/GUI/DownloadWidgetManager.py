@@ -19,13 +19,13 @@ class DownloadWidgetManager:
         self.downloader = downloader
 
     def addVideoDownloadWidget(
-        self, display_id, title, channel, format_id, url, **options
+        self, thumbnail_url, title, channel, format_id, url, **options
     ):
         if self.download_interface == None:
             return
 
         download_widget = VideoDownloadWidget(
-            self.download_interface, display_id, title, channel, format_id
+            self.download_interface, thumbnail_url, title, channel, format_id
         )
         self.widgets.append(download_widget)
         self.download_interface.verticalLayout.addWidget(

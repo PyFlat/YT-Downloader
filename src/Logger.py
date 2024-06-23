@@ -87,4 +87,3 @@ class Logger:
 
 logger_object = Logger(logs_folder="logs")
 logger = logger_object.logger
-logger.info("Logging Started")

@@ -13,14 +13,14 @@ class VideoDownloadWidget(DownloadWidget):
     def __init__(
         self,
         parent: DownloadInterface = None,
-        display_id: str = None,
+        thumbnail_url: str = None,
         title: str = None,
         uploader: str = None,
         format_str: str = None,
     ):
         super().__init__(parent)
         self.__parent = parent
-        self.display_id = display_id
+        self.thumbnail_url = thumbnail_url
         self.setFixedWidth(self.__parent.size().width() - 50)
         self.setFixedHeight(245)
         self.image_data = None
@@ -59,7 +59,6 @@ class VideoDownloadWidget(DownloadWidget):
         self.quality_label.setText(quality_str)
 
     def switch(self):
-
         if not self.icon:
             self.pause_btn.setIcon(FIF.PLAY)
         else:
@@ -69,9 +68,7 @@ class VideoDownloadWidget(DownloadWidget):
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.handle_response(response))
-        request = QNetworkRequest(
-            QUrl(f"https://i.ytimg.com/vi/{self.display_id}/mqdefault.jpg")
-        )
+        request = QNetworkRequest(QUrl(self.thumbnail_url))
         response = manager.get(request)
 
     def handle_response(self, reply: QNetworkReply):

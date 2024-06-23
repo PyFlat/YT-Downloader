@@ -216,7 +216,7 @@ class BaseInformationWidget(InformationWidget):
             format_id = f"{format_id.rsplit('/', 1)[0]}/{resolution}"
 
         download_widget_manager.addVideoDownloadWidget(
-            self.widget_information.get("id"),
+            self.widget_information.get("thumbnail-url"),
             self.widget_information.get("title"),
             self.widget_information.get("channel"),
             format_id,

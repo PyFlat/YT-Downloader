@@ -1,6 +1,10 @@
 import os
 import sys
 
+from src.Logger import logger
+
+logger.info("Logging Started")
+
 from PySide6.QtCore import QSize, QUrl
 from PySide6.QtGui import *
 from PySide6.QtWidgets import QApplication
@@ -14,11 +18,11 @@ from qfluentwidgets import (
     SplashScreen,
 )
 
-from GUI.CustomWidgets.YTInformationWidget import YTInformationWidget
 from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.formats import YOUTUBE_VIDEO
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
+from src.GUI.CustomWidgets.YTInformationWidget import YTInformationWidget
 from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 from src.GUI.Interfaces.MainInterface import MainInterface

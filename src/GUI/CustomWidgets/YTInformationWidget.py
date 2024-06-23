@@ -27,7 +27,6 @@ class YTInformationWidget(BaseInformationWidget):
 
         widget_information = {
             "downloader": downloader,
-            "id": self.info["display_id"],
             "url": self.info["original_url"],
             "thumbnail-url": f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg",
             "title": self.info["title"],
