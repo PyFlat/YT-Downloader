@@ -18,7 +18,9 @@ class CustomListWidgetItem(QListWidgetItem):
 
 
 class BaseInformationWidget(InformationWidget):
-    def __init__(self, parent=None, widget_information: dict = {}):
+    def __init__(
+        self, parent=None, widget_information: dict = {}, video_type: dict = {}
+    ):
         super().__init__(parent)
 
         self.widget_information = widget_information
@@ -27,6 +29,15 @@ class BaseInformationWidget(InformationWidget):
         self.back_to_all_formats = False
         self.button_type_clicked = None
         self.image_data = None
+
+        self.custom_video_formats = [
+            x for x in video_type.get("video_formats", []) if not x.get("best_format")
+        ]
+        self.best_video_formats = [
+            x for x in video_type.get("video_formats", []) if x.get("best_format")
+        ]
+
+        self.best_audio_formats = [x for x in video_type.get("audio_formats", [])]
 
         self.setIcons()
 
@@ -269,11 +280,7 @@ class BaseInformationWidget(InformationWidget):
         self.SearchLineEdit.clear()
         self.back_to_all_formats = False
 
-        for item in (
-            self.widget_information.get("best-vid-formats")
-            if video
-            else self.widget_information.get("best-audio-formats")
-        ):
+        for item in self.best_video_formats if video else self.best_audio_formats:
             list_item = CustomListWidgetItem(item["extension"], item["ID"])
             self.ListWidget.addItem(list_item)
 
@@ -287,7 +294,7 @@ class BaseInformationWidget(InformationWidget):
         self.custom_dl_line_edit.clear()
         self.back_to_all_formats = True
 
-        for item in self.widget_information.get("custom-vid-formats"):
+        for item in self.custom_video_formats:
             list_item = CustomListWidgetItem(item["extension"], item["ID"])
             self.custom_dl_list_widget.addItem(list_item)
 

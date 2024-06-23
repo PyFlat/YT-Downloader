@@ -83,7 +83,9 @@ class MainWindow(FluentWindow):
             site: dict = VIDEO_SITES.get(webpage_url)
             info_widget_class: BaseInformationWidget = site.get("widget")
 
-            self.info_widget = info_widget_class(self, result, downloader)
+            self.info_widget = info_widget_class(
+                self, result, downloader, site.get("data")
+            )
             self.main_interface.page.layout().addWidget(
                 self.info_widget, 0, Qt.AlignTop
             )

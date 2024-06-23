@@ -9,18 +9,12 @@ from src.GUI.Icons.Icons import CustomIcons
 
 class XInformationWidget(BaseInformationWidget):
     def __init__(
-        self, parent=None, info_dict: dict = None, downloader: Downloader = None
+        self,
+        parent=None,
+        info_dict: dict = None,
+        downloader: Downloader = None,
+        video_type: dict = {},
     ):
-
-        custom_video_formats = [
-            x for x in X_VIDEO.get("video_formats", []) if not x.get("best_format")
-        ]
-        best_video_formats = [
-            x for x in X_VIDEO.get("video_formats", []) if x.get("best_format")
-        ]
-
-        best_audio_formats = [x for x in X_VIDEO.get("audio_formats", [])]
-
         self.info = info_dict
 
         small_thumbnail_url = None
@@ -42,13 +36,10 @@ class XInformationWidget(BaseInformationWidget):
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),
-            "custom-vid-formats": custom_video_formats,
-            "best-vid-formats": best_video_formats,
-            "best-audio-formats": best_audio_formats,
             "available-resolutions": self.get_available_resolutions(),
         }
 
-        super().__init__(parent, widget_information)
+        super().__init__(parent, widget_information, video_type)
 
     def getVideoDuration(self) -> str:
         minutes, seconds = divmod(self.info["duration"], 60)
