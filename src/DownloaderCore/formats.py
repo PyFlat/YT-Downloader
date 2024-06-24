@@ -140,18 +140,3 @@ YOUTUBE_VIDEO = {
         },
     ],
 }
-
-[
-    {
-        "id": "0",
-        "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/04b966316b4147c192674791705b6028_1640704739?lk3s=81f88b70&nonce=50009&refresh_token=f7cb2f97e95a00e83faeaa25a31d5699&x-expires=1719349200&x-signature=miX36KuI1OrFZmiv5iHW5qkI3hQ%3D&shp=81f88b70&shcp=-",
-    },
-    {
-        "id": "1",
-        "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/98a991d5264c4aec8d910290f5dfb10e_1640704740?lk3s=81f88b70&nonce=16520&refresh_token=ff1181d1770bb5f969f58ff08ecb1ab7&x-expires=1719349200&x-signature=ajaGxJPabwvQVpsg1g%2Fdl1vIRd8%3D&shp=81f88b70&shcp=-",
-    },
-    {
-        "id": "2",
-        "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/e314b86a7e6e46d7b3d1e0f7aec3ebb9?lk3s=81f88b70&nonce=72119&refresh_token=e1d61015b5ea400d96e6112dd3e65bc1&x-expires=1719349200&x-signature=S5z83GeSnVUJIyry0Kr0xDAJLhE%3D&shp=81f88b70&shcp=-",
-    },
-]
