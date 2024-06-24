@@ -58,7 +58,7 @@ class BaseSettingCard(ExpandGroupSettingCard):
     def showOptionsDialog(
         self, is_video: bool = True, format_dict: dict = None, config_key=None
     ):
-        formats = (
+        formats: list[dict] = (
             format_dict.get("video_formats")
             if is_video
             else format_dict.get("audio_formats")

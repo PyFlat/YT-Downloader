@@ -1,3 +1,37 @@
+def create_video_format(
+    extension: str, merge_format: str, format_string: str, best_format=True
+):
+    return {
+        "extension": extension,
+        "ID": f"video/{extension.lower()}/{ 'best' if best_format else 'custom_res'}",
+        "best_format": best_format,
+        "yt_dlp_options": {
+            **BASE_YOUTUBE_OPTIONS_VIDEO,
+            "merge_output_format": merge_format,
+            "format": format_string,
+        },
+    }
+
+
+def create_audio_format(extension: str, codec: str, quality=192):
+    return {
+        "extension": extension,
+        "ID": f"audio/{extension.lower()}/best",
+        "best_format": True,
+        "yt_dlp_options": {
+            **BASE_YOUTUBE_OPTIONS_AUDIO,
+            "format": "bestaudio/best",
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": codec,
+                    "preferredquality": str(quality),
+                }
+            ],
+        },
+    }
+
+
 BASE_OPTIONS = {
     "socket_timeout": 15,
     "quiet": True,
@@ -18,125 +52,45 @@ BASE_YOUTUBE_OPTIONS_VIDEO = {
 
 BASE_YOUTUBE_OPTIONS_AUDIO = {**BASE_OPTIONS, "outtmpl": "{}/%(title)s.%(ext)s"}
 
+RESOLUTIONS = [
+    "4320p",
+    "2160p",
+    "1440p",
+    "1080p",
+    "720p",
+    "480p",
+    "360p",
+    "240p",
+    "144p",
+]
+
+# X Video configuration
 X_VIDEO = {
-    "webpage_url_domain": "x.com",
     "video_formats": [
-        {
-            "extension": "MP4",
-            "ID": "video/mp4/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "mp4",
-                "format": "bv*+ba[ext=m4a]/b",
-            },
-        },
+        create_video_format("MP4", "mp4", "bv*+ba[ext=m4a]/b"),
     ],
 }
 
+# TikTok Video configuration
 TIKTOK_VIDEO = {
-    "webpage_url_domain": "tiktok.com",
     "video_formats": [
-        {
-            "extension": "MP4",
-            "ID": "video/mp4/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "mp4",
-                "format": "bv*+ba[ext=m4a]/b",
-            },
-        },
+        create_video_format("MP4", "mp4", "bv*+ba[ext=m4a]/b"),
     ],
 }
 
+# YouTube Video configuration
 YOUTUBE_VIDEO = {
-    "webpage_url_domain": "youtube.com",
-    "resolutions": [
-        "4320p",
-        "2160p",
-        "1440p",
-        "1080p",
-        "720p",
-        "480p",
-        "360p",
-        "240p",
-        "144p",
-    ],
+    "resolutions": RESOLUTIONS,
     "video_formats": [
-        {
-            "extension": "MP4",
-            "ID": "video/mp4/custom_res",
-            "best_format": False,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "mp4",
-                "format": "bv[height<={}]+ba[ext=m4a]/b",
-            },
-        },
-        {
-            "extension": "MP4",
-            "ID": "video/mp4/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "mp4",
-                "format": "bv*+ba[ext=m4a]/b",
-            },
-        },
-        {
-            "extension": "MKV",
-            "ID": "video/mkv/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "mkv",
-                "format": "bv*+ba[ext=m4a]/b",
-            },
-        },
-        {
-            "extension": "AVI",
-            "ID": "video/avi/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_VIDEO,
-                "merge_output_format": "avi",
-                "format": "bv*+ba[ext=m4a]/b",
-            },
-        },
+        create_video_format(
+            "MP4", "mp4", "bv[height<={}]+ba[ext=m4a]/b", best_format=False
+        ),
+        create_video_format("MP4", "mp4", "bv*+ba[ext=m4a]/b"),
+        create_video_format("MKV", "mkv", "bv*+ba[ext=m4a]/b"),
+        create_video_format("AVI", "avi", "bv*+ba[ext=m4a]/b"),
     ],
     "audio_formats": [
-        {
-            "extension": "MP3",
-            "ID": "audio/mp3/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_AUDIO,
-                "format": "bestaudio/best",
-                "postprocessors": [
-                    {
-                        "key": "FFmpegExtractAudio",
-                        "preferredcodec": "mp3",
-                        "preferredquality": "192",
-                    }
-                ],
-            },
-        },
-        {
-            "extension": "M4A",
-            "ID": "audio/m4a/best",
-            "best_format": True,
-            "yt_dlp_options": {
-                **BASE_YOUTUBE_OPTIONS_AUDIO,
-                "format": "bestaudio/best",
-                "postprocessors": [
-                    {
-                        "key": "FFmpegExtractAudio",
-                        "preferredcodec": "m4a",
-                        "preferredquality": "192",
-                    }
-                ],
-            },
-        },
+        create_audio_format("MP3", "mp3"),
+        create_audio_format("M4A", "m4a"),
     ],
 }
