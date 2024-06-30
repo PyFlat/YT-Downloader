@@ -1,6 +1,6 @@
 def create_video_format(
     extension: str, merge_format: str, format_string: str, best_format=True
-):
+) -> dict:
     return {
         "extension": extension,
         "ID": f"video/{extension.lower()}/{ 'best' if best_format else 'custom_res'}",
