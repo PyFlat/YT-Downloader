@@ -78,7 +78,10 @@ class MainWindow(FluentWindow):
 
         if webpage_url in VIDEO_SITES:
             site: dict = VIDEO_SITES.get(webpage_url)
-            info_widget_class: BaseInformationWidget = site.get("widget")
+            if result.get("_type") == "playlist":
+                info_widget_class: BaseInformationWidget = site.get("playlist-widget")
+            else:
+                info_widget_class: BaseInformationWidget = site.get("widget")
 
             self.info_widget = info_widget_class(
                 self, result, downloader, site.get("data")
@@ -94,7 +97,7 @@ class MainWindow(FluentWindow):
         if search_text == "":
             return
         self.main_interface.stackedWidget.setCurrentIndex(1)
-        downloader.getVideoInfo(search_text, self.videoInformationCallback)
+        downloader.getPlaylistInfo(search_text, self.videoInformationCallback)
 
     def showDialog(self):
         title = "yt-dlp not found"

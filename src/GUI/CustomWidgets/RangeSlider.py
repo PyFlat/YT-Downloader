@@ -67,6 +67,16 @@ class RangeSlider(QSlider):
         self._upperValue = int
         self._adjustHandlePos()
 
+    def setRange(self, min: int = 0, max: int = 99) -> None:
+        self.setMinimum(min)
+        self.setMaximum(max)
+
+    def getRange(self) -> tuple[int, int]:
+        min = self.minimum()
+        max = self.maximum()
+
+        return min, max
+
     def setOrientation(self, orientation: Qt.Orientation) -> None:
         super().setOrientation(orientation)
         self.setMinimumHeight(22)
@@ -235,28 +245,3 @@ class RangeSlider(QSlider):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._adjustHandlePos()
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Range Slider Example")
-        self.setGeometry(100, 100, 500, 150)
-
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-
-        layout = QVBoxLayout(central_widget)
-
-        self.range_slider = RangeSlider(self)
-        self.range_slider.setMinimum(15)
-        self.range_slider.setMaximum(90)
-        layout.addWidget(self.range_slider)
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())

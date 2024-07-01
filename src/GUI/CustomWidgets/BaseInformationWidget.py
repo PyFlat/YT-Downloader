@@ -19,7 +19,11 @@ class CustomListWidgetItem(QListWidgetItem):
 
 class BaseInformationWidget(InformationWidget):
     def __init__(
-        self, parent=None, widget_information: dict = {}, video_type: dict = {}
+        self,
+        parent=None,
+        widget_information: dict = {},
+        video_type: dict = {},
+        is_playlist: bool = False,
     ):
         super().__init__(parent)
 
@@ -53,6 +57,17 @@ class BaseInformationWidget(InformationWidget):
             self.setDefaultThumbnail()
 
         self.stackedWidget.setCurrentIndex(0)
+
+        if is_playlist:
+            self.enablePlaylist()
+
+    def enablePlaylist(self):
+        self.stackedWidget.setCurrentIndex(3)
+        playlist_length = self.widget_information.get("playlist-length")
+        self.start_range_label.setText(str(1))
+        self.end_range_label.setText(str(playlist_length))
+        self.SubtitleLabel.setText(f"{playlist_length} Videos")
+        self.range_selection_slider.setRange(1, playlist_length)
 
     def connectSignalsToSlots(self):
         self.best_video_btn.clicked.connect(lambda: self.setFormatOptions())
@@ -90,6 +105,7 @@ class BaseInformationWidget(InformationWidget):
         self.author_icon.setIcon(CustomIcons.PERSON)
         self.duration_icon.setIcon(CustomIcons.TIME)
         self.calender_icon.setIcon(CustomIcons.CALENDER)
+        self.playlist_length_icon.setIcon(CustomIcons.PLAYLIST)
 
         self.best_video_btn.setIcon(CustomIcons.VIDEO)
         self.best_audio_btn.setIcon(CustomIcons.AUDIO)
