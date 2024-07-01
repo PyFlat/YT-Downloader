@@ -16,8 +16,6 @@ class YTPlayListInformationWidget(BaseInformationWidget):
         video_type: dict = {},
     ):
         self.info = info_dict
-        with open("data.json", "w") as file:
-            file.write(json.dumps(self.info))
 
         thumbnail_url = None
 
