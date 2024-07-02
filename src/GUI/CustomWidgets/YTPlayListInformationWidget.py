@@ -54,7 +54,6 @@ class YTPlayListInformationWidget(BaseInformationWidget):
                     "title": playlist_object.get("title"),
                     "uploader": playlist_object.get("uploader"),
                     "playlist_index": index,
-                    "selected": True,
                 }
             )
         return videos

@@ -4,6 +4,7 @@ from datetime import datetime
 from src.DownloaderCore.Downloader import Downloader
 from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
 from src.GUI.Icons.Icons import CustomIcons
+from src.utils import transformVideoDuration
 
 
 class TikTokInformationWidget(BaseInformationWidget):
@@ -32,23 +33,10 @@ class TikTokInformationWidget(BaseInformationWidget):
             "channel": self.info["uploader"],
             "url-type": "TikTok Video",
             "url-type-icon": CustomIcons.TIKTOK,
-            "video-duration": self.getVideoDuration(),
+            "video-duration": transformVideoDuration(),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),
         }
 
         super().__init__(parent, widget_information, video_type)
-
-    def getVideoDuration(self) -> str:
-        minutes, seconds = divmod(self.info["duration"], 60)
-        hours, minutes = divmod(minutes, 60)
-
-        if hours > 0:
-            duration = f"{hours:02} hours, {minutes:02} minutes, {seconds:02} seconds"
-        elif minutes > 0:
-            duration = f"{minutes:02} minutes, {seconds:02} seconds"
-        else:
-            duration = f"{seconds:02} seconds"
-
-        return duration
