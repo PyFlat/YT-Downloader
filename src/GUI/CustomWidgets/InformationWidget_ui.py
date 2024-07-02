@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'InformationWidget.ui'
+##
+## Created by: Qt User Interface Compiler version 6.6.3
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -8,18 +18,20 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QListWidgetItem,
     QSizePolicy, QSpacerItem, QStackedWidget, QVBoxLayout,
     QWidget)
+
 from qfluentwidgets import (BodyLabel, CardWidget, HyperlinkLabel, IconWidget,
     LineEdit, ListWidget, PixmapLabel, PrimaryPushButton,
     PushButton, SearchLineEdit, StrongBodyLabel, SubtitleLabel,
     TitleLabel)
 from src.GUI.CustomWidgets.RangeSlider import RangeSlider
-class InformationWidget(QWidget):
-    def __init__(self, parent):
-        super().__init__(parent=parent)
-        self.setObjectName("InformationWidget")
-        Form = self
+
+class Ui_Form(object):
+    def setupUi(self, Form):
+        if not Form.objectName():
+            Form.setObjectName(u"Form")
         Form.resize(728, 420)
         Form.setMaximumSize(QSize(16777215, 420))
+        Form.setStyleSheet(u"")
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -33,8 +45,12 @@ class InformationWidget(QWidget):
         self.TitleLabel.setTextFormat(Qt.RichText)
         self.TitleLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.TitleLabel.setWordWrap(True)
+
         self.horizontalLayout.addWidget(self.TitleLabel)
+
+
         self.verticalLayout.addWidget(self.widget)
+
         self.widget_4 = QWidget(Form)
         self.widget_4.setObjectName(u"widget_4")
         self.horizontalLayout_3 = QHBoxLayout(self.widget_4)
@@ -52,7 +68,9 @@ class InformationWidget(QWidget):
         self.youtube_icon = IconWidget(self.frame)
         self.youtube_icon.setObjectName(u"youtube_icon")
         self.youtube_icon.setMinimumSize(QSize(25, 25))
+
         self.horizontalLayout_7.addWidget(self.youtube_icon)
+
         self.HyperlinkLabel = HyperlinkLabel(self.frame)
         self.HyperlinkLabel.setObjectName(u"HyperlinkLabel")
         font = QFont()
@@ -61,8 +79,12 @@ class InformationWidget(QWidget):
         font.setUnderline(False)
         font.setStrikeOut(False)
         self.HyperlinkLabel.setFont(font)
+
         self.horizontalLayout_7.addWidget(self.HyperlinkLabel)
+
+
         self.horizontalLayout_3.addWidget(self.frame)
+
         self.widget_5 = QWidget(self.widget_4)
         self.widget_5.setObjectName(u"widget_5")
         self.horizontalLayout_4 = QHBoxLayout(self.widget_5)
@@ -70,17 +92,23 @@ class InformationWidget(QWidget):
         self.horizontalLayout_4.setContentsMargins(10, 8, 10, 8)
         self.author_icon = IconWidget(self.widget_5)
         self.author_icon.setObjectName(u"author_icon")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.author_icon.sizePolicy().hasHeightForWidth())
         self.author_icon.setSizePolicy(sizePolicy)
         self.author_icon.setMinimumSize(QSize(25, 25))
+
         self.horizontalLayout_4.addWidget(self.author_icon)
+
         self.StrongBodyLabel_2 = StrongBodyLabel(self.widget_5)
         self.StrongBodyLabel_2.setObjectName(u"StrongBodyLabel_2")
+
         self.horizontalLayout_4.addWidget(self.StrongBodyLabel_2)
+
+
         self.horizontalLayout_3.addWidget(self.widget_5)
+
         self.widget_7 = QWidget(self.widget_4)
         self.widget_7.setObjectName(u"widget_7")
         self.horizontalLayout_5 = QHBoxLayout(self.widget_7)
@@ -91,11 +119,17 @@ class InformationWidget(QWidget):
         sizePolicy.setHeightForWidth(self.duration_icon.sizePolicy().hasHeightForWidth())
         self.duration_icon.setSizePolicy(sizePolicy)
         self.duration_icon.setMinimumSize(QSize(25, 25))
+
         self.horizontalLayout_5.addWidget(self.duration_icon)
+
         self.BodyLabel_3 = BodyLabel(self.widget_7)
         self.BodyLabel_3.setObjectName(u"BodyLabel_3")
+
         self.horizontalLayout_5.addWidget(self.BodyLabel_3)
+
+
         self.horizontalLayout_3.addWidget(self.widget_7)
+
         self.widget_6 = QWidget(self.widget_4)
         self.widget_6.setObjectName(u"widget_6")
         self.horizontalLayout_6 = QHBoxLayout(self.widget_6)
@@ -106,12 +140,20 @@ class InformationWidget(QWidget):
         sizePolicy.setHeightForWidth(self.calender_icon.sizePolicy().hasHeightForWidth())
         self.calender_icon.setSizePolicy(sizePolicy)
         self.calender_icon.setMinimumSize(QSize(25, 25))
+
         self.horizontalLayout_6.addWidget(self.calender_icon)
+
         self.BodyLabel_4 = BodyLabel(self.widget_6)
         self.BodyLabel_4.setObjectName(u"BodyLabel_4")
+
         self.horizontalLayout_6.addWidget(self.BodyLabel_4)
+
+
         self.horizontalLayout_3.addWidget(self.widget_6)
+
+
         self.verticalLayout.addWidget(self.widget_4, 0, Qt.AlignLeft|Qt.AlignTop)
+
         self.widget_3 = QWidget(Form)
         self.widget_3.setObjectName(u"widget_3")
         self.horizontalLayout_2 = QHBoxLayout(self.widget_3)
@@ -119,7 +161,7 @@ class InformationWidget(QWidget):
         self.horizontalLayout_2.setContentsMargins(15, 0, 15, 0)
         self.widget_8 = QWidget(self.widget_3)
         self.widget_8.setObjectName(u"widget_8")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.widget_8.sizePolicy().hasHeightForWidth())
@@ -136,10 +178,16 @@ class InformationWidget(QWidget):
         self.PixmapLabel_2.setStyleSheet(u"")
         self.PixmapLabel_2.setScaledContents(True)
         self.PixmapLabel_2.setAlignment(Qt.AlignCenter)
+
         self.verticalLayout_4.addWidget(self.PixmapLabel_2)
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
         self.verticalLayout_4.addItem(self.verticalSpacer_3)
+
+
         self.horizontalLayout_2.addWidget(self.widget_8)
+
         self.stackedWidget = QStackedWidget(self.widget_3)
         self.stackedWidget.setObjectName(u"stackedWidget")
         self.page = QWidget()
@@ -157,25 +205,39 @@ class InformationWidget(QWidget):
         self.best_video_btn = PushButton(self.widget_2)
         self.best_video_btn.setObjectName(u"best_video_btn")
         self.best_video_btn.setIconSize(QSize(20, 20))
+
         self.verticalLayout_2.addWidget(self.best_video_btn)
+
         self.best_audio_btn = PushButton(self.widget_2)
         self.best_audio_btn.setObjectName(u"best_audio_btn")
         self.best_audio_btn.setIconSize(QSize(20, 20))
+
         self.verticalLayout_2.addWidget(self.best_audio_btn)
+
         self.quick_dl_btn = PushButton(self.widget_2)
         self.quick_dl_btn.setObjectName(u"quick_dl_btn")
         self.quick_dl_btn.setIconSize(QSize(20, 20))
+
         self.verticalLayout_2.addWidget(self.quick_dl_btn)
+
         self.custom_dl_btn = PushButton(self.widget_2)
         self.custom_dl_btn.setObjectName(u"custom_dl_btn")
         self.custom_dl_btn.setIconSize(QSize(20, 20))
+
         self.verticalLayout_2.addWidget(self.custom_dl_btn)
+
         self.back_btn = PushButton(self.widget_2)
         self.back_btn.setObjectName(u"back_btn")
+
         self.verticalLayout_2.addWidget(self.back_btn)
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
         self.verticalLayout_2.addItem(self.verticalSpacer_2)
+
+
         self.horizontalLayout_8.addWidget(self.widget_2)
+
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
@@ -185,11 +247,15 @@ class InformationWidget(QWidget):
         self.verticalLayout_3.setContentsMargins(0, 25, 0, 25)
         self.SearchLineEdit = SearchLineEdit(self.page_2)
         self.SearchLineEdit.setObjectName(u"SearchLineEdit")
+
         self.verticalLayout_3.addWidget(self.SearchLineEdit)
+
         self.ListWidget = ListWidget(self.page_2)
         self.ListWidget.setObjectName(u"ListWidget")
         self.ListWidget.setMaximumSize(QSize(16777215, 125))
+
         self.verticalLayout_3.addWidget(self.ListWidget)
+
         self.widget_9 = QWidget(self.page_2)
         self.widget_9.setObjectName(u"widget_9")
         self.horizontalLayout_9 = QHBoxLayout(self.widget_9)
@@ -198,11 +264,17 @@ class InformationWidget(QWidget):
         self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.PushButton = PushButton(self.widget_9)
         self.PushButton.setObjectName(u"PushButton")
+
         self.horizontalLayout_9.addWidget(self.PushButton, 0, Qt.AlignTop)
+
         self.PrimaryPushButton_4 = PrimaryPushButton(self.widget_9)
         self.PrimaryPushButton_4.setObjectName(u"PrimaryPushButton_4")
+
         self.horizontalLayout_9.addWidget(self.PrimaryPushButton_4, 0, Qt.AlignTop)
+
+
         self.verticalLayout_3.addWidget(self.widget_9)
+
         self.stackedWidget.addWidget(self.page_2)
         self.page_3 = QWidget()
         self.page_3.setObjectName(u"page_3")
@@ -212,11 +284,15 @@ class InformationWidget(QWidget):
         self.verticalLayout_5.setContentsMargins(0, 25, 0, 25)
         self.custom_dl_line_edit = SearchLineEdit(self.page_3)
         self.custom_dl_line_edit.setObjectName(u"custom_dl_line_edit")
+
         self.verticalLayout_5.addWidget(self.custom_dl_line_edit)
+
         self.custom_dl_list_widget = ListWidget(self.page_3)
         self.custom_dl_list_widget.setObjectName(u"custom_dl_list_widget")
         self.custom_dl_list_widget.setMaximumSize(QSize(16777215, 125))
+
         self.verticalLayout_5.addWidget(self.custom_dl_list_widget)
+
         self.widget_10 = QWidget(self.page_3)
         self.widget_10.setObjectName(u"widget_10")
         self.horizontalLayout_10 = QHBoxLayout(self.widget_10)
@@ -225,14 +301,22 @@ class InformationWidget(QWidget):
         self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
         self.custom_dl_back_btn = PushButton(self.widget_10)
         self.custom_dl_back_btn.setObjectName(u"custom_dl_back_btn")
+
         self.horizontalLayout_10.addWidget(self.custom_dl_back_btn, 0, Qt.AlignTop)
+
         self.custom_dl_next_btn = PushButton(self.widget_10)
         self.custom_dl_next_btn.setObjectName(u"custom_dl_next_btn")
+
         self.horizontalLayout_10.addWidget(self.custom_dl_next_btn, 0, Qt.AlignTop)
+
         self.custom_dl_dl_btn = PrimaryPushButton(self.widget_10)
         self.custom_dl_dl_btn.setObjectName(u"custom_dl_dl_btn")
+
         self.horizontalLayout_10.addWidget(self.custom_dl_dl_btn, 0, Qt.AlignTop)
+
+
         self.verticalLayout_5.addWidget(self.widget_10)
+
         self.stackedWidget.addWidget(self.page_3)
         self.page_4 = QWidget()
         self.page_4.setObjectName(u"page_4")
@@ -242,7 +326,9 @@ class InformationWidget(QWidget):
         self.verticalLayout_6.setContentsMargins(16, 12, 16, 12)
         self.TitleLabel_2 = TitleLabel(self.page_4)
         self.TitleLabel_2.setObjectName(u"TitleLabel_2")
+
         self.verticalLayout_6.addWidget(self.TitleLabel_2, 0, Qt.AlignHCenter)
+
         self.widget_12 = QWidget(self.page_4)
         self.widget_12.setObjectName(u"widget_12")
         self.horizontalLayout_12 = QHBoxLayout(self.widget_12)
@@ -252,11 +338,17 @@ class InformationWidget(QWidget):
         self.playlist_length_icon = IconWidget(self.widget_12)
         self.playlist_length_icon.setObjectName(u"playlist_length_icon")
         self.playlist_length_icon.setMinimumSize(QSize(25, 25))
+
         self.horizontalLayout_12.addWidget(self.playlist_length_icon)
+
         self.SubtitleLabel = SubtitleLabel(self.widget_12)
         self.SubtitleLabel.setObjectName(u"SubtitleLabel")
+
         self.horizontalLayout_12.addWidget(self.SubtitleLabel)
+
+
         self.verticalLayout_6.addWidget(self.widget_12, 0, Qt.AlignHCenter|Qt.AlignTop)
+
         self.widget_13 = QWidget(self.page_4)
         self.widget_13.setObjectName(u"widget_13")
         self.horizontalLayout_13 = QHBoxLayout(self.widget_13)
@@ -265,15 +357,23 @@ class InformationWidget(QWidget):
         self.horizontalLayout_13.setContentsMargins(0, 0, 0, 0)
         self.start_range_label = BodyLabel(self.widget_13)
         self.start_range_label.setObjectName(u"start_range_label")
+
         self.horizontalLayout_13.addWidget(self.start_range_label)
+
         self.range_selection_slider = RangeSlider(self.widget_13)
         self.range_selection_slider.setObjectName(u"range_selection_slider")
         self.range_selection_slider.setOrientation(Qt.Horizontal)
+
         self.horizontalLayout_13.addWidget(self.range_selection_slider)
+
         self.end_range_label = BodyLabel(self.widget_13)
         self.end_range_label.setObjectName(u"end_range_label")
+
         self.horizontalLayout_13.addWidget(self.end_range_label)
+
+
         self.verticalLayout_6.addWidget(self.widget_13)
+
         self.widget_11 = QWidget(self.page_4)
         self.widget_11.setObjectName(u"widget_11")
         self.widget_11.setEnabled(True)
@@ -283,20 +383,38 @@ class InformationWidget(QWidget):
         self.horizontalLayout_11.setContentsMargins(12, 12, 12, 12)
         self.pl_next_btn = PushButton(self.widget_11)
         self.pl_next_btn.setObjectName(u"pl_next_btn")
+
         self.horizontalLayout_11.addWidget(self.pl_next_btn, 0, Qt.AlignBottom)
+
         self.PrimaryPushButton = PrimaryPushButton(self.widget_11)
         self.PrimaryPushButton.setObjectName(u"PrimaryPushButton")
         self.PrimaryPushButton.setEnabled(True)
+
         self.horizontalLayout_11.addWidget(self.PrimaryPushButton, 0, Qt.AlignBottom)
+
+
         self.verticalLayout_6.addWidget(self.widget_11)
+
         self.stackedWidget.addWidget(self.page_4)
+
         self.horizontalLayout_2.addWidget(self.stackedWidget)
+
+
         self.verticalLayout.addWidget(self.widget_3)
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
         self.verticalLayout.addItem(self.verticalSpacer)
+
+
         self.retranslateUi(Form)
-        self.stackedWidget.setCurrentIndex(0)
+
+        self.stackedWidget.setCurrentIndex(3)
+
+
         QMetaObject.connectSlotsByName(Form)
+    # setupUi
+
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.TitleLabel.setText(QCoreApplication.translate("Form", u" Rick Astley - Never Gonna Give You Up (Official Music Video) ", None))
@@ -322,3 +440,5 @@ class InformationWidget(QWidget):
         self.end_range_label.setText(QCoreApplication.translate("Form", u"99", None))
         self.pl_next_btn.setText(QCoreApplication.translate("Form", u"Next", None))
         self.PrimaryPushButton.setText(QCoreApplication.translate("Form", u"Select Videos", None))
+    # retranslateUi
+

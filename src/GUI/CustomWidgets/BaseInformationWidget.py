@@ -1,11 +1,17 @@
 from PySide6.QtCore import QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
-from PySide6.QtWidgets import QGraphicsDropShadowEffect, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import (
+    QGraphicsDropShadowEffect,
+    QListWidget,
+    QListWidgetItem,
+    QStyle,
+)
 from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
 
 from src.Config.Config import cfg
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
+from src.GUI.CustomWidgets.PlaylistSelectionDialog import VideoSelectDialog
 from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Icons.Icons import CustomIcons
 from src.Logger import logger
@@ -34,6 +40,8 @@ class BaseInformationWidget(InformationWidget):
         self.button_type_clicked = None
         self.image_data = None
 
+        self.selected_ids = []
+
         self.custom_video_formats = [
             x for x in video_type.get("video_formats", []) if not x.get("best_format")
         ]
@@ -60,6 +68,8 @@ class BaseInformationWidget(InformationWidget):
 
         if is_playlist:
             self.enablePlaylist()
+        else:
+            self.back_btn.setVisible(False)
 
     def enablePlaylist(self):
         self.stackedWidget.setCurrentIndex(3)
@@ -68,6 +78,38 @@ class BaseInformationWidget(InformationWidget):
         self.end_range_label.setText(str(playlist_length))
         self.SubtitleLabel.setText(f"{playlist_length} Videos")
         self.range_selection_slider.setRange(1, playlist_length)
+
+        self.updateDownloadRange()
+
+    def has_clear_range(self, numbers: list[int]):
+        numbers.sort()
+
+        for i in range(len(numbers) - 1):
+            if numbers[i + 1] - numbers[i] != 1:
+                return False
+        self.range_selection_slider.setValue(numbers[0], numbers[-1])
+        return True
+
+    def updateDownloadRange(self):
+        start, stop = self.range_selection_slider.value()
+        self.selected_ids = []
+        for num in range(start, stop + 1):
+            self.selected_ids.append(num)
+
+    def showPlaylistSelectionDialog(self):
+        self.dialog = VideoSelectDialog(
+            self.window(),
+            self.widget_information.get("playlist-entries"),
+            self.selected_ids,
+        )
+        result = self.dialog.exec()
+        if result:
+            self.selected_ids = self.dialog.get_selected()
+
+            if self.selected_ids == [] or self.has_clear_range(self.selected_ids):
+                self.range_selection_slider.setEnabled(True)
+            else:
+                self.range_selection_slider.setEnabled(False)
 
     def connectSignalsToSlots(self):
         self.best_video_btn.clicked.connect(lambda: self.setFormatOptions())
@@ -97,6 +139,14 @@ class BaseInformationWidget(InformationWidget):
         self.custom_dl_line_edit.textChanged.connect(
             lambda text: self.filter_list(text, self.custom_dl_list_widget)
         )
+
+        self.pl_next_btn.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        self.back_btn.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
+
+        self.PrimaryPushButton.clicked.connect(self.showPlaylistSelectionDialog)
+
+        self.range_selection_slider.lowerValueChanged.connect(self.updateDownloadRange)
+        self.range_selection_slider.upperValueChanged.connect(self.updateDownloadRange)
 
     def setIcons(self):
         url_type_icon = self.widget_information.get("url-type-icon")
