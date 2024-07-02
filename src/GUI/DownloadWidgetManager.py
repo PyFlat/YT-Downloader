@@ -20,10 +20,24 @@ class DownloadWidgetManager:
         self.downloader = downloader
 
     def addVideoDownloadWidget(
-        self, thumbnail_url, title, channel, format_id, url, job_str, **options
+        self,
+        thumbnail_url,
+        title,
+        channel,
+        format_id,
+        url,
+        selected_ids: list[int] = None,
+        **options,
     ):
         if self.download_interface == None:
             return
+
+        job_str = download_manager_instance.formatTaskString(url, format_id)
+
+        # if not download_manager_instance.isTask(job_str):
+        #     download_manager_instance.addTask(job_str)
+        # else:
+        #     return
 
         download_widget = VideoDownloadWidget(
             self.download_interface, thumbnail_url, title, channel, format_id
@@ -46,7 +60,12 @@ class DownloadWidgetManager:
             download_widget.finishStatus(success)
             download_manager_instance.removeTask(job_str)
 
-        self.downloader.downloadVideo(url, start, progress, finish, **options)
+        if selected_ids != []:
+            self.downloader.download_playlist(
+                url, start, progress, finish, selected_ids, **options
+            )
+        else:
+            self.downloader.downloadVideo(url, start, progress, finish, **options)
 
 
 download_widget_manager = DownloadWidgetManager()

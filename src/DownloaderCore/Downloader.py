@@ -65,28 +65,27 @@ class Downloader:
     def download_playlist(
         self,
         url: str,
-        outfile_path: str,
-        ffmpeg_path: str,
-        resolution: int,
-        playlist_range: tuple[int, int] | None = None,
+        start_callback: object | None = None,
+        progress_callback: object | None = None,
+        finish_callback: object | None = None,
+        playlist_items: list[int] | None = None,
+        **options,
     ):
         def on_info_recieve(data, url):
             if data == {}:
                 return
-            import os
 
-            if not os.path.isdir(f"{outfile_path}{data['title']}"):
-                os.mkdir(f"{outfile_path}{data['title']}")
             for i, entry in enumerate(data["entries"]):
-                if playlist_range != None:
-                    lower, upper = playlist_range
-                    if i < lower or i > upper:
+                if playlist_items != None:
+                    print(playlist_items, i + 1)
+                    if i + 1 not in playlist_items:
                         continue
                 self.downloadVideo(
                     entry["url"],
-                    f"{outfile_path}{data['title']}/",
-                    ffmpeg_path,
-                    resolution,
+                    start_callback,
+                    progress_callback,
+                    finish_callback,
+                    **options,
                 )
 
         self.getPlaylistInfo(url, on_info_recieve)

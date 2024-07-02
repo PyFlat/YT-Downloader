@@ -16,7 +16,7 @@ class DownloadManager:
         if not job in self.jobs:
             if throw_error:
                 raise ValueError(
-                    f"Cannot remove job for {job}.\n This job does already exist. Active Jobs:\n{'[' + ','.join(self.jobs)+']'}"
+                    f"Cannot remove job for {job}.\n This job does not exist. Active Jobs:\n{'[' + ','.join(self.jobs)+']'}"
                 )
             return False
         self.jobs.remove(job)
@@ -43,8 +43,4 @@ class DownloadManager:
         return job in self.jobs
 
 
-# Cursed way of making 100%? sure, that any importer gets the same instance!
-try:
-    download_manager_instance
-except NameError:
-    download_manager_instance = DownloadManager()
+download_manager_instance = DownloadManager()

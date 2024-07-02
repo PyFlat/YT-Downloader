@@ -33,7 +33,7 @@ class TikTokInformationWidget(BaseInformationWidget):
             "channel": self.info["uploader"],
             "url-type": "TikTok Video",
             "url-type-icon": CustomIcons.TIKTOK,
-            "video-duration": transformVideoDuration(),
+            "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),

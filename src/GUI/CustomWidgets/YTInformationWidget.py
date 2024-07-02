@@ -25,7 +25,7 @@ class YTInformationWidget(BaseInformationWidget):
             "channel": self.info["channel"],
             "url-type": "YouTube Video",
             "url-type-icon": CustomIcons.YOUTUBE,
-            "video-duration": transformVideoDuration(),
+            "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),

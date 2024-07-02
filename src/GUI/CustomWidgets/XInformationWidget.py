@@ -32,7 +32,7 @@ class XInformationWidget(BaseInformationWidget):
             "channel": self.info["uploader"],
             "url-type": "X Video",
             "url-type-icon": CustomIcons.X,
-            "video-duration": transformVideoDuration(),
+            "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),

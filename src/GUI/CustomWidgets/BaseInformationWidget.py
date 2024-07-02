@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
 from qfluentwidgets import Flyout, FlyoutView, PushButton, isDarkTheme
 
 from src.Config.Config import cfg
-from src.DownloaderCore.DownloadManager import download_manager_instance
 from src.GUI.CustomWidgets.InformationWidget import InformationWidget
 from src.GUI.CustomWidgets.PlaylistSelectionDialog import VideoSelectDialog
 from src.GUI.DownloadWidgetManager import download_widget_manager
@@ -308,22 +307,13 @@ class BaseInformationWidget(InformationWidget):
             options["format"] = resolution
             format_id = f"{format_id.rsplit('/', 1)[0]}/{resolution}"
 
-        job_str = download_manager_instance.formatTaskString(
-            self.widget_information.get("url"), format_id
-        )
-
-        if not download_manager_instance.isTask(job_str):
-            download_manager_instance.addTask(job_str)
-        else:
-            return
-
         download_widget_manager.addVideoDownloadWidget(
             self.widget_information.get("thumbnail-url"),
             self.widget_information.get("title"),
             self.widget_information.get("channel"),
             format_id,
             self.widget_information.get("url"),
-            job_str,
+            self.selected_ids,
             **options,
         )
 
