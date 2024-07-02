@@ -39,6 +39,9 @@ class DownloadManager:
             )
         return f"[URL: {video_url} | FORMAT: {format_info}]"
 
+    def isTask(self, job: str) -> bool:
+        return job in self.jobs
+
 
 # Cursed way of making 100%? sure, that any importer gets the same instance!
 try:
