@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 
 from src.DownloaderCore.Downloader import Downloader
+from src.DownloaderCore.DownloadManager import download_manager_instance
 from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
@@ -19,7 +20,7 @@ class DownloadWidgetManager:
         self.downloader = downloader
 
     def addVideoDownloadWidget(
-        self, thumbnail_url, title, channel, format_id, url, **options
+        self, thumbnail_url, title, channel, format_id, url, job_str, **options
     ):
         if self.download_interface == None:
             return
@@ -43,6 +44,7 @@ class DownloadWidgetManager:
 
         def finish(success):
             download_widget.finishStatus(success)
+            download_manager_instance.removeTask(job_str)
 
         self.downloader.downloadVideo(url, start, progress, finish, **options)
 
