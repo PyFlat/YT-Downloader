@@ -16,6 +16,8 @@ class YTPlayListInformationWidget(BaseInformationWidget):
         video_type: dict = {},
     ):
         self.info = info_dict
+        with open("data.json", "w") as file:
+            file.write(json.dumps(self.info))
 
         thumbnail_url = None
 
@@ -30,7 +32,7 @@ class YTPlayListInformationWidget(BaseInformationWidget):
             "thumbnail-url": thumbnail_url,
             "title": self.info["title"],
             "channel": self.info["channel"],
-            "url-type": "YouTube Video",
+            "url-type": "YouTube Playlist",
             "url-type-icon": CustomIcons.YOUTUBE,
             "video-duration": transformVideoDuration(
                 getPlaylistSum(self.info["entries"])
@@ -39,7 +41,19 @@ class YTPlayListInformationWidget(BaseInformationWidget):
                 self.info["modified_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),
             "playlist-length": self.info["playlist_count"],
-            "playlist-entries": self.info["entries"],
+            "playlist-entries": self.getVideoList(self.info["entries"]),
         }
 
         super().__init__(parent, widget_information, video_type, is_playlist=True)
+
+    def getVideoList(self, entries: list[dict] = []):
+        videos = []
+        for index, playlist_object in enumerate(entries):
+            videos.append(
+                {
+                    "title": playlist_object.get("title"),
+                    "uploader": playlist_object.get("uploader"),
+                    "playlist_index": index,
+                }
+            )
+        return videos

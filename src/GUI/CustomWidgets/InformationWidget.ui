@@ -369,18 +369,18 @@
               <number>15</number>
              </property>
              <property name="leftMargin">
-              <number>0</number>
+              <number>35</number>
              </property>
              <property name="topMargin">
               <number>35</number>
              </property>
              <property name="rightMargin">
-              <number>0</number>
+              <number>35</number>
              </property>
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item alignment="Qt::AlignLeft">
+             <item>
               <widget class="PushButton" name="best_video_btn">
                <property name="text">
                 <string>Best Video</string>
@@ -393,7 +393,7 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignLeft">
+             <item>
               <widget class="PushButton" name="best_audio_btn">
                <property name="text">
                 <string>Best Audio</string>
@@ -406,7 +406,7 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignLeft">
+             <item>
               <widget class="PushButton" name="quick_dl_btn">
                <property name="text">
                 <string>Quick Download</string>
@@ -419,7 +419,7 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignLeft">
+             <item>
               <widget class="PushButton" name="custom_dl_btn">
                <property name="text">
                 <string>Custom</string>
@@ -429,6 +429,13 @@
                  <width>20</width>
                  <height>20</height>
                 </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="PushButton" name="back_btn">
+               <property name="text">
+                <string>Back</string>
                </property>
               </widget>
              </item>
@@ -705,6 +712,9 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_11" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <property name="spacing">
               <number>12</number>
@@ -722,14 +732,17 @@
               <number>12</number>
              </property>
              <item alignment="Qt::AlignBottom">
-              <widget class="PushButton" name="PushButton_2">
+              <widget class="PushButton" name="pl_next_btn">
                <property name="text">
-                <string>Skip</string>
+                <string>Next</string>
                </property>
               </widget>
              </item>
              <item alignment="Qt::AlignBottom">
               <widget class="PrimaryPushButton" name="PrimaryPushButton">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="text">
                 <string>Select Videos</string>
                </property>

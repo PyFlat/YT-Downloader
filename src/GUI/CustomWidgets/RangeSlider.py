@@ -3,13 +3,7 @@ import sys
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from qfluentwidgets import (
-    ToolTip,
-    ToolTipFilter,
-    ToolTipPosition,
-    isDarkTheme,
-    themeColor,
-)
+from qfluentwidgets import ToolTip, ToolTipPosition, isDarkTheme, themeColor
 from qfluentwidgets.common.overload import singledispatchmethod
 from qfluentwidgets.components.widgets.slider import SliderHandle
 
@@ -76,6 +70,24 @@ class RangeSlider(QSlider):
         max = self.maximum()
 
         return min, max
+
+    def value(self) -> tuple[int, int]:
+        return self._lowerValue, self._upperValue
+
+    def setValue(self, start: int = 0, end: int = 1):
+        self._lowerValue = start
+        self._upperValue = end
+
+        self._adjustHandlePos()
+
+    def setEnabled(self, arg: bool):
+        super().setEnabled(arg)
+        if arg:
+            self.lowerHandle.setVisible(True)
+            self.upperHandle.setVisible(True)
+        else:
+            self.lowerHandle.setVisible(False)
+            self.upperHandle.setVisible(False)
 
     def setOrientation(self, orientation: Qt.Orientation) -> None:
         super().setOrientation(orientation)
@@ -203,7 +215,7 @@ class RangeSlider(QSlider):
 
     def _valueToPos(self, value):
         total = max(self.maximum() - self.minimum(), 1)
-        groove_pos = (value - self.minimum()) / total * self.grooveLength
+        groove_pos = (int(value) - self.minimum()) / total * self.grooveLength
         groove_pos = max(0, min(groove_pos, self.grooveLength))
         return int(groove_pos)
 
@@ -232,15 +244,18 @@ class RangeSlider(QSlider):
 
         if self.maximum() - self.minimum() == 0:
             return
-
-        painter.setBrush(themeColor())
-        painter.drawRoundedRect(
-            QRectF(
-                groove_start + selected_start, r - 2, selected_end - selected_start, 4
-            ),
-            2,
-            2,
-        )
+        if self.isEnabled():
+            painter.setBrush(themeColor())
+            painter.drawRoundedRect(
+                QRectF(
+                    groove_start + selected_start,
+                    r - 2,
+                    selected_end - selected_start,
+                    4,
+                ),
+                2,
+                2,
+            )
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
