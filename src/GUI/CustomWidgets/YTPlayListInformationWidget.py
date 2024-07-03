@@ -53,6 +53,7 @@ class YTPlayListInformationWidget(BaseInformationWidget):
                 {
                     "title": playlist_object.get("title"),
                     "uploader": playlist_object.get("uploader"),
+                    "id": playlist_object.get("id"),
                     "playlist_index": index,
                 }
             )

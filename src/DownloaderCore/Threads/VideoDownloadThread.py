@@ -2,13 +2,14 @@ from PySide6.QtCore import QObject, QRunnable, Signal
 
 
 class VideoDownloadThread(QObject, QRunnable):
-    __on_finish = Signal(bool)
+    __on_finish = Signal(bool, str)
     __on_progress = Signal(dict)
 
     def __init__(
         self,
         yt_dlp: object,
         url: str = "https://www.youtube.com/watch?v=HBEsr0MfdmQ",
+        id: str = None,
         options: dict[str, object] = {},
         finished_callback: object | None = None,
         progress_callback: object | None = None,
@@ -20,8 +21,8 @@ class VideoDownloadThread(QObject, QRunnable):
         if progress_callback != None:
             self.__on_progress.connect(progress_callback)
         self.__is_cancled = False
-        self.__progress_counter = 0
         self.__url = url
+        self.__id = id
         self.__download_options = options
 
     def _finish_hook(self, result):
@@ -49,6 +50,6 @@ class VideoDownloadThread(QObject, QRunnable):
                 pass  # User cancle
             else:
                 pass  # Unknown error
-            self.__on_finish.emit(False)
+            self.__on_finish.emit(False, self.__id)
         else:
-            self.__on_finish.emit(True)  # All okay
+            self.__on_finish.emit(True, self.__id)  # All okay

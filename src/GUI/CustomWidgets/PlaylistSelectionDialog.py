@@ -1,5 +1,4 @@
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QFrame,
@@ -23,8 +22,6 @@ from qfluentwidgets.components.dialog_box.mask_dialog_base import MaskDialogBase
 class VideoSelectDialog(MaskDialogBase):
     def __init__(self, parent=None, videos=None, selected_ids: list[int] = []):
         super().__init__(parent)
-
-        self.setWindowTitle("Video Selection")
 
         self.videos = videos
 
@@ -115,13 +112,9 @@ class VideoSelectDialog(MaskDialogBase):
         self.main_layout.addLayout(table_layout)
         self.main_layout.addWidget(self.buttonGroup)
 
-    def __onYesButtonClicked(self):
-        self.accept()
-        # Accept logic here
-
     def __connectSignalsToSlots(self):
         self.cancelButton.clicked.connect(self.reject)
-        self.yesButton.clicked.connect(self.__onYesButtonClicked)
+        self.yesButton.clicked.connect(self.accept)
 
         self.search_input.textChanged.connect(self.filter_videos)
         self.select_all_button.clicked.connect(self.video_table.selectAll)
@@ -129,6 +122,8 @@ class VideoSelectDialog(MaskDialogBase):
         self.search_title_checkbox.stateChanged.connect(self.filter_videos)
         self.search_uploader_checkbox.stateChanged.connect(self.filter_videos)
         self.search_index_checkbox.stateChanged.connect(self.filter_videos)
+
+        self.video_table.horizontalHeader().sectionClicked.connect(self.handle_sort)
 
     def __setQss(self):
         FluentStyleSheet.COLOR_DIALOG.apply(self)
@@ -155,7 +150,12 @@ class VideoSelectDialog(MaskDialogBase):
                 )
 
         for index in self.selected_ids:
-            self.video_table.delegate.selectedRows.add(index - 1)
+            self.video_table.selectRow(index - 1)
+        self.scrollBarToTop()
+
+    def scrollBarToTop(self):
+        self.video_table.scrollDelagate.vScrollBar.ani.setEndValue(0)
+        self.video_table.scrollDelagate.vScrollBar.ani.start()
 
     def filter_videos(self):
         self.video_table.keyboardSearch
@@ -185,7 +185,24 @@ class VideoSelectDialog(MaskDialogBase):
         self.video_table.setUpdatesEnabled(True)
 
     def get_selected(self) -> list[int]:
-        return [index + 1 for index in self.video_table.delegate.selectedRows]
+        selected_rows = set()
+        for item in self.video_table.selectedItems():
+            selected_rows.add(item.row())
+        return [index + 1 for index in selected_rows]
+
+    def handle_sort(self, logicalIndex):
+        selected_rows = [index - 1 for index in self.get_selected()]
+        self.video_table.sortItems(
+            logicalIndex, self.video_table.horizontalHeader().sortIndicatorOrder()
+        )
+
+        QTimer.singleShot(0, lambda: self.reapply_selection(selected_rows))
+
+    def reapply_selection(self, selected_rows):
+        self.video_table.clearSelection()
+        for row in selected_rows:
+            self.video_table.selectRow(row)
+        self.scrollBarToTop()
 
 
 class PlaylistIndexTableWidgetItem(QTableWidgetItem):

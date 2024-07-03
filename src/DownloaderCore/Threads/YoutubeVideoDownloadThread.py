@@ -10,6 +10,7 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
         self,
         yt_dlp: Any,
         url: str,
+        id: str = None,
         finished_callback: Union[Callable, None] = None,
         progress_callback: Union[Callable, None] = None,
         **options: Dict[str, Any]
@@ -31,7 +32,9 @@ class YoutubeVideoDownloadThread(VideoDownloadThread):
 
         self._update_options_with_user_input(new_options, options)
 
-        super().__init__(yt_dlp, url, new_options, finished_callback, progress_callback)
+        super().__init__(
+            yt_dlp, url, id, new_options, finished_callback, progress_callback
+        )
 
     def _get_new_options(self, options: Dict[str, Any]) -> Dict[str, Any]:
         """

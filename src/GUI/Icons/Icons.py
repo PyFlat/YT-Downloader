@@ -17,6 +17,8 @@ class CustomIcons(FluentIconBase, Enum):
     X = "x"
     TIKTOK = "tiktok"
     PLAYLIST = "playlist_length"
+    CHEVRON_DOWN = "chevron_down"
+    CHEVRON_UP = "chevron_up"
 
     def path(self, theme=Theme.AUTO):
         return f"src/GUI/Icons/icons_{getIconColor(theme)}/{self.value}_{getIconColor(theme)}.svg"

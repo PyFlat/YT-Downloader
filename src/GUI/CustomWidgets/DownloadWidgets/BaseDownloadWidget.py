@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 from qfluentwidgets import FluentIcon as FIF
@@ -6,36 +6,37 @@ from qfluentwidgets import isDarkTheme
 
 from src.Config.Config import cfg
 from src.GUI.CustomWidgets.DownloadWidget import DownloadWidget
+from src.GUI.CustomWidgets.PLSmallDownloadWidget import PLSmallDownloadWidget
+from src.GUI.Icons.Icons import CustomIcons
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 
-class VideoDownloadWidget(DownloadWidget):
+class BaseDownloadWidget(DownloadWidget):
     def __init__(
         self,
         parent: DownloadInterface = None,
-        thumbnail_url: str = None,
-        title: str = None,
-        uploader: str = None,
-        format_str: str = None,
+        widget_information: dict = {},
+        is_playlist: bool = False,
     ):
         super().__init__(parent)
+
         self.__parent = parent
-        self.thumbnail_url = thumbnail_url
-        self.setFixedWidth(self.__parent.size().width() - 50)
-        self.setFixedHeight(245)
+
+        self.widget_information = widget_information
+
+        self.playlist_widgets_folded = False
+
+        self.__initWidget()
+
+        self.__setPlaylist(is_playlist)
+
         self.image_data = None
-        self.last_eta = 0
-        self.last_speed = ""
-        self.title_label.setText(title)
-        self.channel_label.setText(uploader)
 
-        self.updateFormatLabels(format_str)
-
-        self.cancel_btn.setIcon(FIF.CANCEL_MEDIUM)
-
-        self.pause_btn.setIcon(FIF.PAUSE)
         self.icon = False
-        self.pause_btn.clicked.connect(self.switch)
+
+    def __initWidget(self):
+        self.setFixedWidth(self.__parent.size().width() - 50)
+        self.SingleDirectionScrollArea.setVisible(False)
 
         if cfg.get(cfg.thumbnail_streaming):
             self.fetchThumbnails()
@@ -43,7 +44,30 @@ class VideoDownloadWidget(DownloadWidget):
             color = "202020" if isDarkTheme() else "eeeeee"
             self.setStyleSheet(f"background: #{color}; border-radius: 10px")
 
-    def updateFormatLabels(self, format_str: str):
+        self.__setTexts()
+        self.__setIcons()
+        self.__connectSignalsToSlots()
+
+    def __setPlaylist(self, is_playlist: bool):
+        self.IconWidget.setVisible(is_playlist)
+        self.SingleDirectionScrollArea.setVisible(is_playlist)
+        self.__setVideoListVisibility(self.playlist_widgets_folded)
+
+    def __setVideoListVisibility(self, visible: bool):
+        self.playlist_widgets_folded = visible
+        if visible:
+            self.SingleDirectionScrollArea.setVisible(True)
+            self.IconWidget.setIcon(CustomIcons.CHEVRON_UP)
+        else:
+            self.SingleDirectionScrollArea.setVisible(False)
+            self.IconWidget.setIcon(CustomIcons.CHEVRON_DOWN)
+
+    def __setTexts(self):
+        self.title_label.setText(self.widget_information.get("title"))
+        self.channel_label.setText(self.widget_information.get("uploader"))
+
+        format_str: str = self.widget_information.get("format-id")
+
         parts = format_str.split("/")
         format_str = "Format: " + parts[0].capitalize() + "/" + parts[1].upper()
 
@@ -58,6 +82,31 @@ class VideoDownloadWidget(DownloadWidget):
         self.format_label.setText(format_str)
         self.quality_label.setText(quality_str)
 
+    def __setIcons(self):
+        self.cancel_btn.setIcon(FIF.CANCEL_MEDIUM)
+
+        self.pause_btn.setIcon(FIF.PAUSE)
+
+        self.IconWidget.setIcon(CustomIcons.CHEVRON_DOWN)
+        self.IconWidget.setFixedSize(40, 40)
+
+    def __connectSignalsToSlots(self):
+        self.pause_btn.clicked.connect(self.switch)
+        self.IconWidget.mousePressEvent = lambda _: [
+            self.__setVideoListVisibility(not self.playlist_widgets_folded),
+            self.update_pixmap(),
+        ]
+
+    def addDownloadLabel(self, title: str = "", uploader: str = ""):
+        smallDLWidget = PLSmallDownloadWidget(self.__parent, title, uploader)
+        self.verticalLayout_4.insertWidget(
+            self.verticalLayout_4.count() - 1,
+            smallDLWidget,
+            0,
+            Qt.AlignmentFlag.AlignTop,
+        )
+        return smallDLWidget
+
     def switch(self):
         if not self.icon:
             self.pause_btn.setIcon(FIF.PLAY)
@@ -68,7 +117,7 @@ class VideoDownloadWidget(DownloadWidget):
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.handle_response(response))
-        request = QNetworkRequest(QUrl(self.thumbnail_url))
+        request = QNetworkRequest(QUrl(self.widget_information.get("thumbnail-url")))
         response = manager.get(request)
 
     def handle_response(self, reply: QNetworkReply):
@@ -84,7 +133,7 @@ class VideoDownloadWidget(DownloadWidget):
 
         pixmap = pixmap.scaledToWidth(self.width(), Qt.SmoothTransformation)
 
-        transparent_pixmap = QPixmap(self.size())
+        transparent_pixmap = QPixmap(QSize(self.width(), self.sizeHint().height()))
         color = QColor(Qt.black if isDarkTheme() else Qt.white)
         color.setAlpha(150)
         transparent_pixmap.fill(color)
@@ -112,48 +161,28 @@ class VideoDownloadWidget(DownloadWidget):
         painter.end()
         return rounded
 
-    def updateStatus(self, status_dict: dict):
+    def updateStatus(
+        self,
+        progress: int = 0,
+        progress_text: str = None,
+        status_text: str = "",
+    ):
 
-        self.status_label.setText("Status: Downloading...")
+        self.status_label.setText(status_text)
 
-        downloaded_bytes = status_dict.get("downloaded_bytes", 0)
-        total_bytes = status_dict.get("total_bytes") or status_dict.get(
-            "total_bytes_estimate"
-        )
-        if total_bytes:
-            progress = round(100 * downloaded_bytes / total_bytes)
-        else:
-            progress = 0
         if self.progress_bar.value() != progress:
             self.progress_bar.setValue(progress)
 
-        eta = status_dict.get("_eta_str", self.last_eta)
-        if eta != "Unknown":
-            self.last_eta = eta
-        else:
-            eta = self.last_eta
-
-        speed = status_dict.get("_speed_str", self.last_speed).lstrip()
-        if "Unknown" not in speed:
-            self.last_speed = speed
-        else:
-            speed = self.last_speed
-
-        total_size = status_dict.get("_total_bytes_str", "N/A").lstrip()
-        if total_size == "N/A":
-            total_size = status_dict.get("_total_bytes_estimate_str", "???").lstrip()
-            total_size = "~" + total_size
-        text_to_set = f"{progress}% of {total_size} at ({speed}) - {eta} left"
-        if self.progress_label.text() != text_to_set:
-            self.progress_label.setText(text_to_set)
+        if self.progress_label.text() != progress_text:
+            self.progress_label.setText(progress_text)
 
     def updatePostProcessStatus(self, status_dict: dict):
         if status_dict.get("postprocessing") == "started":
-            self.status_label.setText("Status: Postprocessing started")
+            self.status_label.setText("Status: Converting...")
         else:
-            self.status_label.setText("Status: Postprocessing finished")
+            self.status_label.setText("Status: Converting finished")
 
-    def finishStatus(self, success):
+    def finishStatus(self, success, url):
         if success:
             self.progress_bar.setValue(100)
             self.progress_label.setText("100%")

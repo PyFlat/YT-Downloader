@@ -49,6 +49,7 @@ class Downloader:
     def downloadVideo(
         self,
         url: str,
+        id: str = None,
         start_callback: object | None = None,
         progress_callback: object | None = None,
         finish_callback: object | None = None,
@@ -56,7 +57,12 @@ class Downloader:
     ):
         self.thread_manager.runTask(
             YoutubeVideoDownloadThread(
-                self.yt_dlp, url, finish_callback, progress_callback, **options
+                self.yt_dlp,
+                url,
+                id,
+                finish_callback,
+                progress_callback,
+                **options,
             ),
             False,
             start_callback,
@@ -77,11 +83,11 @@ class Downloader:
 
             for i, entry in enumerate(data["entries"]):
                 if playlist_items != None:
-                    print(playlist_items, i + 1)
                     if i + 1 not in playlist_items:
                         continue
                 self.downloadVideo(
                     entry["url"],
+                    entry["id"],
                     start_callback,
                     progress_callback,
                     finish_callback,

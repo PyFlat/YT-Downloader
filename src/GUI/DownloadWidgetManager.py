@@ -3,7 +3,12 @@ from PySide6.QtWidgets import QWidget
 
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.DownloadManager import download_manager_instance
-from src.GUI.CustomWidgets.VideoDownloadWidget import VideoDownloadWidget
+from src.GUI.CustomWidgets.DownloadWidgets.PlaylistDownloadWidget import (
+    PlaylistDownloadWidget,
+)
+from src.GUI.CustomWidgets.DownloadWidgets.VideoDownloadWidget import (
+    VideoDownloadWidget,
+)
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 
@@ -21,30 +26,33 @@ class DownloadWidgetManager:
 
     def addVideoDownloadWidget(
         self,
-        thumbnail_url,
-        title,
-        channel,
-        format_id,
-        url,
-        selected_ids: list[int] = None,
+        widget_information: dict = {},
         **options,
     ):
         if self.download_interface == None:
             return
 
-        job_str = download_manager_instance.formatTaskString(url, format_id)
+        is_playlist = widget_information.get("selected-ids") != []
+
+        job_str = download_manager_instance.formatTaskString(
+            widget_information.get("url"), widget_information.get("format-id")
+        )
 
         # if not download_manager_instance.isTask(job_str):
         #     download_manager_instance.addTask(job_str)
         # else:
         #     return
-
-        download_widget = VideoDownloadWidget(
-            self.download_interface, thumbnail_url, title, channel, format_id
-        )
+        if is_playlist:
+            download_widget = PlaylistDownloadWidget(
+                self.download_interface, widget_information
+            )
+        else:
+            download_widget = VideoDownloadWidget(
+                self.download_interface, widget_information
+            )
         self.widgets.append(download_widget)
         self.download_interface.verticalLayout.addWidget(
-            download_widget, 0, Qt.AlignTop | Qt.AlignCenter
+            download_widget, 0, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter
         )
 
         def start():
@@ -56,16 +64,23 @@ class DownloadWidgetManager:
             else:
                 download_widget.updateStatus(result)
 
-        def finish(success):
-            download_widget.finishStatus(success)
-            download_manager_instance.removeTask(job_str)
+        def finish(success, url):
+            download_widget.finishStatus(success, url)
+            # download_manager_instance.removeTask(job_str)
 
-        if selected_ids != []:
+        if is_playlist:
             self.downloader.download_playlist(
-                url, start, progress, finish, selected_ids, **options
+                widget_information.get("url"),
+                start,
+                progress,
+                finish,
+                widget_information.get("selected-ids"),
+                **options,
             )
         else:
-            self.downloader.downloadVideo(url, start, progress, finish, **options)
+            self.downloader.downloadVideo(
+                widget_information.get("url"), start, progress, finish, **options
+            )
 
 
 download_widget_manager = DownloadWidgetManager()
