@@ -86,6 +86,12 @@ class MainWindow(FluentWindow):
         if webpage_url in VIDEO_SITES:
             site: dict = VIDEO_SITES.get(webpage_url)
             if result.get("_type") == "playlist":
+                if "&list=" in result.get("original_url"):
+                    vid_url = result.get("original_url").split("&list=")[0]
+                    msgb_result = self.showVideoPlaylistDialog()
+                    if msgb_result:
+                        self.searchByUrl(vid_url)
+                        return
                 info_widget_class: BaseInformationWidget = site.get("playlist-widget")
             else:
                 info_widget_class: BaseInformationWidget = site.get("widget")
@@ -99,12 +105,22 @@ class MainWindow(FluentWindow):
 
         self.main_interface.stackedWidget.setCurrentIndex(0)
 
-    def searchByUrl(self):
-        search_text = self.main_interface.LineEdit.text().replace(" ", "")
-        if search_text == "":
+    def searchByUrl(self, url: str = None):
+        search_text = url or self.main_interface.LineEdit.text().strip()
+
+        if not search_text:
             return
+
         self.main_interface.stackedWidget.setCurrentIndex(1)
         downloader.getPlaylistInfo(search_text, self.videoInformationCallback)
+
+    def showVideoPlaylistDialog(self):
+        title = "Choose Video or Playlist"
+        content = "The provided video URL is part of a playlist. Do you want to load the playlist or just the video?"
+        msgb = MessageBox(title, content, self)
+        msgb.yesButton.setText("Load Video")
+        msgb.cancelButton.setText("Load Playlist")
+        return msgb.exec()
 
     def showDialog(self):
         title = "yt-dlp not found"
