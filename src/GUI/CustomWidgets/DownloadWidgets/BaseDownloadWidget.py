@@ -35,7 +35,7 @@ class BaseDownloadWidget(DownloadWidget):
 
         self.icon = False
 
-        self.update_pixmap()
+        # self.update_pixmap()
 
     def __initWidget(self):
         self.setFixedWidth(self.__parent.size().width() - 50)
@@ -67,7 +67,7 @@ class BaseDownloadWidget(DownloadWidget):
 
     def __setTexts(self):
         self.title_label.setText(self.widget_information.get("title"))
-        self.channel_label.setText(self.widget_information.get("uploader"))
+        self.channel_label.setText(self.widget_information.get("channel"))
 
         format_str: str = self.widget_information.get("format-id")
 
@@ -115,8 +115,6 @@ class BaseDownloadWidget(DownloadWidget):
         else:
             self.pause_btn.setIcon(FIF.PAUSE)
         self.icon = not self.icon
-
-        self.update_pixmap()
 
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
@@ -166,6 +164,7 @@ class BaseDownloadWidget(DownloadWidget):
         self.setGraphicsEffect(glow)
 
     def round_pixmap_corners(self, pixmap, radius):
+        print(pixmap.size())
         rounded = QPixmap(pixmap.size())
         rounded.fill(Qt.transparent)
         painter = QPainter(rounded)

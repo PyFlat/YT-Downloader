@@ -2,12 +2,14 @@ import re
 from datetime import datetime
 
 from src.DownloaderCore.Downloader import Downloader
-from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
+from src.GUI.CustomWidgets.InformationWidgets.BaseInformationWidget import (
+    BaseInformationWidget,
+)
 from src.GUI.Icons.Icons import CustomIcons
 from src.utils import transformVideoDuration
 
 
-class XInformationWidget(BaseInformationWidget):
+class TikTokInformationWidget(BaseInformationWidget):
     def __init__(
         self,
         parent=None,
@@ -15,12 +17,13 @@ class XInformationWidget(BaseInformationWidget):
         downloader: Downloader = None,
         video_type: dict = {},
     ):
+
         self.info = info_dict
 
         small_thumbnail_url = None
 
         for thumbnail in self.info.get("thumbnails", []):
-            if thumbnail.get("id") == "small":
+            if thumbnail.get("id") == "0":
                 small_thumbnail_url = thumbnail.get("url")
                 break
 
@@ -30,27 +33,12 @@ class XInformationWidget(BaseInformationWidget):
             "thumbnail-url": small_thumbnail_url,
             "title": self.info["title"],
             "channel": self.info["uploader"],
-            "url-type": "X Video",
-            "url-type-icon": CustomIcons.X,
+            "url-type": "TikTok Video",
+            "url-type-icon": CustomIcons.TIKTOK,
             "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
             ).strftime("%d.%m.%Y"),
-            "available-resolutions": self.get_available_resolutions(),
         }
 
         super().__init__(parent, widget_information, video_type)
-
-    def get_available_resolutions(self) -> list[str]:
-        resolution = []
-        for stream in self.info["formats"]:
-            if stream["video_ext"] != "none":
-                stre = f"{stream['resolution'].split('x')[1]}p"
-                if stre not in resolution:
-                    resolution.append(stre)
-        resolution = sorted(
-            resolution,
-            key=lambda s: int(re.compile(r"\d+").search(s).group()),
-            reverse=True,
-        )
-        return resolution

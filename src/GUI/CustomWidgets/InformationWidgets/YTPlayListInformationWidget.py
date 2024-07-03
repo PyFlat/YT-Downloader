@@ -2,7 +2,9 @@ import json
 from datetime import datetime
 
 from src.DownloaderCore.Downloader import Downloader
-from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
+from src.GUI.CustomWidgets.InformationWidgets.BaseInformationWidget import (
+    BaseInformationWidget,
+)
 from src.GUI.Icons.Icons import CustomIcons
 from src.utils import getPlaylistSum, transformVideoDuration
 

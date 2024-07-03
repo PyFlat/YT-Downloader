@@ -1,8 +1,14 @@
 from src.DownloaderCore.formats import *
-from src.GUI.CustomWidgets.TikTokInformationWidget import TikTokInformationWidget
-from src.GUI.CustomWidgets.XInformationWidget import XInformationWidget
-from src.GUI.CustomWidgets.YTInformationWidget import YTInformationWidget
-from src.GUI.CustomWidgets.YTPlayListInformationWidget import (
+from src.GUI.CustomWidgets.InformationWidgets.TikTokInformationWidget import (
+    TikTokInformationWidget,
+)
+from src.GUI.CustomWidgets.InformationWidgets.XInformationWidget import (
+    XInformationWidget,
+)
+from src.GUI.CustomWidgets.InformationWidgets.YTInformationWidget import (
+    YTInformationWidget,
+)
+from src.GUI.CustomWidgets.InformationWidgets.YTPlayListInformationWidget import (
     YTPlayListInformationWidget,
 )
 

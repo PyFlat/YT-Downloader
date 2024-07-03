@@ -2,12 +2,14 @@ import re
 from datetime import datetime
 
 from src.DownloaderCore.Downloader import Downloader
-from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
+from src.GUI.CustomWidgets.InformationWidgets.BaseInformationWidget import (
+    BaseInformationWidget,
+)
 from src.GUI.Icons.Icons import CustomIcons
 from src.utils import transformVideoDuration
 
 
-class YTInformationWidget(BaseInformationWidget):
+class XInformationWidget(BaseInformationWidget):
     def __init__(
         self,
         parent=None,
@@ -17,14 +19,21 @@ class YTInformationWidget(BaseInformationWidget):
     ):
         self.info = info_dict
 
+        small_thumbnail_url = None
+
+        for thumbnail in self.info.get("thumbnails", []):
+            if thumbnail.get("id") == "small":
+                small_thumbnail_url = thumbnail.get("url")
+                break
+
         widget_information = {
             "downloader": downloader,
             "url": self.info["original_url"],
-            "thumbnail-url": f"https://i.ytimg.com/vi/{self.info['display_id']}/mqdefault.jpg",
+            "thumbnail-url": small_thumbnail_url,
             "title": self.info["title"],
-            "channel": self.info["channel"],
-            "url-type": "YouTube Video",
-            "url-type-icon": CustomIcons.YOUTUBE,
+            "channel": self.info["uploader"],
+            "url-type": "X Video",
+            "url-type-icon": CustomIcons.X,
             "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"

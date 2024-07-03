@@ -22,7 +22,9 @@ from src.Config.Config import cfg
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.SupportedSites import VIDEO_SITES
 from src.DownloaderCore.Threads.ThreadManager import ThreadManager
-from src.GUI.CustomWidgets.BaseInformationWidget import BaseInformationWidget
+from src.GUI.CustomWidgets.InformationWidgets.BaseInformationWidget import (
+    BaseInformationWidget,
+)
 from src.GUI.DownloadWidgetManager import download_widget_manager
 from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 from src.GUI.Interfaces.MainInterface import MainInterface
