@@ -47,7 +47,12 @@ class MainWindow(FluentWindow):
 
         self.setting_interface = SettingInterface(self, downloader)
 
-        self.setting_interface.themeCard.optionChanged.connect(self.updateVideoWidget)
+        self.setting_interface.themeCard.optionChanged.connect(
+            lambda: [
+                self.updateVideoWidget(),
+                download_widget_manager.updateDownloadWidgets(),
+            ]
+        )
 
         self.initNavigation()
 

@@ -49,7 +49,7 @@ class Downloader:
     def downloadVideo(
         self,
         url: str,
-        id: str = None,
+        id: str = "",
         start_callback: object | None = None,
         progress_callback: object | None = None,
         finish_callback: object | None = None,

@@ -1,6 +1,7 @@
 from PySide6.QtCore import QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QPainter, QPalette, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
+from PySide6.QtWidgets import QGraphicsDropShadowEffect
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import isDarkTheme
 
@@ -26,13 +27,15 @@ class BaseDownloadWidget(DownloadWidget):
 
         self.playlist_widgets_folded = False
 
-        self.__initWidget()
-
         self.__setPlaylist(is_playlist)
+
+        self.__initWidget()
 
         self.image_data = None
 
         self.icon = False
+
+        self.update_pixmap()
 
     def __initWidget(self):
         self.setFixedWidth(self.__parent.size().width() - 50)
@@ -88,7 +91,6 @@ class BaseDownloadWidget(DownloadWidget):
         self.pause_btn.setIcon(FIF.PAUSE)
 
         self.IconWidget.setIcon(CustomIcons.CHEVRON_DOWN)
-        self.IconWidget.setFixedSize(40, 40)
 
     def __connectSignalsToSlots(self):
         self.pause_btn.clicked.connect(self.switch)
@@ -114,6 +116,8 @@ class BaseDownloadWidget(DownloadWidget):
             self.pause_btn.setIcon(FIF.PAUSE)
         self.icon = not self.icon
 
+        self.update_pixmap()
+
     def fetchThumbnails(self):
         manager = QNetworkAccessManager(self)
         manager.finished.connect(lambda: self.handle_response(response))
@@ -134,12 +138,11 @@ class BaseDownloadWidget(DownloadWidget):
         pixmap = pixmap.scaledToWidth(self.width(), Qt.SmoothTransformation)
 
         transparent_pixmap = QPixmap(QSize(self.width(), self.sizeHint().height()))
-        color = QColor(Qt.black if isDarkTheme() else Qt.white)
-        color.setAlpha(150)
+        color = QColor(0, 0, 0, 150) if isDarkTheme() else QColor(255, 255, 255, 150)
         transparent_pixmap.fill(color)
 
         painter = QPainter(transparent_pixmap)
-        painter.setOpacity(0.1)
+        painter.setOpacity(0.2)
         painter.drawPixmap(0, 0, pixmap)
         painter.end()
 
@@ -149,6 +152,18 @@ class BaseDownloadWidget(DownloadWidget):
         palette = QPalette()
         palette.setBrush(QPalette.Window, QPixmap(final_pixmap))
         self.setPalette(palette)
+
+        color = QColor(255, 255, 255, 150) if isDarkTheme() else QColor(0, 0, 0, 150)
+
+        self.add_shadow_effect(color)
+
+    def add_shadow_effect(self, color: QColor = QColor(255, 255, 255, 150)):
+        glow = QGraphicsDropShadowEffect(self)
+        glow.setBlurRadius(25)
+        glow.setXOffset(0)
+        glow.setYOffset(0)
+        glow.setColor(color)
+        self.setGraphicsEffect(glow)
 
     def round_pixmap_corners(self, pixmap, radius):
         rounded = QPixmap(pixmap.size())

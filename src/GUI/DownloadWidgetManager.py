@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget
 
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.DownloadManager import download_manager_instance
+from src.GUI.CustomWidgets.DownloadWidgets.BaseDownloadWidget import BaseDownloadWidget
 from src.GUI.CustomWidgets.DownloadWidgets.PlaylistDownloadWidget import (
     PlaylistDownloadWidget,
 )
@@ -16,7 +17,7 @@ class DownloadWidgetManager:
     def __init__(self):
         self.download_interface = None
         self.downloader = None
-        self.widgets = []
+        self.widgets: list[BaseDownloadWidget] = []
 
     def setInterface(
         self, download_interface: DownloadInterface, downloader: Downloader
@@ -70,17 +71,25 @@ class DownloadWidgetManager:
 
         if is_playlist:
             self.downloader.download_playlist(
-                widget_information.get("url"),
-                start,
-                progress,
-                finish,
-                widget_information.get("selected-ids"),
+                url=widget_information.get("url"),
+                start_callback=start,
+                progress_callback=progress,
+                finish_callback=finish,
+                playlist_items=widget_information.get("selected-ids"),
                 **options,
             )
         else:
             self.downloader.downloadVideo(
-                widget_information.get("url"), start, progress, finish, **options
+                url=widget_information.get("url"),
+                start_callback=start,
+                progress_callback=progress,
+                finish_callback=finish,
+                **options,
             )
+
+    def updateDownloadWidgets(self):
+        for widget in self.widgets:
+            widget.update_pixmap()
 
 
 download_widget_manager = DownloadWidgetManager()

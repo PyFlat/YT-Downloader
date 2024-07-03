@@ -26,7 +26,7 @@ class DownloadInterface(QWidget):
         self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 750, 547))
         self.scrollAreaWidgetContents.setMinimumSize(QSize(750, 500))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout.setSpacing(15)
+        self.verticalLayout.setSpacing(25)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(25, 25, 25, 25)
         self.ScrollArea.setWidget(self.scrollAreaWidgetContents)
