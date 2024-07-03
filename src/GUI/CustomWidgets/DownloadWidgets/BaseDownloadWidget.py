@@ -35,7 +35,8 @@ class BaseDownloadWidget(DownloadWidget):
 
         self.icon = False
 
-        # self.update_pixmap()
+        if not is_playlist:
+            self.setFixedHeight(self.sizeHint().height())
 
     def __initWidget(self):
         self.setFixedWidth(self.__parent.size().width() - 50)
@@ -164,7 +165,6 @@ class BaseDownloadWidget(DownloadWidget):
         self.setGraphicsEffect(glow)
 
     def round_pixmap_corners(self, pixmap, radius):
-        print(pixmap.size())
         rounded = QPixmap(pixmap.size())
         rounded.fill(Qt.transparent)
         painter = QPainter(rounded)
