@@ -190,10 +190,11 @@ class Downloader:
 
             def on_download_finish(success):
                 if download_finish_callback != None:
-                    wait = download_finish_callback(success)
-                file = r"C:\Users\Johannes\Documents\Github\YT-Downloader\appdata\win_installer_v1.3.3.exe"
-                QProcess.startDetached(file)
-                main_window.close()
+                    confirmed = download_finish_callback(success)
+                if confirmed:
+                    file = f"C:/Users/Johannes/Documents/Github/YT-Downloader/appdata/win_installer_v{tag}.exe"
+                    QProcess.startDetached(file)
+                    main_window.close()
 
             self.thread_manager.runTask(
                 GithubDownloaderThread(

@@ -48,6 +48,7 @@ class MainWindow(FluentWindow):
         self.download_interface.setStyleSheet("background: transparent; border: none")
 
         self.setting_interface = SettingInterface(self, downloader)
+        self.setting_interface.quitRequested.connect(self.quitApplication)
 
         self.setting_interface.themeCard.optionChanged.connect(
             lambda: [
@@ -132,14 +133,17 @@ class MainWindow(FluentWindow):
             self.switchTo(self.setting_interface)
             self.setting_interface.updateYtDlpCard.button.click()
         else:
-            self.close()
-            sys.exit()
+            self.quitApplication()
 
     def checkForYtdlp(self):
         if downloader.yt_dlp == None:
             self.showDialog()
         else:
             self.setting_interface.update_ytdlp_version()
+
+    def quitApplication(self):
+        self.close()
+        sys.exit()
 
     def restartApplication(self):
         self.closeEvent(QCloseEvent())

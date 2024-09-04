@@ -1,6 +1,6 @@
 import os
 
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QLabel, QWidget
 from qfluentwidgets import ComboBoxSettingCard, ExpandLayout
@@ -31,6 +31,7 @@ from src.version import VERSION
 
 
 class SettingInterface(ScrollArea):
+    quitRequested = Signal()
 
     def __init__(self, parent: FluentWindow = None, downloader: Downloader = None):
         super().__init__(parent=parent)
@@ -241,7 +242,9 @@ class SettingInterface(ScrollArea):
                 "Warning",
                 "After the download is finished, the application needs to restart!",
             ):
-                return
+                if self.downloader.yt_dlp == None:
+                    self.quitRequested.emit()
+                    return
 
         msg.show()
         if ffmpeg:
@@ -287,23 +290,22 @@ class SettingInterface(ScrollArea):
             self.ffmpegPathCard.setContent(folder)
 
     def updateApplication(self, automatic_call: bool = False):
-        # Ensure the current widget is this instance before proceeding
-        if self.__parent.stackedWidget.currentWidget() != self:
-            self.__parent.switchTo(self)
 
-        # Create a message box for displaying download progress
-        download_msg_box = DownloadMessageBox(self)
+        download_msg_box: DownloadMessageBox = None
 
         def handle_update_dialog(available, tag):
-            # Skip update dialog for automatic calls if no update is available
+            nonlocal download_msg_box
             if automatic_call and not available:
                 return False
 
-            # Create a message box for update notifications
+            if self.__parent.stackedWidget.currentWidget() != self:
+                self.__parent.switchTo(self)
+
+            download_msg_box = DownloadMessageBox(self)
+
             update_msg_box = MessageBox("Search for updates", "", self)
             update_msg_box.cancelButton.hide()
 
-            # Customize message based on update status
             if tag == "no_release_version":
                 message = "You are already on a non-released beta version!"
             elif tag == "already_up_to_date":
@@ -313,8 +315,8 @@ class SettingInterface(ScrollArea):
                 message = f"Current version: {VERSION}\nNew version: {tag}\nInstall it?"
                 update_msg_box.cancelButton.show()
 
-            # Set message content and prompt user
             update_msg_box.contentLabel.setText(message)
+
             if update_msg_box.exec():
                 if available:
                     download_msg_box.show()
@@ -323,14 +325,21 @@ class SettingInterface(ScrollArea):
                 return False
 
         def update_progress(progress):
-            download_msg_box.ProgressRing.setValue(progress)
+            if download_msg_box is not None:
+                download_msg_box.ProgressRing.setValue(progress)
 
         def handle_download_completion(success):
-            MessageBox(
-                "Download completed",
-                "The app has to close to perform the update!",
-                self,
-            ).exec()
+            if download_msg_box is not None:
+                download_msg_box.accept()
+            return (
+                True
+                if MessageBox(
+                    "Download completed",
+                    "The app has to close to perform the update!",
+                    self,
+                ).exec()
+                else False
+            )
 
         self.downloader.updateApplication(
             update_progress,

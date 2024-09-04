@@ -22,7 +22,7 @@ class Config(QConfig):
     )
 
     maximum_download_threads = RangeConfigItem(
-        "Downloader", "max-download-threads", 1, RangeValidator(1, 10)
+        "Downloader", "max-download-threads", 3, RangeValidator(1, 10)
     )
     thumbnail_streaming = ConfigItem(
         "Downloader", "thumbnail-streaming", True, BoolValidator()
@@ -41,5 +41,5 @@ class Config(QConfig):
 
 
 cfg = Config()
-cfg.themeMode.value = Theme.AUTO
+cfg.themeMode.value = Theme.DARK
 qconfig.load("src/Config/config.json", cfg)

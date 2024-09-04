@@ -3,6 +3,7 @@ from qfluentwidgets import BodyLabel, ExpandGroupSettingCard, FluentIcon, PushBu
 
 from src.Config.Config import cfg
 from src.GUI.Dialogs.FormatSelectDialog import FormatSelectDialog
+from src.Logger import logger
 
 
 class BaseSettingCard(ExpandGroupSettingCard):
@@ -52,6 +53,8 @@ class BaseSettingCard(ExpandGroupSettingCard):
         self.addGroupWidget(widget)
 
     def format_formatId_string(self, formatId: str) -> str:
+        if formatId == "":
+            return "Not configured"
         _, part1, part2 = formatId.split("/")
         return f"{part1.upper()} ({part2.capitalize()})"
 
