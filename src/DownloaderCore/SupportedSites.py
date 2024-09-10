@@ -2,6 +2,9 @@ from src.DownloaderCore.formats import *
 from src.GUI.CustomWidgets.InformationWidgets.TikTokInformationWidget import (
     TikTokInformationWidget,
 )
+from src.GUI.CustomWidgets.InformationWidgets.TwitchInformationWidget import (
+    TwitchInformationWidget,
+)
 from src.GUI.CustomWidgets.InformationWidgets.XInformationWidget import (
     XInformationWidget,
 )
@@ -20,4 +23,5 @@ VIDEO_SITES = {
     },
     "x.com": {"data": X_VIDEO, "widget": XInformationWidget},
     "tiktok.com": {"data": TIKTOK_VIDEO, "widget": TikTokInformationWidget},
+    "twitch.tv": {"data": TWITCH_VIDEO, "widget": TwitchInformationWidget},
 }

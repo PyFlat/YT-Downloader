@@ -78,6 +78,13 @@ TIKTOK_VIDEO = {
     ],
 }
 
+# Twitch Video configuration
+TWITCH_VIDEO = {
+    "video_formats": [
+        create_video_format("MP4", "mp4", "bv*+ba[ext=m4a]/b"),
+    ],
+}
+
 # YouTube Video configuration
 YOUTUBE_VIDEO = {
     "resolutions": RESOLUTIONS,

@@ -8,7 +8,7 @@ from src.GUI.Icons.Icons import CustomIcons
 from src.utils import transformVideoDuration
 
 
-class TikTokInformationWidget(BaseInformationWidget):
+class TwitchInformationWidget(BaseInformationWidget):
     def __init__(
         self,
         parent=None,
@@ -19,21 +19,16 @@ class TikTokInformationWidget(BaseInformationWidget):
 
         self.info = info_dict
 
-        small_thumbnail_url = None
-
-        for thumbnail in self.info.get("thumbnails", []):
-            if thumbnail.get("id") == "0":
-                small_thumbnail_url = thumbnail.get("url")
-                break
+        thumbnail_url = self.info.get("thumbnail")
 
         widget_information = {
             "downloader": downloader,
             "url": self.info["original_url"],
-            "thumbnail-url": small_thumbnail_url,
+            "thumbnail-url": thumbnail_url,
             "title": self.info["title"],
             "channel": self.info["uploader"],
-            "url-type": "TikTok Video",
-            "url-type-icon": CustomIcons.TIKTOK,
+            "url-type": "Twitch Video",
+            "url-type-icon": CustomIcons.TWITCH,
             "video-duration": transformVideoDuration(self.info["duration"]),
             "upload-date": datetime.strptime(
                 self.info["upload_date"], "%Y%m%d"
