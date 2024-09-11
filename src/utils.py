@@ -3,11 +3,13 @@ def transformVideoDuration(duration_secs: int = 0) -> str:
     hours, minutes = divmod(minutes, 60)
 
     if hours > 0:
-        duration = f"{hours:02} hours, {minutes:02} minutes, {seconds:02} seconds"
+        duration = (
+            f"{hours:02.0f} hours, {minutes:02.0f} minutes, {seconds:02.0f} seconds"
+        )
     elif minutes > 0:
-        duration = f"{minutes:02} minutes, {seconds:02} seconds"
+        duration = f"{minutes:02.0f} minutes, {seconds:02.0f} seconds"
     else:
-        duration = f"{seconds:02} seconds"
+        duration = f"{seconds:02.0f} seconds"
 
     return duration
 

@@ -14,6 +14,9 @@ from src.GUI.CustomWidgets.InformationWidgets.YTInformationWidget import (
 from src.GUI.CustomWidgets.InformationWidgets.YTPlayListInformationWidget import (
     YTPlayListInformationWidget,
 )
+from src.GUI.CustomWidgets.InformationWidgets.ZdfInformationWidget import (
+    ZdfInformationWidget,
+)
 
 VIDEO_SITES = {
     "youtube.com": {
@@ -24,4 +27,5 @@ VIDEO_SITES = {
     "x.com": {"data": X_VIDEO, "widget": XInformationWidget},
     "tiktok.com": {"data": TIKTOK_VIDEO, "widget": TikTokInformationWidget},
     "twitch.tv": {"data": TWITCH_VIDEO, "widget": TwitchInformationWidget},
+    "zdf.de": {"data": ZDF_VIDEO, "widget": ZdfInformationWidget},
 }

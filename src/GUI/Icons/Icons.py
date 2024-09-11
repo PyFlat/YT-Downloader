@@ -17,6 +17,7 @@ class CustomIcons(FluentIconBase, Enum):
     X = "x"
     TIKTOK = "tiktok"
     TWITCH = "twitch"
+    ZDF = "zdf"
     PLAYLIST = "playlist_length"
     CHEVRON_DOWN = "chevron_down"
     CHEVRON_UP = "chevron_up"
