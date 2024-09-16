@@ -39,6 +39,8 @@ class DownloadWidgetManager:
             return
 
         is_playlist = widget_information.get("selected-ids") != []
+        cur_downloads = 0
+        max_downloads = len(widget_information.get("selected-ids"))
 
         job_str = download_manager_instance.formatTaskString(
             widget_information.get("url"), widget_information.get("format-id")
@@ -73,9 +75,12 @@ class DownloadWidgetManager:
                 download_widget.updateStatus(result)
 
         def finish(success, url):
+            nonlocal cur_downloads, max_downloads
             download_widget.finishStatus(success, url)
-            download_manager_instance.removeTask(job_str)
-            self.info_badge.setText(str(download_manager_instance.getTaskCount()))
+            cur_downloads += 1
+            if not is_playlist or cur_downloads == max_downloads:
+                download_manager_instance.removeTask(job_str)
+                self.info_badge.setText(str(download_manager_instance.getTaskCount()))
 
         if is_playlist:
             self.downloader.download_playlist(
