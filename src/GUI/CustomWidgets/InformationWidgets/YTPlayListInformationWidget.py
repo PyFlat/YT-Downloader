@@ -10,9 +10,11 @@ from src.utils import getPlaylistSum, transformVideoDuration
 
 
 class YTPlayListInformationWidget(BaseInformationWidget):
+
     def __init__(
         self,
         parent=None,
+        setting_interface=None,
         info_dict: dict = None,
         downloader: Downloader = None,
         video_type: dict = {},
@@ -46,7 +48,9 @@ class YTPlayListInformationWidget(BaseInformationWidget):
             "playlist-entries": self.getVideoList(self.info["entries"]),
         }
 
-        super().__init__(parent, widget_information, video_type, is_playlist=True)
+        super().__init__(
+            parent, setting_interface, widget_information, video_type, is_playlist=True
+        )
 
     def getVideoList(self, entries: list[dict] = []):
         videos = []

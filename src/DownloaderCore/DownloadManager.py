@@ -42,5 +42,8 @@ class DownloadManager:
     def isTask(self, job: str) -> bool:
         return job in self.jobs
 
+    def getTaskCount(self) -> int:
+        return len(self.jobs)
+
 
 download_manager_instance = DownloadManager()

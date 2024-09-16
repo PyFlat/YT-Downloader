@@ -27,6 +27,7 @@ class BaseInformationWidget(InformationWidget):
     def __init__(
         self,
         parent=None,
+        setting_interface=None,
         widget_information: dict = {},
         video_type: dict = {},
         is_playlist: bool = False,
@@ -36,6 +37,7 @@ class BaseInformationWidget(InformationWidget):
         self.widget_information = widget_information
 
         self._parent = parent
+        self.setting_interface = setting_interface
         self.back_to_all_formats = False
         self.button_type_clicked = None
         self.image_data = None
@@ -269,6 +271,13 @@ class BaseInformationWidget(InformationWidget):
         )
 
     def perform_download(self, quickdl: bool = False, video: bool = None):
+        from src.utils import checkForFFmpegBinaries, checkForFFmpegDialog
+
+        checkForFFmpegDialog(self._parent, self.setting_interface)
+
+        if not checkForFFmpegBinaries():
+            return
+
         item = None
         format_id = ""
 
@@ -294,7 +303,7 @@ class BaseInformationWidget(InformationWidget):
 
         options = {
             "ID": format_id,
-            "ffmpeg_path": cfg.get(cfg.ffmpeg_path),
+            "ffmpeg_location": cfg.get(cfg.ffmpeg_path),
             "outtmpl": cfg.get(cfg.download_folder),
             "overwrites": True,
         }

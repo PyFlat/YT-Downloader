@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget
+from qfluentwidgets import InfoBadge
 
 from src.DownloaderCore.Downloader import Downloader
 from src.DownloaderCore.DownloadManager import download_manager_instance
@@ -15,13 +15,18 @@ from src.GUI.Interfaces.DownloadInterface import DownloadInterface
 
 class DownloadWidgetManager:
     def __init__(self):
+        self.info_badge = None
         self.download_interface = None
         self.downloader = None
         self.widgets: list[BaseDownloadWidget] = []
 
     def setInterface(
-        self, download_interface: DownloadInterface, downloader: Downloader
+        self,
+        info_badge: InfoBadge,
+        download_interface: DownloadInterface,
+        downloader: Downloader,
     ):
+        self.info_badge = info_badge
         self.download_interface = download_interface
         self.downloader = downloader
 
@@ -39,10 +44,12 @@ class DownloadWidgetManager:
             widget_information.get("url"), widget_information.get("format-id")
         )
 
-        # if not download_manager_instance.isTask(job_str):
-        #     download_manager_instance.addTask(job_str)
-        # else:
-        #     return
+        if not download_manager_instance.isTask(job_str):
+            download_manager_instance.addTask(job_str)
+        else:
+            return
+
+        self.info_badge.setText(str(download_manager_instance.getTaskCount()))
         if is_playlist:
             download_widget = PlaylistDownloadWidget(
                 self.download_interface, widget_information
@@ -67,7 +74,8 @@ class DownloadWidgetManager:
 
         def finish(success, url):
             download_widget.finishStatus(success, url)
-            # download_manager_instance.removeTask(job_str)
+            download_manager_instance.removeTask(job_str)
+            self.info_badge.setText(str(download_manager_instance.getTaskCount()))
 
         if is_playlist:
             self.downloader.download_playlist(

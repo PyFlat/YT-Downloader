@@ -13,6 +13,7 @@ class YTInformationWidget(BaseInformationWidget):
     def __init__(
         self,
         parent=None,
+        setting_interface=None,
         info_dict: dict = None,
         downloader: Downloader = None,
         video_type: dict = {},
@@ -34,7 +35,7 @@ class YTInformationWidget(BaseInformationWidget):
             "available-resolutions": self.get_available_resolutions(),
         }
 
-        super().__init__(parent, widget_information, video_type)
+        super().__init__(parent, setting_interface, widget_information, video_type)
 
     def get_available_resolutions(self) -> list[str]:
         resolution = []

@@ -5,7 +5,7 @@ from src.Logger import logger
 
 logger.info("Logging Started")
 
-from PySide6.QtCore import QSize, QUrl
+from PySide6.QtCore import QSize, QTimer, QUrl
 from PySide6.QtGui import *
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
@@ -98,7 +98,7 @@ class MainWindow(FluentWindow):
                 info_widget_class: BaseInformationWidget = site.get("widget")
 
             self.info_widget = info_widget_class(
-                self, result, downloader, site.get("data")
+                self, self.setting_interface, result, downloader, site.get("data")
             )
             self.main_interface.page.layout().addWidget(
                 self.info_widget, 0, Qt.AlignTop
@@ -141,6 +141,10 @@ class MainWindow(FluentWindow):
         else:
             self.setting_interface.update_ytdlp_version()
 
+        from src.utils import checkForFFmpegDialog
+
+        checkForFFmpegDialog(self, self.setting_interface)
+
     def quitApplication(self):
         self.close()
         sys.exit()
@@ -158,7 +162,7 @@ class MainWindow(FluentWindow):
         self.download_interface_nav_item = self.addSubInterface(
             self.download_interface, FIF.DOWNLOAD, "Download"
         )
-        InfoBadge.attension(
+        self.download_info_badge = InfoBadge.attension(
             text=0,
             parent=self.download_interface_nav_item.parent(),
             target=self.download_interface_nav_item,
@@ -208,5 +212,7 @@ if __name__ == "__main__":
     thread_manager.setMaxThreadCount(cfg.get(cfg.maximum_download_threads))
     downloader = Downloader(thread_manager)
     main_window = MainWindow()
-    download_widget_manager.setInterface(main_window.download_interface, downloader)
+    download_widget_manager.setInterface(
+        main_window.download_info_badge, main_window.download_interface, downloader
+    )
     sys.exit(app.exec())
