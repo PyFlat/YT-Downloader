@@ -1,12 +1,11 @@
 <strong>Neue Funktionen:</strong>
 
 <ul>
-<li style="text-align: left;">Laufende Downloads können nun abgebrochen werden</li>
 </ul>
 <br>
 <strong>Fehlerbehebungen:</strong>
 <ul>
-    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem es zu Problemen kam, wenn ein Video in verschiedenen Formaten zu schnell hintereinander heruntergeladen wurde.</li>
-    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem fälschlicherweise die Videoauswahl für Playlists angezeigt wurde, wenn ein Video nach einer Playlist geladen wurde.</li>
-    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem Videos weiter heruntergeladen wurden, nachdem die Anwendung geschlossen wurde.</li>
+    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem der Download-Button bei bestimmten Aktionen deaktiviert blieb.</li>
+    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem die Suche nicht funktionierte, wenn ein Vorschaubild nicht verfügbar ist.</li>
+    <li style="text-align: left;">Ein Fehler wurde behoben, bei dem der FFmpeg Dialog nach der Neuinstallation nicht funktionierte.</li>
 </ul>

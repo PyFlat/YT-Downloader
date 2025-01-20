@@ -8,8 +8,11 @@ from src.Logger import Logger
 class Utils:
     @staticmethod
     def get_abs_path(relative_path):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        base_path = getattr(sys, "_MEIPASS", current_dir)
+        if getattr(sys, "frozen", False):
+            base_path = os.path.dirname(sys.executable)
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
         path = os.path.join(base_path, relative_path).replace("\\", "/")
         return path
 
@@ -904,9 +907,9 @@ class Downloader:
         msg_box.layout().setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         res = msg_box.exec()
-        if res == 0:
+        if res == 2:
             self.download_ffmpeg()
-        elif res == 1:
+        elif res == 3:
             self.change_ffmpeg_location()
 
     def handle_update_available(self, update_available, tag, auto):

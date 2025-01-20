@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from cx_Freeze import Executable, setup
+
 from src.version import VERSION
 
 try:
@@ -24,13 +25,10 @@ build_exe_options = {
         "fileinput",
         "xml.etree.ElementTree",
         "ctypes.wintypes",
-        "asyncio"
+        "asyncio",
     ],
-    "excludes": [
-        "tkinter",
-        "yt_dlp"],
+    "excludes": ["tkinter", "yt_dlp", "numpy"],
     "include_files": include_files,
-    "zip_include_packages": ["PySide6"],
 }
 
 executables = [Executable("main.py", base=base, icon="appdata/images/app-icon.ico")]
