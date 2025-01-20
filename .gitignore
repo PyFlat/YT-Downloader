@@ -17,3 +17,5 @@ yt_dlp
 FFmpeg/
 
 env/
+
+config.json
