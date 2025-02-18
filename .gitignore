@@ -20,3 +20,5 @@ env/
 test.py
 data.json
 src/GUI/Icons/convert_svgs.py
+
+config.json
