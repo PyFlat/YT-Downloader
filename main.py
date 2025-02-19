@@ -1013,7 +1013,7 @@ class Downloader:
     def update_self(self, tag):
         logger.info("Update download started")
         self.self_download_thread = GithubDownloader(
-            f"https://github.com/PyFlat/YT-Downloader/releases/latest/download/pyflat_yt_dl_win_installer_{tag}.exe",
+            f"https://github.com/PyFlat/YT-Downloader/releases/download/{tag}/pyflat_yt_dl_win_installer_{tag}.exe",
             f"appdata/pyflat_yt_dl_win_installer_{tag}.exe",
         )
         self.self_download_thread.progress.connect(self.update_progress_self)

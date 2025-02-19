@@ -1,6 +1,8 @@
 <strong>Neue Funktionen:</strong>
 
 <ul>
+    <li style="text-align: left;">Yt-dlp wird jetzt automatisch aktualisiert wenn die Version zu alt ist.</li>
+    <li style="text-align: left;">Es können nun auch Beta-Versionen heruntergeladen werden.</li>
 </ul>
 <br>
 <strong>Fehlerbehebungen:</strong>

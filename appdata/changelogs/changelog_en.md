@@ -1,6 +1,8 @@
 <strong>New Features:</strong>
 
 <ul>
+    <li style="text-align: left;">Yt-dlp is now automatically updated if the version is too old.</li>
+    <li style="text-align: left;">Beta versions can now also be downloaded.</li>
 </ul>
 <br>
 <strong>Bug Fixes:</strong>
