@@ -34,7 +34,6 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
-from dotenv import load_dotenv
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -1707,10 +1706,19 @@ class UpdateThread(QThread):
         from main import VERSION
 
         try:
-            response = requests.get(
-                "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases",
-                headers={"Authorization": f"Bearer {GITHUB_KEY}"},
-            )
+            response = None
+            if GITHUB_KEY != None:
+                response = requests.get(
+                    "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases",
+                    headers={"Authorization": f"Bearer {GITHUB_KEY}"},
+                )
+            else:
+                logger.info(
+                    "Did not detect GITHUB_KEY enviroment variable, using api without authentification"
+                )
+                response = requests.get(
+                    "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases"
+                )
             if response.status_code == 403:
                 logger.error("Github API rate limit exceeded")
                 self.update_available.emit(False, "rate_limit", self.auto, False)
@@ -1731,6 +1739,7 @@ class UpdateThread(QThread):
             return
         isBetaInstalled = bool(re.search(r"-beta(\.\d+)?$", VERSION))
         newIsBeta = bool(re.search(r"-beta(\.\d+)?$", self.versionTag))
+        # v\d.\d.\d((-beta).\d?)?
 
         if isBetaInstalled and not newIsBeta:
             newIsOlder = self.versionTag[1:] < VERSION.split("-")[0]
