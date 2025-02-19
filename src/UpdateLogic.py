@@ -1,18 +1,21 @@
 import enum
 
 
-class result(enum.Enum):
+class Result(enum.Enum):
     NO_MSGBOX = 0
     NO_UPDATE_FOUND = 1
     FOUND_BETA = 2
     FOUND_FULL = 3
     FOUND_DOWNGRADE = 4
 
+    RATE_LIMIT_EXCEEDED = 5
+    NO_CONNECTION = 6
 
-class report:
-    def __init__(self, value: int | result, is_terminal: bool):
+
+class Report:
+    def __init__(self, value: int | Result, is_terminal: bool):
         self.is_terminal: bool = is_terminal
-        self.value: result | int = value
+        self.value: Result | int = value
 
 
 class auto:
@@ -22,7 +25,7 @@ class auto:
     def create_nodes(self):
         raise RuntimeError("Not implemented")
 
-    def test(self, *inputs: bool) -> result:
+    def test(self, *inputs: bool) -> Result:
         if None in self.nodes:
             self.create_nodes()
             if None in self.nodes:
@@ -33,19 +36,19 @@ class auto:
             self.nodes[i].set(x)
         current_idx: int = 0
         while True:
-            res: report = self.nodes[current_idx].step()
+            res: Report = self.nodes[current_idx].step()
             if res.is_terminal:
                 return res.value
             current_idx = res.value
 
 
 class node:
-    def __init__(self, true_index: report, false_index: report):
+    def __init__(self, true_index: Report, false_index: Report):
         self.value = False
-        self.true_index: report = true_index
-        self.false_index: report = false_index
+        self.true_index: Report = true_index
+        self.false_index: Report = false_index
 
-    def step(self) -> report:
+    def step(self) -> Report:
         if self.value == True:
             return self.true_index
         return self.false_index
@@ -54,24 +57,24 @@ class node:
         self.value = value
 
 
-class logic(auto):
+class Logic(auto):
     def __init__(self):
         super().__init__(8)
 
     def create_nodes(self):
-        self.nodes[0] = node(report(1, False), report(2, False))
-        self.nodes[1] = node(report(6, False), report(3, False))
-        self.nodes[2] = node(report(4, False), report(5, False))
+        self.nodes[0] = node(Report(1, False), Report(2, False))
+        self.nodes[1] = node(Report(6, False), Report(3, False))
+        self.nodes[2] = node(Report(4, False), Report(5, False))
         self.nodes[3] = node(
-            report(result.FOUND_BETA, True), report(result.FOUND_FULL, True)
+            Report(Result.FOUND_BETA, True), Report(Result.FOUND_FULL, True)
         )
-        self.nodes[4] = node(report(7, False), report(result.NO_MSGBOX, True))
-        self.nodes[5] = node(report(result.FOUND_FULL, True), report(6, False))
+        self.nodes[4] = node(Report(7, False), Report(Result.NO_MSGBOX, True))
+        self.nodes[5] = node(Report(Result.FOUND_FULL, True), Report(6, False))
         self.nodes[6] = node(
-            report(result.NO_UPDATE_FOUND, True), report(result.NO_MSGBOX, True)
+            Report(Result.NO_UPDATE_FOUND, True), Report(Result.NO_MSGBOX, True)
         )
         self.nodes[7] = node(
-            report(result.FOUND_FULL, True), report(result.FOUND_DOWNGRADE, True)
+            Report(Result.FOUND_FULL, True), Report(Result.FOUND_DOWNGRADE, True)
         )
 
     def test(
@@ -84,7 +87,7 @@ class logic(auto):
         call_origin_search: bool,
         exists_full_version_above_current_beta: bool,
         exists_newer_version: bool,
-    ) -> result:
+    ) -> Result:
         return super().test(
             is_beta_enabled,
             current_version_is_latest,

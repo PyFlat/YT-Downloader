@@ -44,6 +44,7 @@ from src.CustomWidgets.SLabel import SLabel
 from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
 from src.TranslationManager import TranslationManager
 from src.Ui_MainWindow import Ui_MainWindow
+from src.UpdateLogic import Logic, Result
 from src.version import VERSION
 
 GITHUB_KEY = os.getenv("GITHUB_KEY")
@@ -65,7 +66,7 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle(f"YouTube Downloader v{VERSION}")
+        self.setWindowTitle(f"YouTube Downloader {VERSION}")
         self.ui.toggle_sidebar_btn.clicked.connect(lambda: self.toggle_menu())
         self.ui.download_btn.setEnabled(False)
         self.ui.tableWidget.horizontalHeader().setVisible(True)
@@ -218,9 +219,11 @@ class Downloader:
         self.cur_process = []
         self.selected_ids = []
         self.loading = False
+        self.yt_dlp_latest_version = None
         self.delete_exe_files()
         self.connect_menu_actions()
         self.tm = TranslationManager(Utils.get_abs_path("languages/"), mw)
+        self.logic = Logic()
         self.update_language_action()
         if not os.path.isfile(Utils.get_abs_path("appdata/config.ini")):
             y = threading.Thread(target=self.create_ini)
@@ -228,7 +231,7 @@ class Downloader:
             y.join()
         self.load_config()
         if getattr(sys, "frozen", False) or self.update_check:
-            self.search_for_updates()
+            self.search_for_updates(False, False)
 
     def cleanup(self):
         for download in self.downloads:
@@ -347,7 +350,7 @@ class Downloader:
             lambda ev: [
                 setattr(self, "beta_versions", ev),
                 self.update_config("DEFAULT", "beta-versions", str(ev)),
-                self.search_for_updates(downgrade=not ev),
+                self.search_for_updates(True, False),
             ]
         )
         mw.ui.actionShow_Thumbnails.triggered.connect(
@@ -360,11 +363,9 @@ class Downloader:
             lambda: self.change_ffmpeg_location()
         )
         mw.ui.actionDownload_FFmpeg.triggered.connect(lambda: self.download_ffmpeg())
-        mw.ui.actionUpdate_Yt_dlp.triggered.connect(lambda: self.download_yt_dlp())
+        mw.ui.actionUpdate_Yt_dlp.triggered.connect(lambda: self.download_yt_dlp(True))
         mw.ui.actionSearch_For_Updates.triggered.connect(
-            lambda: self.search_for_updates(
-                False, True if not self.beta_versions else None
-            )
+            lambda: self.search_for_updates(True, True)
         )
         mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
         mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
@@ -510,16 +511,15 @@ class Downloader:
         self.file = os.path.join(os.path.normpath(expanded_path), "").replace("\\", "/")
         self.update_config("DEFAULT", "download_path", self.file)
         self.yt_dlp_installed = config["DEFAULT"]["yt-dlp-installed"]
+        self.yt_dlp_date = config["DEFAULT"]["yt-dlp-date"]
         self.first_use = config["DEFAULT"].getboolean(
             "first-use-since-update", fallback=True
         )
         self.update_config_version(config)
         if self.first_use:
             self.show_changelog()
-        if self.yt_dlp_installed == "False":
-            self.user_info_no_yt_dlp()
-        else:
-            self.import_yt_dl()
+
+        self.download_yt_dlp()
 
     def user_info_no_yt_dlp(self):
         if self.yes_no_messagebox(
@@ -930,7 +930,7 @@ class Downloader:
         elif res == 3:
             self.change_ffmpeg_location()
 
-    def handle_update_available(self, update_available, tag, auto, downgrade):
+    def handle_update_available(self, result: Result, tag: str):
         try:
             if self.update_thread != None:
                 self.update_thread.stop()
@@ -940,21 +940,45 @@ class Downloader:
             else:
                 logger.error(f"An unknown error occurred: {e}")
         self.update_thread = None
-        if update_available:
+
+        if result == Result.NO_MSGBOX:
+            return
+        elif result == Result.NO_CONNECTION:
+            self.yes_no_messagebox(
+                self.tm.get_inline_string("error-no-internet"),
+                QMessageBox.Icon.Critical,
+                self.tm.get_inline_string("no-internet"),
+                QMessageBox.Ok,
+            )
+        elif result == Result.NO_UPDATE_FOUND:
+            self.yes_no_messagebox(
+                self.tm.get_inline_string("no-update-found"),
+                QMessageBox.Icon.Information,
+                self.tm.get_inline_string("no-update-found"),
+                QMessageBox.Ok,
+            )
+        elif result == Result.RATE_LIMIT_EXCEEDED:
+            self.yes_no_messagebox(
+                self.tm.get_inline_string("rate-limit-exceeded").format("#f44336"),
+                QMessageBox.Icon.Warning,
+                self.tm.get_inline_string("rate-limit-exceeded-title"),
+                QMessageBox.Ok,
+            )
+        else:
             msg_box = QMessageBox(mw)
             msg_box.setText(
                 self.tm.get_inline_string("update-available").format(
                     "#a7a7a7",
                     VERSION,
-                    tag,
+                    tag[1:],
                     (
                         self.tm.get_inline_string("beta-version-available").format(
                             "#f44336"
                         )
-                        if "beta" in tag
+                        if result == Result.FOUND_BETA
                         else (
                             self.tm.get_inline_string("downgrade-last-stable")
-                            if downgrade
+                            if result == Result.FOUND_DOWNGRADE
                             else ""
                         )
                     ),
@@ -972,30 +996,13 @@ class Downloader:
             res = msg_box.exec()
             if res == 0:
                 self.update_self(tag)
-        elif not update_available and tag == "no_connection":
-            self.yes_no_messagebox(
-                self.tm.get_inline_string("error-no-internet"),
-                QMessageBox.Warning,
-                self.tm.get_inline_string("no-internet"),
-                QMessageBox.Ok,
-            )
-        elif not update_available and not auto:
-            self.yes_no_messagebox(
-                self.tm.get_inline_string("no-update-found"),
-                QMessageBox.Information,
-                self.tm.get_inline_string("no-update-found"),
-                QMessageBox.Ok,
-            )
 
-    def search_for_updates(self, auto=True, downgrade=None):
+    def search_for_updates(self, call_origin_menu: bool, call_origin_search: bool):
         if self.update_thread != None:
             return
         logger.info("Started searching for updates")
-        print(f"Downgrade: {downgrade}")
         self.update_thread = UpdateThread(
-            auto,
-            not downgrade if downgrade is not None else self.beta_versions,
-            True if downgrade is not None else False,
+            self.beta_versions, call_origin_menu, call_origin_search
         )
         self.update_thread.update_available.connect(self.handle_update_available)
         self.update_thread.start()
@@ -1006,8 +1013,8 @@ class Downloader:
     def update_self(self, tag):
         logger.info("Update download started")
         self.self_download_thread = GithubDownloader(
-            f"https://github.com/PyFlat/YT-Downloader/releases/latest/download/win_installer_v{tag}.exe",
-            f"appdata/win_installer_v{tag}.exe",
+            f"https://github.com/PyFlat/YT-Downloader/releases/latest/download/pyflat_yt_dl_win_installer_{tag}.exe",
+            f"appdata/pyflat_yt_dl_win_installer_{tag}.exe",
         )
         self.self_download_thread.progress.connect(self.update_progress_self)
         self.self_download_thread.finished.connect(
@@ -1057,7 +1064,22 @@ class Downloader:
             mw.close()
             sys.exit(0)
 
-    def download_yt_dlp(self):
+    def download_yt_dlp(self, force=False):
+        if self.yt_dlp_installed and not force:
+            date_format = "%Y-%m-%d %H:%M:%S.%f"
+            installation_date = datetime.datetime.strptime(
+                self.yt_dlp_date, date_format
+            )
+            current_date = datetime.datetime.now()
+            readable_format = "%d.%m.%Y"
+
+            if (current_date - installation_date).days < 10:
+                logger.info(
+                    f"yt-dlp installation date: {installation_date.strftime(readable_format)} latest version: {current_date.strftime(readable_format)}"
+                )
+                self.import_yt_dl()
+                return
+
         logger.info("Download yt-dlp started")
         self.yt_dlp_download_thread = GithubDownloader(
             "https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp",
@@ -1066,12 +1088,9 @@ class Downloader:
         self.yt_dlp_download_thread.progress.connect(self.update_progress_yt_dlp)
         self.yt_dlp_download_thread.finished.connect(self.download_finished_yt_dlp)
 
-        self.yt_dlp_progress_dialog = ProgressDialog("yt-dlp", mw, self)
-        self.yt_dlp_progress_dialog.show()
-
         self.yt_dlp_download_thread.start()
 
-    def update_progress_yt_dlp(self, progress):
+    def update_progress_yt_dlp(self, progress: float):
         if progress < 0:
             self.yt_dlp_progress_dialog.close()
             logger.error("Internet connection error")
@@ -1081,11 +1100,9 @@ class Downloader:
                 self.tm.get_inline_string("no-internet"),
                 QMessageBox.Ok,
             )
-        if self.yt_dlp_progress_dialog:
-            self.yt_dlp_progress_dialog.update_progress(progress)
+        logger.debug(f"yt-dlp download progress: {progress}")
 
     def download_finished_yt_dlp(self, success):
-        self.yt_dlp_progress_dialog.close()
         self.yt_dlp_progress_dialog = None
         if not success:
             logger.warning("yt-dlp download failed")
@@ -1099,12 +1116,6 @@ class Downloader:
         logger.info("yt-dlp download and installation finished")
         self.update_config("DEFAULT", "yt-dlp-installed", "True")
         self.update_config("DEFAULT", "yt-dlp-date", str(datetime.datetime.now()))
-        self.yes_no_messagebox(
-            self.tm.get_inline_string("installation-finished").format("yt-dlp"),
-            QMessageBox.Information,
-            self.tm.get_inline_string("info"),
-            QMessageBox.Ok,
-        )
         self.import_yt_dl()
 
     def download_ffmpeg(self):
@@ -1693,14 +1704,26 @@ class ThreadWorker(QRunnable):
 
 
 class UpdateThread(QThread):
-    update_available = Signal(bool, str, bool, bool)
+    update_available = Signal(Result, str)
 
-    def __init__(self, auto, beta: bool = False, callFromBetaCheckbox: bool = False):
+    def __init__(
+        self, is_beta_enabled: bool, call_origin_menu: bool, call_origin_search: bool
+    ):
         super().__init__()
-        self.auto = auto
-        self.beta = beta
-        self.versionTag = ""
-        self.callFromBetaCheckbox = callFromBetaCheckbox
+        self.logic = Logic()
+        self.is_beta_enabled = is_beta_enabled
+        self.call_origin_menu = call_origin_menu
+        self.call_origin_search = call_origin_search
+
+        self.current_version_is_latest = None
+        self.current_version_is_beta = None
+        self.latest_is_beta = None
+        self.exists_newer_full_version = None
+        self.exists_full_version_above_current_beta = None
+
+        self.responseTag = None
+
+        self.result = None
 
     def run(self):
         from main import VERSION
@@ -1709,7 +1732,7 @@ class UpdateThread(QThread):
             response = None
             if GITHUB_KEY != None:
                 response = requests.get(
-                    "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases",
+                    "https://api.github.com/repos/PyFlat/YT-Downloader/releases",
                     headers={"Authorization": f"Bearer {GITHUB_KEY}"},
                 )
             else:
@@ -1717,51 +1740,52 @@ class UpdateThread(QThread):
                     "Did not detect GITHUB_KEY enviroment variable, using api without authentification"
                 )
                 response = requests.get(
-                    "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases"
+                    "https://api.github.com/repos/PyFlat/YT-Downloader/releases"
                 )
             if response.status_code == 403:
                 logger.error("Github API rate limit exceeded")
-                self.update_available.emit(False, "rate_limit", self.auto, False)
+                self.update_available.emit(Result.RATE_LIMIT_EXCEEDED, "")
                 del response
                 return
-            if not self.beta:
-                for release in response.json():
-                    if not release["prerelease"]:
-                        self.versionTag = release["tag_name"]
-                        break
-            else:
-                self.versionTag = response.json()[0]["tag_name"]
 
-            del response
         except requests.exceptions.ConnectionError:
             logger.error("Internet connection error")
-            self.update_available.emit(None, "no_connection", None)
+            self.update_available.emit(Result.NO_CONNECTION, "")
             return
-        isBetaInstalled = bool(re.search(r"-beta(\.\d+)?$", VERSION))
-        newIsBeta = bool(re.search(r"-beta(\.\d+)?$", self.versionTag))
-        # v\d.\d.\d((-beta).\d?)?
 
-        if isBetaInstalled and not newIsBeta:
-            newIsOlder = self.versionTag[1:] < VERSION.split("-")[0]
-            if newIsOlder and self.beta:
-                self.update_available.emit(False, "", self.auto, False)
-                return
-            self.update_available.emit(
-                True and self.callFromBetaCheckbox,
-                self.versionTag[1:],
-                self.auto,
-                True and newIsOlder,
-            )
-        elif (
-            not isBetaInstalled
-            and newIsBeta
-            and VERSION == self.versionTag[1:].split("-")[0]
-        ):
-            self.update_available.emit(False, "", self.auto, False)
-        elif VERSION < self.versionTag[1:]:
-            self.update_available.emit(True, self.versionTag[1:], self.auto, False)
+        jsonResponse: list[dict[str, any]] = response.json()
+
+        self.current_version_is_latest = VERSION >= jsonResponse[0].get("tag_name")
+        self.current_version_is_beta = bool(re.search(r"-beta(\.\d+)?$", VERSION))
+        self.latest_is_beta = bool(
+            re.search(r"-beta(\.\d+)?$", jsonResponse[0].get("tag_name"))
+        )
+        noBetaVersions: list[dict[str, any]] = list(
+            filter(lambda x: not x.get("prerelease"), jsonResponse)
+        )
+        self.exists_newer_full_version = VERSION.split("-")[0] < noBetaVersions[0].get(
+            "tag_name"
+        )
+        self.exists_full_version_above_current_beta = VERSION.split("-")[
+            0
+        ] < noBetaVersions[0].get("tag_name")
+
+        if self.latest_is_beta:
+            self.responseTag = jsonResponse[0].get("tag_name")
         else:
-            self.update_available.emit(False, "", self.auto, False)
+            self.responseTag = noBetaVersions[0].get("tag_name")
+
+        self.result = self.logic.test(
+            self.is_beta_enabled,
+            self.current_version_is_beta,
+            self.current_version_is_latest,
+            self.latest_is_beta,
+            self.call_origin_menu,
+            self.call_origin_search,
+            self.exists_full_version_above_current_beta,
+            self.exists_newer_full_version,
+        )
+        self.update_available.emit(self.result, self.responseTag)
 
     def stop(self):
         raise Exception("Thread stopped")
@@ -1916,7 +1940,7 @@ class ImportYTDLP(QThread):
         super().__init__()
 
     def run(self):
-        global YoutubeDL, DownloadError
+        global YoutubeDL, DownloadError, __version__
         if Utils.get_abs_path("appdata/yt_dlp") in sys.path:
             sys.path.remove(Utils.get_abs_path("appdata/yt_dlp"))
         if os.path.isfile(Utils.get_abs_path("appdata/yt_dlp")):
@@ -1924,6 +1948,7 @@ class ImportYTDLP(QThread):
         try:
             from yt_dlp import YoutubeDL
             from yt_dlp.utils import DownloadError
+            from yt_dlp.version import __version__
 
             logger.info("Imported yt-dlp succesfully")
             self.result.emit(True)
