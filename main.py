@@ -29,11 +29,12 @@ import os
 import re
 import shutil
 import threading
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
+from dotenv import load_dotenv
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -45,6 +46,8 @@ from src.CustomWidgets.VideoSelectDialog import VideoSelectDialog
 from src.TranslationManager import TranslationManager
 from src.Ui_MainWindow import Ui_MainWindow
 from src.version import VERSION
+
+GITHUB_KEY = os.getenv("GITHUB_KEY")
 
 
 class noLogger:
@@ -225,7 +228,7 @@ class Downloader:
             y.start()
             y.join()
         self.load_config()
-        if getattr(sys, "frozen", False) and self.update_check:
+        if getattr(sys, "frozen", False) or self.update_check:
             self.search_for_updates()
 
     def cleanup(self):
@@ -341,6 +344,13 @@ class Downloader:
                 self.update_config("DEFAULT", "check-for-updates", str(ev)),
             ]
         )
+        mw.ui.actionBeta_Versions.triggered.connect(
+            lambda ev: [
+                setattr(self, "beta_versions", ev),
+                self.update_config("DEFAULT", "beta-versions", str(ev)),
+                self.search_for_updates(downgrade=not ev),
+            ]
+        )
         mw.ui.actionShow_Thumbnails.triggered.connect(
             lambda ev: [
                 setattr(self, "stream_thumbnails", ev),
@@ -353,7 +363,9 @@ class Downloader:
         mw.ui.actionDownload_FFmpeg.triggered.connect(lambda: self.download_ffmpeg())
         mw.ui.actionUpdate_Yt_dlp.triggered.connect(lambda: self.download_yt_dlp())
         mw.ui.actionSearch_For_Updates.triggered.connect(
-            lambda: self.search_for_updates(False)
+            lambda: self.search_for_updates(
+                False, True if not self.beta_versions else None
+            )
         )
         mw.ui.actionMaximum_Threads.triggered.connect(lambda: self.change_max_threads())
         mw.ui.actionShow_Changelog.triggered.connect(lambda: self.show_changelog())
@@ -479,6 +491,7 @@ class Downloader:
             "yt-dlp-installed": "False",
             "yt-dlp-date": "False",
             "check-for-updates": "True",
+            "beta-versions": "False",
             "max-download-threads": "1",
             "thumbnail-streaming": "True",
             "log-level": "info",
@@ -544,6 +557,12 @@ class Downloader:
         )
         mw.ui.actionAutomatic_Update_Check.setChecked(self.update_check)
         self.update_config("DEFAULT", "check-for-updates", str(self.update_check))
+
+        self.beta_versions = config["DEFAULT"].getboolean(
+            "beta-versions", fallback=False
+        )
+        mw.ui.actionBeta_Versions.setChecked(self.beta_versions)
+        self.update_config("DEFAULT", "beta-versions", str(self.beta_versions))
 
         self.max_download_threads = int(
             config["DEFAULT"].get("max-download-threads", fallback=1)
@@ -912,12 +931,35 @@ class Downloader:
         elif res == 3:
             self.change_ffmpeg_location()
 
-    def handle_update_available(self, update_available, tag, auto):
+    def handle_update_available(self, update_available, tag, auto, downgrade):
+        try:
+            if self.update_thread != None:
+                self.update_thread.stop()
+        except Exception as e:
+            if e.args[0] == "Thread stopped":
+                pass
+            else:
+                logger.error(f"An unknown error occurred: {e}")
         self.update_thread = None
         if update_available:
             msg_box = QMessageBox(mw)
             msg_box.setText(
-                self.tm.get_inline_string("update-available").format(VERSION, tag)
+                self.tm.get_inline_string("update-available").format(
+                    "#a7a7a7",
+                    VERSION,
+                    tag,
+                    (
+                        self.tm.get_inline_string("beta-version-available").format(
+                            "#f44336"
+                        )
+                        if "beta" in tag
+                        else (
+                            self.tm.get_inline_string("downgrade-last-stable")
+                            if downgrade
+                            else ""
+                        )
+                    ),
+                )
             )
             msg_box.setWindowTitle("Update found")
             msg_box.setIcon(QMessageBox.Information)
@@ -946,11 +988,16 @@ class Downloader:
                 QMessageBox.Ok,
             )
 
-    def search_for_updates(self, auto=True):
+    def search_for_updates(self, auto=True, downgrade=None):
         if self.update_thread != None:
             return
         logger.info("Started searching for updates")
-        self.update_thread = UpdateThread(auto)
+        print(f"Downgrade: {downgrade}")
+        self.update_thread = UpdateThread(
+            auto,
+            not downgrade if downgrade is not None else self.beta_versions,
+            True if downgrade is not None else False,
+        )
         self.update_thread.update_available.connect(self.handle_update_available)
         self.update_thread.start()
 
@@ -960,7 +1007,7 @@ class Downloader:
     def update_self(self, tag):
         logger.info("Update download started")
         self.self_download_thread = GithubDownloader(
-            f"https://github.com/PyFlat-Studios-JR/YT-Downloader/releases/latest/download/win_installer_v{tag}.exe",
+            f"https://github.com/PyFlat/YT-Downloader/releases/latest/download/win_installer_v{tag}.exe",
             f"appdata/win_installer_v{tag}.exe",
         )
         self.self_download_thread.progress.connect(self.update_progress_self)
@@ -1647,26 +1694,68 @@ class ThreadWorker(QRunnable):
 
 
 class UpdateThread(QThread):
-    update_available = Signal(bool, str, bool)
+    update_available = Signal(bool, str, bool, bool)
 
-    def __init__(self, auto):
+    def __init__(self, auto, beta: bool = False, callFromBetaCheckbox: bool = False):
         super().__init__()
         self.auto = auto
+        self.beta = beta
+        self.versionTag = ""
+        self.callFromBetaCheckbox = callFromBetaCheckbox
 
     def run(self):
         from main import VERSION
 
         try:
-            f = urlopen("https://github.com/PyFlat/YT-Downloader/releases/latest").url
-        except URLError:
+            response = requests.get(
+                "https://api.github.com/repos/PyFlat/Fortnite-Ranked-Tracker/releases",
+                headers={"Authorization": f"Bearer {GITHUB_KEY}"},
+            )
+            if response.status_code == 403:
+                logger.error("Github API rate limit exceeded")
+                self.update_available.emit(False, "rate_limit", self.auto, False)
+                del response
+                return
+            if not self.beta:
+                for release in response.json():
+                    if not release["prerelease"]:
+                        self.versionTag = release["tag_name"]
+                        break
+            else:
+                self.versionTag = response.json()[0]["tag_name"]
+
+            del response
+        except requests.exceptions.ConnectionError:
             logger.error("Internet connection error")
             self.update_available.emit(None, "no_connection", None)
             return
-        tag = f.split("/")[-1]
-        if VERSION < tag[1:]:
-            self.update_available.emit(True, tag[1:], self.auto)
+        isBetaInstalled = bool(re.search(r"-beta(\.\d+)?$", VERSION))
+        newIsBeta = bool(re.search(r"-beta(\.\d+)?$", self.versionTag))
+
+        if isBetaInstalled and not newIsBeta:
+            newIsOlder = self.versionTag[1:] < VERSION.split("-")[0]
+            if newIsOlder and self.beta:
+                self.update_available.emit(False, "", self.auto, False)
+                return
+            self.update_available.emit(
+                True and self.callFromBetaCheckbox,
+                self.versionTag[1:],
+                self.auto,
+                True and newIsOlder,
+            )
+        elif (
+            not isBetaInstalled
+            and newIsBeta
+            and VERSION == self.versionTag[1:].split("-")[0]
+        ):
+            self.update_available.emit(False, "", self.auto, False)
+        elif VERSION < self.versionTag[1:]:
+            self.update_available.emit(True, self.versionTag[1:], self.auto, False)
         else:
-            self.update_available.emit(False, "", self.auto)
+            self.update_available.emit(False, "", self.auto, False)
+
+    def stop(self):
+        raise Exception("Thread stopped")
 
 
 class VideoDownloadThread(QThread):
@@ -1914,6 +2003,7 @@ def qt_message_handler(mode, context, message):
     else:
         mode = logging.DEBUG
     logger.log(mode, message)
+    logger.log(mode, context)
 
 
 if __name__ == "__main__":

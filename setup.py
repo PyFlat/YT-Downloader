@@ -26,6 +26,7 @@ build_exe_options = {
         "xml.etree.ElementTree",
         "ctypes.wintypes",
         "asyncio",
+        "shlex",
     ],
     "excludes": ["tkinter", "yt_dlp", "numpy"],
     "include_files": include_files,

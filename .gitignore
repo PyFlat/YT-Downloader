@@ -22,3 +22,4 @@ data.json
 src/GUI/Icons/convert_svgs.py
 
 config.json
+.env

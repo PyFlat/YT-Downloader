@@ -1460,6 +1460,7 @@ QTableWidget QScrollBar{
      <addaction name="actionDefault"/>
     </widget>
     <addaction name="actionAutomatic_Update_Check"/>
+    <addaction name="actionBeta_Versions"/>
     <addaction name="actionShow_Thumbnails"/>
     <addaction name="actionDefault_Resolution"/>
     <addaction name="actionMaximum_Threads"/>
@@ -1641,6 +1642,20 @@ QTableWidget QScrollBar{
   <action name="actionDefault">
    <property name="text">
     <string>Default</string>
+   </property>
+  </action>
+  <action name="actionBeta_Versions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <selectedoff>appdata/images/square.png</selectedoff>
+     <selectedon>appdata/images/check-square.png</selectedon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Beta Versions</string>
    </property>
   </action>
  </widget>
