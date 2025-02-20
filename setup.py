@@ -36,7 +36,7 @@ executables = [Executable("main.py", base=base, icon="appdata/images/app-icon.ic
 
 setup(
     name="youtube_downloader",
-    version=VERSION,
+    version=VERSION[1:],
     description="Youtube Downloader",
     options={"build_exe": build_exe_options},
     executables=executables,
