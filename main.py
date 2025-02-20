@@ -1065,7 +1065,7 @@ class Downloader:
             sys.exit(0)
 
     def download_yt_dlp(self, force=False):
-        if self.yt_dlp_installed and not force:
+        if self.yt_dlp_installed == True and not force:
             date_format = "%Y-%m-%d %H:%M:%S.%f"
             installation_date = datetime.datetime.strptime(
                 self.yt_dlp_date, date_format
@@ -1754,6 +1754,7 @@ class UpdateThread(QThread):
             return
 
         jsonResponse: list[dict[str, any]] = response.json()
+        del response
 
         self.current_version_is_latest = VERSION >= jsonResponse[0].get("tag_name")
         self.current_version_is_beta = bool(re.search(r"-beta(\.\d+)?$", VERSION))
