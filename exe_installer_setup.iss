@@ -50,6 +50,10 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; 
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\{#MyAppIconFile}"
 
 [Run]
+Filename: "{cmd}"; Parameters: "/C del /S /Q ""{app}\lib\appdata\__init__.pyc"""; Flags: runhidden
+Filename: "{cmd}"; Parameters: "/C del /S /Q ""{app}\lib\src\__init__.pyc"""; Flags: runhidden
+Filename: "{cmd}"; Parameters: "/C for /R ""{app}\lib\appdata"" %F in (__init__.pyc) do del ""%F"""; Flags: runhidden
+Filename: "{cmd}"; Parameters: "/C for /R ""{app}\lib\src"" %F in (__init__.pyc) do del ""%F"""; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
