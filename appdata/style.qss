@@ -3,6 +3,7 @@
 	color: white;
 	font-size: 25px;
 	outline: none;
+    border: none;
 	background-color:  #323C5A;
 }
 
@@ -217,18 +218,18 @@ QMenu {
     border: 1px solid white;
     border-radius: 2px;
 }
-
-QMenu::item {
-    background: transparent;
-}
 QMenu::item:selected {
     background: #515670;
 }
-
+QMenu::icon:checked {
+    border: none;
+}
+QMenuBar::item, QMenu::item {
+    background-color: transparent;
+}
 QMenuBar::item:selected{
     background: #3f435a;
 }
-
 QScrollBar {
     width: 8px;
     padding-top: 10px;
