@@ -994,7 +994,7 @@ class Downloader:
             skip = QPushButton(self.tm.get_inline_string("skip-update"))
             msg_box.addButton(skip, QMessageBox.ActionRole)
             res = msg_box.exec()
-            if res == 0:
+            if res == 2:
                 self.update_self(tag)
 
     def search_for_updates(self, call_origin_menu: bool, call_origin_search: bool):
@@ -1060,7 +1060,7 @@ class Downloader:
             QMessageBox.Yes | QMessageBox.No,
         ):
             logger.info("Update download finished, updating now")
-            os.popen(f"start appdata/win_installer_v{tag}.exe")
+            os.popen(f"start appdata/pyflat_yt_dl_win_installer_{tag}.exe")
             mw.close()
             sys.exit(0)
 
