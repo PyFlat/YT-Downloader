@@ -10,6 +10,7 @@ mainwindow_ui.py
 ui_mainwindow.py
 
 build_exe.bat
+build_exe_admin.bat
 
 yt_dlp
 
@@ -23,4 +24,3 @@ src/GUI/Icons/convert_svgs.py
 
 config.json
 .env
-*.lnk
