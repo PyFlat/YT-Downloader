@@ -5,6 +5,9 @@
 #define MyAppPublisher "PyFlat Studios"
 #define MyAppExeName "main.exe"
 #define MyAppIconFile "appdata/images/app-icon.ico"
+#define BaseBuildDir "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-"
+#define BuildDir BaseBuildDir + AppPythonVersion
+
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -35,13 +38,13 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\frozen_application_license.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\python3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\python312.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\appdata\*"; DestDir: "{app}\appdata"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\languages\*"; DestDir: "{app}\languages"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\Johannes\Documents\GitHub\YT-Downloader\build\exe.win-amd64-3.12\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\frozen_application_license.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\python3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\python{#StringChange(AppPythonVersion, '.', '')}.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\appdata\*"; DestDir: "{app}\appdata"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildDir}\languages\*"; DestDir: "{app}\languages"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildDir}\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
