@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from typing import List
 
 from src.Logger import Logger
 
@@ -297,11 +298,12 @@ class Downloader:
 
     def show_video_select(self):
         videos = []
-        for index, playlist_object in enumerate(self.data.playlist_data_objects):
+        playlist_data_objects: List[DataHandler] = self.data.playlist_data_objects
+        for index, playlist_object in enumerate(playlist_data_objects):
             videos.append(
                 {
                     "title": playlist_object.title,
-                    "uploader": playlist_object.author,
+                    "uploader": playlist_object.uploader,
                     "playlist_index": index,
                     "selected": True if index + 1 in self.selected_ids else False,
                 }
@@ -677,7 +679,6 @@ class Downloader:
             info != {}
             and info["webpage_url_domain"] != None
             and info["webpage_url_domain"] == "youtube.com"
-            and info["channel"] != None
             and info != False
         ):
             self.cur_link = cur_link
@@ -1244,8 +1245,7 @@ class DataHandler:
         self.playlist = playlist
         self.url = url
         self.title = str(info["title"])
-        self.uploader = info["channel"]
-        self.author = info["channel"]
+        self.uploader = info["channel"] or info["channel_id"]
         self.info = info
         self.file_name_threads = []
 
@@ -1417,7 +1417,7 @@ class DataHandler:
     def download(self, row=None):
         if row == None:
             data = [
-                self.author,
+                self.uploader,
                 self.title,
                 self.vid_ext.upper(),
                 self.vid_res,
