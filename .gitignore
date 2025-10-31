@@ -13,6 +13,8 @@ ui_mainwindow.py
 
 build_exe.bat
 
+build_exe_admin.bat
+
 yt_dlp
 
 *.ini
@@ -29,3 +31,5 @@ thumbnails/
 data.json
 
 test.py
+
+.env
