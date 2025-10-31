@@ -216,7 +216,7 @@ class Downloader:
         self.search_activated = True
         self.new_widget_thread_running = False
         self.update_thread = None
-        self.downloads = []
+        self.downloads: list[DataHandler] = []
         self.cur_process = []
         self.selected_ids = []
         self.loading = False
@@ -1248,6 +1248,7 @@ class DataHandler:
         self.uploader = info["channel"] or info["channel_id"]
         self.info = info
         self.file_name_threads = []
+        self.playlist_data_objects: list[DataHandler] = []
 
         if skip:
             return
@@ -1408,8 +1409,12 @@ class DataHandler:
 
         def download_next(index):
             if index < len(dl.selected_ids):
-                video_id = dl.selected_ids[index] - 1
-                self.playlist_data_objects[video_id].prepare_for_download(ext, res)
+                video_id: int = dl.selected_ids[index] - 1
+                playlist_data_object = self.playlist_data_objects[video_id]
+                playlist_data_object_copy = DataHandler(
+                    playlist_data_object.url, playlist_data_object.info, skip=True
+                )
+                playlist_data_object_copy.prepare_for_download(ext, res)
                 QTimer.singleShot(1000, lambda: download_next(index + 1))
 
         download_next(0)
