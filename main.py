@@ -1241,11 +1241,11 @@ class Downloader:
 
 
 class DataHandler:
-    def __init__(self, url, info, playlist=False, skip=False):
+    def __init__(self, url, info: dict, playlist=False, skip=False):
         self.playlist = playlist
         self.url = url
         self.title = str(info["title"])
-        self.uploader = info["channel"] or info["channel_id"]
+        self.uploader = info.get("channel") or info.get("channel_id")
         self.info = info
         self.file_name_threads = []
         self.playlist_data_objects: list[DataHandler] = []
